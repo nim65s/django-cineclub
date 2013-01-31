@@ -1,0 +1,143 @@
+h1 {
+    text-align: center;
+    font-family: "DejaVu Sans Mono";
+    font-size: 1.5em;
+    border-bottom: 1px silver dashed;
+}
+
+#main {
+    width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5px;
+}
+
+#menu {
+    float: right;
+    width: 19%;
+    padding-left: 5px;
+    background-color: #313131;
+    border-left: solid 1px black;
+    border-bottom: solid 1px black;
+    border-top: solid 1px black;
+    border-radius: 15px 0px 0px 15px;
+    font-family: "DejaVu Sans";
+    color: #B7B795;
+}
+
+#menu h1 {
+    color: #D7D787;
+}
+
+#blog_content {
+    float: left;
+    width: 80%;
+}
+
+.commentaire {
+    border-top: solid 1px black;
+    border-left: solid 1px black;
+    border-radius: 15px 0px 15px 0px;
+    background-color: white;
+    padding: 3px;
+    min-height: 60px;
+}
+
+.auteur {
+    float: right;
+    width: auto;
+    border-left: solid 1px black;
+    border-bottom: solid 1px black;
+    border-radius: 0px 0px 0px 20px / 10px;
+}
+
+article {
+    border-right: solid 1px black;
+    border-bottom: solid 1px black;
+    margin-bottom: 5px;
+    border-radius: 0px 0px 15px 0px;
+    background-color: white;
+}
+
+.article-title {
+    max-width: 245px;
+    float: left;
+    text-align: center;
+}
+
+article h2 {
+    border-left: solid 1px black;
+    border-bottom: solid 1px black;
+    border-radius: 0px 0px 0px 20px / 10px;
+    color: #313131;
+    font-family: "DejaVu Sans";
+    margin-top: 0;
+    min-height: 1.35em;
+}
+
+h2 {
+    font-size: 1.3em;
+}
+
+.article-content {
+    margin-left: 255px;
+    margin-right: 2px;
+}
+
+aside {
+    float: right;
+}
+
+.pubdate {
+    float: right;
+}
+
+#clearboth, .cat {
+    clear: both;
+}
+
+.navbar {
+    min-width: 1000px;
+}
+
+.navbar-fixed-top .navbar-inner {
+    padding: 0 20px 0 20px;
+}
+
+body {
+    padding-top: 40px;
+    background: #D9D9D9;
+}
+
+.navbar-inner .brand {
+    background: black;
+    color: lime;
+    text-shadow: 0 0 0 white;
+    width: 300px;
+    font-size: 2em;
+    text-align: center;
+}
+
+#cv_content {
+    float: left;
+    width: 80%;
+}
+
+#cv_content h2 {
+    text-align: center;
+    font-size: 1.4em;
+    background-color: #2056ae;
+}
+
+#cv_content h3 {
+    font-size: 1.25em;
+}
+
+#cv_content h4 {
+    font-size:1.1em;
+}
+
+#cv_content img {
+    clear: both;
+    float: right;
+}
