@@ -8,9 +8,14 @@
         <link href="{{ STATIC_URL }}nim.css" rel="stylesheet" media="screen">
         <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
         <!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+        <style>
+            #sortable { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+            #sortable li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }
+            #sortable li span { position: absolute; margin-left: -1.3em; }
+        </style>
     </head>
     <body>
-        <header class="navbar navbar-fixed-top">
+        <header class="navbar">
             <div class="navbar-inner">
                 <a class="brand" href="/">CINÉ \o/</a>
                 {% if request.user.is_authenticated %}

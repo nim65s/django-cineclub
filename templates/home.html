@@ -2,10 +2,10 @@
 
 {% block content %}
 
-{% for date, set in films.iteritems %}
-    <h5>{{ date.date }} ({{date.categorie}})</h5>
-    {% for film, vote in set.iteritems %}
-        <p>{{ film }} » {{ vote }}</p>
+{% for date, liste in films.iteritems %}
+    <h2>{{ date.date }} ({{date.get_categorie}})</h2>
+    {% for score, film in liste %}
+        <p>{{ score }} » <a href="/films#{{ film.slug }}">{{ film.titre }}</a></p>
     {% endfor %}
 {% endfor %}
 

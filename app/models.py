@@ -1,6 +1,8 @@
+#-*- coding: utf-8 -*-
+from django.db.models import URLField, TextField, ImageField, BooleanField, SlugField
 from django.db.models import CharField, DateField, DateTimeField, IntegerField
-from django.db.models import URLField, TextField, ImageField, BooleanField
 from django.db.models import Model, ForeignKey, ManyToManyField
+from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
 
 CHOIX_CATEGORIE = (
@@ -13,12 +15,34 @@ class Film(Model):
     titre = CharField(max_length=200,primary_key=True)
     respo = ForeignKey(User)
     description = TextField()
+    slug = SlugField(unique=True, blank=True)
 
     categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D')
 
     titre_vo = CharField(max_length=200,blank=True, null=True)
     imdb = URLField(blank=True, null=True)
     allocine = URLField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.titre)
+
+        # Création des votes
+        N = len(Film.objects.all()) + 1
+        for personne in User.objects.all():
+            try:
+                Vote.objects.get(film=self, personne=personne)
+            except Vote.DoesNotExist:
+                v = Vote()
+                v.choix = N
+                v.film = self
+                v.personne = personne
+                v.save()
+        super(Film, self).save(*args, **kwargs)
+
+    def get_categorie(self):
+        if self.categorie == 'D':
+            return 'Divertissement'
+        return 'Culture'
 
     def score_absolu(self):
         score = 0
@@ -38,7 +62,7 @@ class Vote(Model):
     choix = IntegerField()
     plusse = BooleanField(default=False)
 
-    unique_together = (("film", "personne"), ("personne", "choix"))
+    unique_together = ("film", "personne")
 
     def __unicode__(self):
         if self.plusse:
@@ -49,6 +73,17 @@ class Vote(Model):
 class Date(Model):
     date = DateField()
     categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D')
+
+    def get_categorie(self):
+        if self.categorie == 'D':
+            return 'Divertissement'
+        return 'Culture'
+
+    def presents(self):
+        return self.dispo_set.filter(dispo='O')
+
+    def pas_surs(self):
+        return self.dispo_set.filter(dispo='N')
 
     def __unicode__(self):
         return u'%s:%s' % (self.date, self.categorie)

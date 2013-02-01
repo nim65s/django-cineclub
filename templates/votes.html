@@ -1,7 +1,32 @@
 {% extends "main.html" %}
 
 {% block content %}
-{% for vote in votes %}
-{{ vote }}
-{% endfor %}
+    <ul id="sortable">
+        {% for vote in votes %}
+            <li class="ui-state-default" data-slug="{{ vote.film.slug }}"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>{{ vote.film.titre }}</li>
+        {% endfor %}
+    </ul>
+
+    <form action="voter" method="POST">
+        {% csrf_token %}
+        <input name="ordre" value="" type="hidden"/>
+        <input type="submit" value="Voter !" />
+    </form>
+{% endblock %}
+
+
+{% block scripts_jquery %}
+    <script>
+        $(function() {
+            $( "#sortable" ).sortable({
+                placeholder: "ui-state-highlight",
+                stop: function(event, ui) {
+                    var data = "";
+                    $("#sortable li").each(function(i, el){ data += $(el).data("slug") + ","; });
+                    $("form > [name='ordre']").val(data);
+                }
+            });
+            $( "#sortable" ).disableSelection();
+        });
+    </script>
 {% endblock %}

@@ -2,6 +2,21 @@
 
 {% block content %}
 {% for film in films %}
-{{ film }}
+    <div id="{{ film.slug }}">
+        <h2>{{ film.titre }} ({{ film.categorie }})</h2>
+        <p>{{ film.description }}</p>
+        <dl>
+            <dt>respo</dt><dd>{{ film.respo }}</dd>
+            {% if film.titre_vo %}
+                <dt>Titre VO</dt><dd>{{ film.titre_vo }}</dd>
+            {% endif %}
+            {% if film.imdb %}
+                <dt>IMDB</dt><dd>{{ film.imdb }}</dd>
+            {% endif %}
+            {% if film.allocine %}
+                <dt>Allociné</dt><dd>{{ film.allocine }}</dd>
+            {% endif %}
+        </dl>
+    </div>
 {% endfor %}
 {% endblock %}
