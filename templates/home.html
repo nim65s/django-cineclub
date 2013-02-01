@@ -1,5 +1,12 @@
 {% extends "main.html" %}
 
 {% block content %}
-<h1>Home</h1>
+
+{% for date, set in films.iteritems %}
+    <h5>{{ date.date }} ({{date.categorie}})</h5>
+    {% for film, vote in set.iteritems %}
+        <p>{{ film }} » {{ vote }}</p>
+    {% endfor %}
+{% endfor %}
+
 {% endblock %}

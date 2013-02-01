@@ -13,23 +13,35 @@
         <header class="navbar navbar-fixed-top">
             <div class="navbar-inner">
                 <a class="brand" href="/">CINÉ \o/</a>
-                <nav role="navigation">
-                    <ul class="nav">
-                        <li><a href="/">Accueil</a></li>
-                        <li><a href="/films">Films</a></li>
-                        <li><a href="/dates">Dates</a></li>
-                        <li><a href="/votes">Votes</a></li>
-                    </ul>
-                </nav>
-                <form class="navbar-search pull-right form-search">
-                    <div class="input-append">
-                        <input type="text" class="search-query input-medium" placeholder="Search">
-                        <button class="btn" type="submit"><i class="icon-search"></i></button>
-                    </div>
-                </form>
+                {% if request.user.is_authenticated %}
+                    <nav role="navigation">
+                        <ul class="nav">
+                            <li><a href="/">Prévisions</a></li>
+                            <li><a href="/films">Films</a></li>
+                            <li><a href="/dates">Dates</a></li>
+                            <li><a href="/votes">Votes</a></li>
+                            <li><a href="/logout">Logout</a></li>
+                        </ul>
+                    </nav>
+                    <form class="navbar-search pull-right form-search">
+                        <div class="input-append">
+                            <input type="text" class="search-query input-medium" placeholder="Search">
+                            <button class="btn" type="submit"><i class="icon-search"></i></button>
+                        </div>
+                    </form>
+                {% else %}
+                    <form method="post" action="/" class="form-inline navbar-form pull-right">
+                        {% csrf_token %}
+                        <input type="text" name="username" class="input-small" placeholder="Login" autofocus required>
+                        <input type="password" name="password" class="input-small" placeholder="Password" required>
+                        <input type="checkbox" checked>
+                        <button type="submit" class="btn">log.in</button>
+                    </form>
+                {% endif %}
             </div>
         </header>
-        {% block section %}
+        {% if erreur %} {{ erreur }} {% endif %}
+        {% block content %}
         {% endblock %}
         <script src="http://code.jquery.com/jquery-latest.js"></script>
         <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>

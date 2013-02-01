@@ -3,16 +3,16 @@ from django.db.models import URLField, TextField, ImageField, BooleanField
 from django.db.models import Model, ForeignKey, ManyToManyField
 from django.contrib.auth.models import User
 
+CHOIX_CATEGORIE = (
+        ('D', 'Divertissement'),
+        ('C', 'Culture'),
+        )
+
 
 class Film(Model):
     titre = CharField(max_length=200,primary_key=True)
     respo = ForeignKey(User)
     description = TextField()
-
-    CHOIX_CATEGORIE = (
-            ('D', 'Divertissement'),
-            ('C', 'Culture'),
-            )
 
     categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D')
 
@@ -20,7 +20,7 @@ class Film(Model):
     imdb = URLField(blank=True, null=True)
     allocine = URLField(blank=True, null=True)
 
-    def score(self):
+    def score_absolu(self):
         score = 0
         for vote in self.vote_set.all():
             score -= vote.choix
@@ -48,7 +48,17 @@ class Vote(Model):
 
 class Date(Model):
     date = DateField()
+    categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D')
+
+    def __unicode__(self):
+        return u'%s:%s' % (self.date, self.categorie)
+
+
+class Dispo(Model):
+    date = ForeignKey(Date)
     personne = ForeignKey(User)
+
+    unique_together = ("date", "personne")
 
     CHOIX_DISPO = (
             ('O', 'Dispo'),
@@ -60,6 +70,7 @@ class Date(Model):
 
     def __unicode__(self):
         return u'%s %s %s' % (self.date, self.dispo, self.personne)
+
 
 class Commentaire(Model):
     date = DateTimeField(auto_now=True, auto_now_add=True)
