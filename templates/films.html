@@ -22,9 +22,9 @@
 <div>
     {% for film in films %}
         <div id="{{ film.slug }}">
-            {% if film.respo == request.user %}<a href="films?edit={{ film.slug }}">{% endif %}
+            {% if film.respo == request.user.cinephile %}<a href="films?edit={{ film.slug }}">{% endif %}
             <h2>{{ film.titre }} ({{ film.get_categorie }})</h2>
-            {% if film.respo == request.user %}</a>{% endif %}
+            {% if film.respo == request.user.cinephile %}</a>{% endif %}
             <p>{{ film.description }}</p>
             <dl>
                 <dt>respo</dt><dd>{{ film.respo }}</dd>

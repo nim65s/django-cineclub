@@ -45,7 +45,7 @@ STATIC_ROOT = '/public/static'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/static/'
+STATIC_URL = 'http://yuppa.saurel.me/public/static/'
 
 MEDIA_URL = '/public/media/'
 
@@ -80,13 +80,6 @@ ROOT_URLCONF = 'cine.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'cine.wsgi.application'
-
-TEMPLATE_DIRS = (
-        '/home/nim/cine/templates',
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -142,6 +135,19 @@ TEMPLATE_CONTEXT_PROCESSORS = (
         "django.core.context_processors.tz",
         'django.core.context_processors.request',
         "django.contrib.messages.context_processors.messages")
+
+
+PASSWORD_HASHERS = (
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.BCryptPasswordHasher',
+    'django.contrib.auth.hashers.SHA1PasswordHasher',
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+    'django.contrib.auth.hashers.CryptPasswordHasher',
+)
+
+
+
 
 try:
     from local_settings import *

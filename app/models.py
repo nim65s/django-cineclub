@@ -108,6 +108,7 @@ class Soiree(Model):
     categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D')
 
     def save(self, *args, **kwargs):
+        super(Soiree, self).save(*args, **kwargs)
         # Création des Dispos
         for cinephile in Cinephile.objects.all():
             try:
@@ -118,7 +119,6 @@ class Soiree(Model):
                 d.cinephile = cinephile
                 d.dispo = 'N'
                 d.save()
-        super(Soiree, self).save(*args, **kwargs)
 
     def get_categorie(self):
         if self.categorie == 'D':
@@ -132,7 +132,7 @@ class Soiree(Model):
         return self.dispo_set.filter(dispo='N')
 
     def __unicode__(self):
-        return u'%s:%s' % (self.soiree, self.categorie)
+        return u'%s:%s' % (self.date, self.categorie)
 
 
 class Dispo(Model):

@@ -14,6 +14,11 @@ framework.
 
 """
 import os
+import sys
+
+sys.path.append('/var/www/cine/cine')
+sys.path.append('/var/www/cine')
+sys.path.append('/var/www')
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 

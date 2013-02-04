@@ -56,13 +56,13 @@ def films(request):
         form = FilmForm(request.POST)
         if 'slug' in form.data:
             film = Film.objects.get(slug=form.data['slug'])
-            #if film.respo == request.user: TODO
+            #if film.respo == request.user.cinephile: TODO
             form = FilmForm(request.POST, instance=film)
         if form.is_valid():
-            form.instance.respo = request.user
+            form.instance.respo = request.user.cinephile
             form.save()
             c['success'] = u'Film ajouté avec succès :D'
-            c['edit'] = false
+            c['edit'] = False
         else:
             c['error'] = u'Le formulaire n’est pas valide.'
     else:
@@ -79,12 +79,16 @@ def films(request):
 
 @login_required
 def dispos(request):
-    dispos = Dispo.objects.filter(cinephile=request.user)
+    dispos = Dispo.objects.filter(cinephile=request.user.cinephile)
     c = { 'dispos': dispos }
     if request.method == 'POST':
         for dispo in dispos:
-            dispo.dispo = request.POST[dispo.soiree.date.strftime('%Y-%m-%d')]
-            dispo.save()
+            strdate = dispo.soiree.date.strftime('%Y-%m-%d')
+            if strdate in request.POST:
+                dispo.dispo = request.POST[strdate]
+                dispo.save()
+            else:
+                print strdate, 'not in POST:', request.POST
     return render_to_response('dispos.html', c, context_instance=RequestContext(request))
 
 
@@ -96,9 +100,9 @@ def votes(request):
             i = 1
             for vote in ordre:
                 film = Film.objects.get(slug=vote)
-                v = Vote.objects.get(film=film, cinephile=request.user)
+                v = Vote.objects.get(film=film, cinephile=request.user.cinephile)
                 v.choix = i
                 v.save()
                 i += 1
-    c = { 'votes': Vote.objects.filter(cinephile=request.user).order_by("choix") }
+    c = { 'votes': Vote.objects.filter(cinephile=request.user.cinephile).order_by("choix") }
     return render_to_response('votes.html', c, context_instance=RequestContext(request))
