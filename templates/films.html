@@ -23,7 +23,7 @@
     {% for film in films %}
         <div id="{{ film.slug }}">
             {% if film.respo == request.user %}<a href="films?edit={{ film.slug }}">{% endif %}
-            <h2>{{ film.titre }} ({{ film.categorie }})</h2>
+            <h2>{{ film.titre }} ({{ film.get_categorie }})</h2>
             {% if film.respo == request.user %}</a>{% endif %}
             <p>{{ film.description }}</p>
             <dl>
