@@ -28,13 +28,13 @@
                 <dt>Présents</dt>
                 <dd>
                     {% for disp in dispo.date.presents %}
-                        {{ disp.personne }}{% if not forloop.last %},{% endif %}
+                        {{ disp.cinephile }}{% if not forloop.last %},{% endif %}
                     {% endfor %}
                 </dd>
                 <dt>Pas sûrs</dt>
                 <dd>
                     {% for disp in dispo.date.pas_surs %}
-                        {{ disp.personne }}{% if not forloop.last %},{% endif %}
+                        {{ disp.cinephile }}{% if not forloop.last %},{% endif %}
                     {% endfor %}
                 </dd>
             </dl>

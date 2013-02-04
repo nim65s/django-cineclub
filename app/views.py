@@ -29,19 +29,19 @@ def logout_view(request):
 def previsions(request):
     films = {}
     N = len(Film.objects.all()) * len(User.objects.all()) + 1
-    for date in Date.objects.all():
-        if Dispo.objects.filter(dispo='O', date=date):
-            films[date] = []
-            for film in Film.objects.filter(categorie=date.categorie):
+    for soiree in Soiree.objects.all():
+        if Dispo.objects.filter(dispo='O', soiree=soiree):
+            films[soiree] = []
+            for film in Film.objects.filter(categorie=soiree.categorie):
                 score = N
-                for dispo in Dispo.objects.filter(dispo='O', date=date):
-                    vote = Vote.objects.get(personne=dispo.personne, film=film)
+                for dispo in Dispo.objects.filter(dispo='O', soiree=soiree):
+                    vote = Vote.objects.get(cinephile=dispo.cinephile, film=film)
                     score -= vote.choix
                     if vote.plusse:
                         score += 1
-                films[date].append((score, film))
-            films[date].sort()
-            films[date].reverse()
+                films[soiree].append((score, film))
+            films[soiree].sort()
+            films[soiree].reverse()
     c = { 'films': films }
     return render_to_response('home.html', c, context_instance=RequestContext(request))
 
@@ -79,11 +79,11 @@ def films(request):
 
 @login_required
 def dispos(request):
-    dispos = Dispo.objects.filter(personne=request.user)
+    dispos = Dispo.objects.filter(cinephile=request.user)
     c = { 'dispos': dispos }
     if request.method == 'POST':
         for dispo in dispos:
-            dispo.dispo = request.POST[dispo.date.date.strftime('%Y-%m-%d')]
+            dispo.dispo = request.POST[dispo.soiree.date.strftime('%Y-%m-%d')]
             dispo.save()
     return render_to_response('dispos.html', c, context_instance=RequestContext(request))
 
@@ -96,9 +96,9 @@ def votes(request):
             i = 1
             for vote in ordre:
                 film = Film.objects.get(slug=vote)
-                v = Vote.objects.get(film=film, personne=request.user)
+                v = Vote.objects.get(film=film, cinephile=request.user)
                 v.choix = i
                 v.save()
                 i += 1
-    c = { 'votes': Vote.objects.filter(personne=request.user).order_by("choix") }
+    c = { 'votes': Vote.objects.filter(cinephile=request.user).order_by("choix") }
     return render_to_response('votes.html', c, context_instance=RequestContext(request))
