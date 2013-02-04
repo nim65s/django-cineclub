@@ -4,6 +4,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
 
 from models import *
 
@@ -47,8 +48,32 @@ def previsions(request):
 
 @login_required
 def films(request):
-    c = { 'films': Film.objects.all() }
-    print request.user
+    c = {
+            'films': Film.objects.all(),
+            'edit': True
+            }
+    if request.method == 'POST':
+        form = FilmForm(request.POST)
+        if 'slug' in form.data:
+            film = Film.objects.get(slug=form.data['slug'])
+            #if film.respo == request.user: TODO
+            form = FilmForm(request.POST, instance=film)
+        if form.is_valid():
+            form.instance.respo = request.user
+            form.save()
+            c['success'] = u'Film ajouté avec succès :D'
+            c['edit'] = false
+        else:
+            c['error'] = u'Le formulaire n’est pas valide.'
+    else:
+        if 'edit' in request.GET:
+            film = Film.objects.get(slug=request.GET['edit'])
+            c['slug'] = film.slug
+            form = FilmForm(instance=film)
+        else:
+            form = FilmForm()
+            c['edit'] = False
+    c['filmform'] = form
     return render_to_response('films.html', c, context_instance=RequestContext(request))
 
 

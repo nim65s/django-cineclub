@@ -4,6 +4,7 @@ from django.db.models import CharField, DateField, DateTimeField, IntegerField
 from django.db.models import Model, ForeignKey, ManyToManyField
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
+from django.forms import ModelForm
 
 CHOIX_CATEGORIE = (
         ('D', 'Divertissement'),
@@ -56,6 +57,12 @@ class Film(Model):
         return self.titre
 
 
+class FilmForm(ModelForm):
+    class Meta:
+        model = Film
+        exclude = ('respo', 'slug')
+
+
 class Vote(Model):
     film = ForeignKey(Film)
     personne = ForeignKey(User)
@@ -73,6 +80,19 @@ class Vote(Model):
 class Date(Model):
     date = DateField()
     categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D')
+
+    def save(self, *args, **kwargs):
+        # Création des Dispos
+        for personne in User.objects.all():
+            try:
+                Dispo.objects.get(date=self, personne=personne)
+            except Dispo.DoesNotExist:
+                d = Dispo()
+                d.date = self
+                d.personne = personne
+                d.dispo = 'N'
+                d.save()
+        super(Date, self).save(*args, **kwargs)
 
     def get_categorie(self):
         if self.categorie == 'D':

@@ -1,22 +1,44 @@
 {% extends "main.html" %}
 
 {% block content %}
-{% for film in films %}
-    <div id="{{ film.slug }}">
-        <h2>{{ film.titre }} ({{ film.categorie }})</h2>
-        <p>{{ film.description }}</p>
-        <dl>
-            <dt>respo</dt><dd>{{ film.respo }}</dd>
-            {% if film.titre_vo %}
-                <dt>Titre VO</dt><dd>{{ film.titre_vo }}</dd>
-            {% endif %}
-            {% if film.imdb %}
-                <dt>IMDB</dt><dd>{{ film.imdb }}</dd>
-            {% endif %}
-            {% if film.allocine %}
-                <dt>Allociné</dt><dd>{{ film.allocine }}</dd>
-            {% endif %}
-        </dl>
-    </div>
-{% endfor %}
+<div style="float: right;">
+    {% if edit %}
+        <h2>Modifier : </h2>
+    {% else %}
+        <h2>Ajouter : </h2>
+    {% endif %}
+    <form method="post" action="films">
+        {% csrf_token %}
+        {{ filmform }}
+        <br>
+        {% if edit %}
+            <input type="hidden" name="slug" value="{{ slug }}" />
+            <button type="submit" class="btn">Modifier</button>
+        {% else %}
+            <button type="submit" class="btn">Ajouter \o/</button>
+        {% endif %}
+    </form>
+</div>
+<div>
+    {% for film in films %}
+        <div id="{{ film.slug }}">
+            {% if film.respo == request.user %}<a href="films?edit={{ film.slug }}">{% endif %}
+            <h2>{{ film.titre }} ({{ film.categorie }})</h2>
+            {% if film.respo == request.user %}</a>{% endif %}
+            <p>{{ film.description }}</p>
+            <dl>
+                <dt>respo</dt><dd>{{ film.respo }}</dd>
+                {% if film.titre_vo %}
+                    <dt>Titre VO</dt><dd>{{ film.titre_vo }}</dd>
+                {% endif %}
+                {% if film.imdb %}
+                    <dt>IMDB</dt><dd>{{ film.imdb }}</dd>
+                {% endif %}
+                {% if film.allocine %}
+                    <dt>Allociné</dt><dd>{{ film.allocine }}</dd>
+                {% endif %}
+            </dl>
+        </div>
+    {% endfor %}
+</div>
 {% endblock %}
