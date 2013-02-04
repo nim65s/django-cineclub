@@ -29,7 +29,7 @@ def logout_view(request):
 def previsions(request):
     films = {}
     N = len(Film.objects.all()) * len(User.objects.all()) + 1
-    for date in Date.objects.filter(date__gte=datetime.date.today()):
+    for date in Date.objects.all():
         if Dispo.objects.filter(dispo='O', date=date):
             films[date] = []
             for film in Film.objects.filter(categorie=date.categorie):
@@ -78,19 +78,18 @@ def films(request):
 
 
 @login_required
-def dates(request):
-    c = { 'dates': Date.objects.filter(date__gte=datetime.date.today()) }
-    return render_to_response('dates.html', c, context_instance=RequestContext(request))
+def dispos(request):
+    dispos = Dispo.objects.filter(personne=request.user)
+    c = { 'dispos': dispos }
+    if request.method == 'POST':
+        for dispo in dispos:
+            dispo.dispo = request.POST[dispo.date.date.strftime('%Y-%m-%d')]
+            dispo.save()
+    return render_to_response('dispos.html', c, context_instance=RequestContext(request))
 
 
 @login_required
 def votes(request):
-    c = { 'votes': Vote.objects.filter(personne=request.user).order_by("choix") }
-    return render_to_response('votes.html', c, context_instance=RequestContext(request))
-
-
-@login_required
-def voter(request):
     if request.method == 'POST':
         ordre = request.POST['ordre'].split(',')[:-1]
         if ordre:
@@ -101,4 +100,5 @@ def voter(request):
                 v.choix = i
                 v.save()
                 i += 1
-    return votes(request)
+    c = { 'votes': Vote.objects.filter(personne=request.user).order_by("choix") }
+    return render_to_response('votes.html', c, context_instance=RequestContext(request))

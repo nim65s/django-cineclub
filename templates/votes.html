@@ -7,7 +7,7 @@
         {% endfor %}
     </ul>
 
-    <form action="voter" method="POST">
+    <form action="votes" method="POST">
         {% csrf_token %}
         <input name="ordre" value="" type="hidden"/>
         <input type="submit" value="Voter !" />

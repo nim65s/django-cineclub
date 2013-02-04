@@ -11,6 +11,8 @@ CHOIX_CATEGORIE = (
         ('C', 'Culture'),
         )
 
+# Dès qu’on ajoute une personne, il faut ajouter les Votes & Dispos…
+
 
 class Film(Model):
     titre = CharField(max_length=200,primary_key=True)

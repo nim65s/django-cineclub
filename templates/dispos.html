@@ -1,0 +1,51 @@
+{% extends "main.html" %}
+
+{% block content %}
+
+<form method="post" action="dispos">
+    <button type="submit" class="btn">Modifier</button>
+    {% csrf_token %}
+    {% for dispo in dispos %}
+        <div id="{{ dispo.date.date|date:"Y-m-d"}}">
+            <h2>{{ dispo.date.date }}</h2>
+            <div class="btn-group" data-toggle="buttons-radio">
+                <button type="button" class="btn btn-primary btn-success{% if dispo.dispo == 'O' %} active{% endif %}" data-toggle="button">
+                    Présent
+                    <input type="radio" name="{{ dispo.date.date|date:"Y-m-d" }}" value="O" {% if dispo.dispo == 'O' %}checked{% endif %}/>
+                </button>
+                <button type="button" class="btn btn-primary btn-danger{% if dispo.dispo == 'P' %} active{% endif %}" data-toggle="button">
+                    Absent
+                    <input type="radio" name="{{ dispo.date.date|date:"Y-m-d" }}" value="P" {% if dispo.dispo == 'P' %}checked{% endif %}/>
+                </button>
+                <button type="button" class="btn btn-primary{% if dispo.dispo == 'N' %} active{% endif %}" data-toggle="button">
+                    Ne sais pas
+                    <input type="radio" name="{{ dispo.date.date|date:"Y-m-d" }}" value="N" {% if dispo.dispo == 'N' %}checked{% endif %}/>
+                </button>
+            </div>
+            <dl>
+                <dt>Catégorie</dt>
+                <dd>{{ dispo.date.get_categorie }}</dd>
+                <dt>Présents</dt>
+                <dd>
+                    {% for disp in dispo.date.presents %}
+                        {{ disp.personne }}{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                </dd>
+                <dt>Pas sûrs</dt>
+                <dd>
+                    {% for disp in dispo.date.pas_surs %}
+                        {{ disp.personne }}{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                </dd>
+            </dl>
+        </div>
+    {% endfor %}
+</form>
+
+{% endblock %}
+
+{% block scripts_jquery %}
+    <script>
+        $('.nav-tabs').button()
+    </script>
+{% endblock %}
