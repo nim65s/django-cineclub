@@ -106,3 +106,6 @@ def votes(request):
                 i += 1
     c = { 'votes': Vote.objects.filter(cinephile=request.user.cinephile).order_by("choix") }
     return render_to_response('votes.html', c, context_instance=RequestContext(request))
+
+def about(request):
+    return render_to_response('about.html', {}, context_instance=RequestContext(request))

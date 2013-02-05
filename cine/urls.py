@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     url(r'^films$', 'app.views.films'),
     url(r'^dispos$', 'app.views.dispos'),
     url(r'^votes$', 'app.views.votes'),
+    url(r'^about$', 'app.views.about'),
 
     url(r'^admin/', include(admin.site.urls)),
 )
