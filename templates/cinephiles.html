@@ -1,0 +1,11 @@
+{% extends "main.html" %}
+
+{% block content %}
+<h1>Cinéphiles</h1>
+{% for cinephile in cinephiles %}
+    <div>
+        <h2>{{ cinephile.username }}</h2>
+        <p>{{ cinephile.first_name }} {{ cinephile.last_name }}: <a href="mailto:{{ cinephile.email }}">mail</a> − <a href="films?respo={{ cinephile.username }}">films</a></p>
+    </div>
+{% endfor %}
+{% endblock %}

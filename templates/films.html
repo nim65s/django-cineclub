@@ -1,44 +1,49 @@
 {% extends "main.html" %}
 
 {% block content %}
-<div style="float: right;">
-    {% if edit %}
-        <h2>Modifier : </h2>
-    {% else %}
-        <h2>Ajouter : </h2>
-    {% endif %}
-    <form method="post" action="films">
-        {% csrf_token %}
-        {{ filmform }}
-        <br>
-        {% if edit %}
-            <input type="hidden" name="slug" value="{{ slug }}" />
-            <button type="submit" class="btn">Modifier</button>
-        {% else %}
-            <button type="submit" class="btn">Ajouter \o/</button>
-        {% endif %}
-    </form>
-</div>
-<div>
-    {% for film in films %}
-        <div id="{{ film.slug }}">
-            {% if film.respo == request.user.cinephile %}<a href="films?edit={{ film.slug }}">{% endif %}
-            <h2>{{ film.titre }} ({{ film.get_categorie }})</h2>
-            {% if film.respo == request.user.cinephile %}</a>{% endif %}
-            <p>{{ film.description }}</p>
-            <dl>
-                <dt>respo</dt><dd>{{ film.respo }}</dd>
-                {% if film.titre_vo %}
-                    <dt>Titre VO</dt><dd>{{ film.titre_vo }}</dd>
-                {% endif %}
-                {% if film.imdb %}
-                    <dt>IMDB</dt><dd>{{ film.imdb }}</dd>
-                {% endif %}
-                {% if film.allocine %}
-                    <dt>Allociné</dt><dd>{{ film.allocine }}</dd>
-                {% endif %}
-            </dl>
+<h1>Films</h1>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span9">
+            {% for film in films %}
+                <div id="{{ film.slug }}">
+                    <h2>{{ film.titre }} ({{ film.get_categorie }}) {% if film.respo == request.user %}(<a href="films?edit={{ film.slug }}">edit</a>){% endif %}</h2>
+                    <p>{{ film.description }}</p>
+                    <dl>
+                        <dt>respo</dt><dd>{{ film.respo.username }} (<a href="films?respo={{ film.respo.username }}">filtrer</a>)</dd>
+                        {% if film.titre_vo %}
+                            <dt>Titre VO</dt><dd>{{ film.titre_vo }}</dd>
+                        {% endif %}
+                        {% if film.imdb or film.allocine %}
+                            <dt>Lien(s)</dt>
+                            <dd>
+                                {% if film.imdb %}<a href="{{ film.imdb }}">IMDB</a>{% endif %}
+                                {% if film.allocine %}<a href="{{ film.allocine }}">Allociné</a>{% endif %}
+                            </dd>
+                        {% endif %}
+                    </dl>
+                </div>
+            {% endfor %}
         </div>
-    {% endfor %}
+        <div class="span3">
+            {% if edit %}
+                <h2>Modifier : </h2>
+            {% else %}
+                <h2>Ajouter : </h2>
+            {% endif %}
+            <form method="post" action="films">
+                {% csrf_token %}
+                {{ filmform.as_p }}
+                <br>
+                {% if edit %}
+                    <input type="hidden" name="slug" value="{{ slug }}" />
+                    <button type="submit" class="btn">Modifier</button>
+                {% else %}
+                    <button type="submit" class="btn">Ajouter \o/</button>
+                {% endif %}
+            </form>
+        </div>
+    </div>
 </div>
+
 {% endblock %}

@@ -150,3 +150,7 @@ div.btn-group[data-toggle=buttons-radio] input[type=radio] {
   height:     100%;
   opacity:    0.0;
 }
+
+input, textarea, select {
+    width:   100%;
+}

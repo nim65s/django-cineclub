@@ -12,35 +12,35 @@ CHOIX_CATEGORIE = (
         )
 
 
-class Cinephile(User):
-    def save(self, *args, **kwargs):
-        # Création des votes
-        N = len(Film.objects.all()) + 1
-        for film in Film.objects.all():
-            try:
-                Vote.objects.get(film=film, cinephile=self)
-            except Vote.DoesNotExist:
-                v = Vote()
-                v.choix = N
-                v.film = film
-                v.cinephile = self
-                v.save()
-        for soiree in Soiree.objects.all():
-            try:
-                Dispo.objects.get(soiree=soiree, cinephile=self)
-            except Dispo.DoesNotExist:
-                d = Dispo()
-                d.dispo = 'N'
-                d.soiree = soiree
-                d.cinephile = self
-                d.save()
-        super(Cinephile, self).save(*args, **kwargs)
-
+#class Cinephile(User):
+#    def save(self, *args, **kwargs):
+#        # Création des votes
+#        N = len(Film.objects.all()) + 1
+#        for film in Film.objects.all():
+#            try:
+#                Vote.objects.get(film=film, cinephile=self)
+#            except Vote.DoesNotExist:
+#                v = Vote()
+#                v.choix = N
+#                v.film = film
+#                v.cinephile = self
+#                v.save()
+#        for soiree in Soiree.objects.all():
+#            try:
+#                Dispo.objects.get(soiree=soiree, cinephile=self)
+#            except Dispo.DoesNotExist:
+#                d = Dispo()
+#                d.dispo = 'N'
+#                d.soiree = soiree
+#                d.cinephile = self
+#                d.save()
+#        super(Cinephile, self).save(*args, **kwargs)
+#
 
 
 class Film(Model):
-    titre = CharField(max_length=200,primary_key=True)
-    respo = ForeignKey(Cinephile)
+    titre = CharField(max_length=200, unique=True)
+    respo = ForeignKey(User)
     description = TextField()
     slug = SlugField(unique=True, blank=True)
 
@@ -55,7 +55,7 @@ class Film(Model):
 
         # Création des votes
         N = len(Film.objects.all()) + 1
-        for cinephile in Cinephile.objects.all():
+        for cinephile in User.objects.all():
             try:
                 Vote.objects.get(film=self, cinephile=cinephile)
             except Vote.DoesNotExist:
@@ -89,9 +89,28 @@ class FilmForm(ModelForm):
         exclude = ('respo', 'slug')
 
 
+class UserForm(ModelForm):
+    class Meta:
+        model = User
+        exclude = ('password', 'is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions')
+
+    def __init__(self, *args, **kwargs):
+        super(UserForm, self).__init__(*args, **kwargs)
+        instance = getattr(self, 'instance', None)
+        if instance and instance.id:
+            self.fields['last_login'].widget.attrs['readonly'] = True
+            self.fields['date_joined'].widget.attrs['readonly'] = True
+
+    def clean_last_login(self):
+        return self.instance.last_login
+
+    def clean_date_joined(self):
+        return self.instance.date_joined
+
+
 class Vote(Model):
     film = ForeignKey(Film)
-    cinephile = ForeignKey(Cinephile)
+    cinephile = ForeignKey(User)
     choix = IntegerField()
     plusse = BooleanField(default=False)
 
@@ -110,7 +129,7 @@ class Soiree(Model):
     def save(self, *args, **kwargs):
         super(Soiree, self).save(*args, **kwargs)
         # Création des Dispos
-        for cinephile in Cinephile.objects.all():
+        for cinephile in User.objects.all():
             try:
                 Dispo.objects.get(soiree=self, cinephile=cinephile)
             except Dispo.DoesNotExist:
@@ -126,10 +145,10 @@ class Soiree(Model):
         return 'Culture'
 
     def presents(self):
-        return self.dispo_set.filter(dispo='O')
+        return ", ".join([ cinephile.cinephile.username for cinephile in self.dispo_set.filter(dispo='O')])
 
     def pas_surs(self):
-        return self.dispo_set.filter(dispo='N')
+        return ", ".join([ cinephile.cinephile.username for cinephile in self.dispo_set.filter(dispo='N')])
 
     def __unicode__(self):
         return u'%s:%s' % (self.date, self.categorie)
@@ -137,7 +156,7 @@ class Soiree(Model):
 
 class Dispo(Model):
     soiree = ForeignKey(Soiree)
-    cinephile = ForeignKey(Cinephile)
+    cinephile = ForeignKey(User)
 
     unique_together = ("soiree", "cinephile")
 
@@ -155,6 +174,6 @@ class Dispo(Model):
 
 class Commentaire(Model):
     date = DateTimeField(auto_now=True, auto_now_add=True)
-    posteur = ForeignKey(Cinephile)
+    posteur = ForeignKey(User)
     film = ForeignKey(Film)
     commentaire = TextField()

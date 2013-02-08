@@ -1,6 +1,7 @@
 {% extends "main.html" %}
 
 {% block content %}
+<h1>Prévisions</h1>
 
 {% for soiree, liste in films.iteritems %}
     <h2>{{ soiree.date }} ({{soiree.get_categorie}})</h2>

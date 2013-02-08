@@ -1,6 +1,7 @@
 {% extends "main.html" %}
 
 {% block content %}
+<h1>Disponibilités</h1>
 
 <form method="post" action="dispos">
     <button type="submit" class="btn">Modifier</button>
@@ -9,37 +10,25 @@
         <div id="{{ dispo.soiree.date|date:"Y-m-d"}}">
             <h2>{{ dispo.soiree.date }}</h2>
             <div class="btn-group" data-toggle="buttons-radio">
-                <button type="button" class="btn btn-primary btn-success{% if dispo.dispo == 'O' %} active{% endif %}" data-toggle="button">
-                    Présent
-                    <input type="radio" name="{{ dispo.soiree.date|date:"Y-m-d" }}" value="O" {% if dispo.dispo == 'O' %}checked{% endif %}/>
-                </button>
-                <button type="button" class="btn btn-primary btn-danger{% if dispo.dispo == 'P' %} active{% endif %}" data-toggle="button">
-                    Absent
-                    <input type="radio" name="{{ dispo.soiree.date|date:"Y-m-d" }}" value="P" {% if dispo.dispo == 'P' %}checked{% endif %}/>
-                </button>
-                <button type="button" class="btn btn-primary{% if dispo.dispo == 'N' %} active{% endif %}" data-toggle="button">
-                    Ne sais pas
-                    <input type="radio" name="{{ dispo.soiree.date|date:"Y-m-d" }}" value="N" {% if dispo.dispo == 'N' %}checked{% endif %}/>
-                </button>
+                <button type="button" class="btn btn-primary btn-success{% if dispo.dispo == 'O' %} active{% endif %}" data-name="{{dispo.soiree.date|date:"Y-m-d"}},O">Présent</button>
+                <button type="button" class="btn btn-primary btn-danger{% if dispo.dispo == 'P' %} active{% endif %}" data-name="{{dispo.soiree.date|date:"Y-m-d"}},P">Absent</button>
+                <button type="button" class="btn btn-primary{% if dispo.dispo == 'N' %} active{% endif %}" data-name="{{dispo.soiree.date|date:"Y-m-d"}},N">Ne sais pas</button>
             </div>
             <dl>
                 <dt>Catégorie</dt>
                 <dd>{{ dispo.soiree.get_categorie }}</dd>
                 <dt>Présents</dt>
-                <dd>
-                    {% for disp in dispo.soiree.presents %}
-                        {{ disp.cinephile }}{% if not forloop.last %},{% endif %}
-                    {% endfor %}
-                </dd>
+                <dd> {{ dispo.soiree.presents }}</dd>
                 <dt>Pas sûrs</dt>
-                <dd>
-                    {% for disp in dispo.soiree.pas_surs %}
-                        {{ disp.cinephile }}{% if not forloop.last %},{% endif %}
-                    {% endfor %}
-                </dd>
+                <dd> {{ dispo.soiree.pas_surs }}</dd>
             </dl>
         </div>
     {% endfor %}
+    <div id="realform">
+        {% for dispo in dispos %}
+            <input type="hidden" name="{{ dispo.soiree.date|date:"Y-m-d" }}" value="{{ dispo.dispo }}" />
+        {% endfor %}
+    </div>
 </form>
 
 {% endblock %}
@@ -47,5 +36,11 @@
 {% block scripts_jquery %}
     <script>
         $('.nav-tabs').button()
+        $(function () {
+            $('div.btn-group button[data-name]').on('click', function() {
+                var select = $(this).data('name').split(',');
+                $('#realform > input[name="'+select[0]+'"]').attr('value', select[1]);
+            });
+        });
     </script>
 {% endblock %}

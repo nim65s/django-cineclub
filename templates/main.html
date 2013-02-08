@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <title>CinéNim \o/ α</title>
+        <title>CinéNim \o/ β</title>
         <link rel="icon" type="image/png" href="{{ STATIC_URL }}favicon.png" />
         <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet" media="screen">
         <link href="{{ STATIC_URL }}nim.css" rel="stylesheet" media="screen">
@@ -17,7 +17,7 @@
     <body>
         <header class="navbar">
             <div class="navbar-inner">
-                <a class="brand" href="/">CinéNim \o/ α</a>
+                <a class="brand" href="/">CinéNim \o/ β</a>
                 {% if request.user.is_authenticated %}
                     <nav role="navigation">
                         <ul class="nav">
@@ -25,28 +25,31 @@
                             <li><a href="/films">Films</a></li>
                             <li><a href="/dispos">Dispos</a></li>
                             <li><a href="/votes">Votes</a></li>
+                            <li><a href="/cinephiles">Cinéphiles</a></li>
+                            <li><a href="/faq">FAQ</a></li>
                             <li><a href="/about">À Propos…</a></li>
+                            <li><a href="/profil">Mon profil</a></li>
                             <li><a href="/logout">Logout</a></li>
                         </ul>
                     </nav>
-                    <form class="navbar-search pull-right form-search">
+                    <!--<form class="navbar-search pull-right form-search">
                         <div class="input-append">
                             <input type="text" class="search-query input-medium" placeholder="Search">
                             <button class="btn" type="submit"><i class="icon-search"></i></button>
                         </div>
-                    </form>
+                    </form>-->
                 {% else %}
                     <form method="post" action="/" class="form-inline navbar-form pull-right">
                         {% csrf_token %}
                         <input type="text" name="username" class="input-small" placeholder="Login" autofocus required>
                         <input type="password" name="password" class="input-small" placeholder="Password" required>
-                        <input type="checkbox" checked>
                         <button type="submit" class="btn">log.in</button>
                     </form>
                 {% endif %}
             </div>
         </header>
-        {% if erreur %} {{ erreur }} {% endif %}
+        {% if error %}<p style="background-color: #da4f49;">{{ error }}</p>{% endif %}
+        {% if success %}<p style="background-color: #51a351;">{{ success }}</p>{% endif %}
         {% block content %}
         {% endblock %}
         <script src="http://code.jquery.com/jquery-latest.js"></script>
