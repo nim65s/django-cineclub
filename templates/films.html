@@ -14,6 +14,8 @@
                         {% if film.titre_vo %}
                             <dt>Titre VO</dt><dd>{{ film.titre_vo }}</dd>
                         {% endif %}
+                        {% if film.realisateur %}<dt>Réalisateur</dt><dd>{{ film.realisateur }}</dd>{% endif %}
+                        {% if film.duree %}<dt>Durée</dt><dd>{{ film.duree }}</dd>{% endif %}
                         {% if film.imdb or film.allocine %}
                             <dt>Lien(s)</dt>
                             <dd>

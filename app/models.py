@@ -49,9 +49,12 @@ class Film(Model):
     titre_vo = CharField(max_length=200,blank=True, null=True)
     imdb = URLField(blank=True, null=True)
     allocine = URLField(blank=True, null=True)
+    realisateur = CharField(max_length=200, null=True, blank=True)
+    duree = CharField(max_length=20, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.titre)
+        super(Film, self).save(*args, **kwargs)
 
         # Création des votes
         N = len(Film.objects.all()) + 1
@@ -64,7 +67,6 @@ class Film(Model):
                 v.film = self
                 v.cinephile = cinephile
                 v.save()
-        super(Film, self).save(*args, **kwargs)
 
     def get_categorie(self):
         if self.categorie == 'D':
