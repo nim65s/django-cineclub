@@ -69,9 +69,7 @@ class Film(Model):
                 v.save()
 
     def get_categorie(self):
-        if self.categorie == 'D':
-            return 'Divertissement'
-        return 'Culture'
+        return dict(CHOIX_CATEGORIE)[self.categorie]
 
     def score_absolu(self):
         score = 0
@@ -142,9 +140,7 @@ class Soiree(Model):
                 d.save()
 
     def get_categorie(self):
-        if self.categorie == 'D':
-            return 'Divertissement'
-        return 'Culture'
+        return dict(CHOIX_CATEGORIE)[self.categorie]
 
     def presents(self):
         return ", ".join([ cinephile.cinephile.username for cinephile in self.dispo_set.filter(dispo='O')])
