@@ -39,10 +39,11 @@
                         </div>
                     </form>-->
                 {% else %}
-                    <form method="post" action="/" class="form-inline navbar-form pull-right">
+                    <form method="post" action="/login" class="form-inline navbar-form pull-right">
                         {% csrf_token %}
                         <input type="text" name="username" class="input-small" placeholder="Login" autofocus required>
                         <input type="password" name="password" class="input-small" placeholder="Password" required>
+                        {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}" />{% endif %}
                         <button type="submit" class="btn">log.in</button>
                     </form>
                 {% endif %}

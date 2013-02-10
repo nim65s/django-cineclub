@@ -5,6 +5,7 @@ from django.template import RequestContext
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+from django.http import HttpResponseRedirect
 
 from models import *
 
@@ -18,14 +19,16 @@ def logout_view(request):
 
 def previsions(request):
     c = {}
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
-        if user is not None:
-            login(request, user)
-        else:
-            c['error'] = "Échec sur l’authentification…"
+    #if request.method == 'POST':
+    #    username = request.POST['username']
+    #    password = request.POST['password']
+    #    user = authenticate(username=username, password=password)
+    #    if user is not None:
+    #        login(request, user)
+    #        if 'next' in request.GET:
+    #            return HttpResponseRedirect(request.GET['next'])
+    #    else:
+    #        c['error'] = "Échec sur l’authentification…"
 
     films = {}
     N = len(Film.objects.all()) * len(User.objects.all()) + 1

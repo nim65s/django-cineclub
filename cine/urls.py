@@ -5,6 +5,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', 'app.views.previsions'),
+    url(r'^login$', 'django.contrib.auth.views.login', {'template_name': 'home.html'}),
     url(r'^logout$', 'app.views.logout_view'),
     url(r'^films$', 'app.views.films'),
     url(r'^dispos$', 'app.views.dispos'),

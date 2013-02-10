@@ -6,36 +6,17 @@ from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
 from django.forms import ModelForm
 
+from django.core.mail import EmailMultiAlternatives
+
+from email.MIMEText import MIMEText
+from email.Header import Header
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 CHOIX_CATEGORIE = (
         ('D', 'Divertissement'),
         ('C', 'Culture'),
         )
-
-
-#class Cinephile(User):
-#    def save(self, *args, **kwargs):
-#        # Création des votes
-#        N = len(Film.objects.all()) + 1
-#        for film in Film.objects.all():
-#            try:
-#                Vote.objects.get(film=film, cinephile=self)
-#            except Vote.DoesNotExist:
-#                v = Vote()
-#                v.choix = N
-#                v.film = film
-#                v.cinephile = self
-#                v.save()
-#        for soiree in Soiree.objects.all():
-#            try:
-#                Dispo.objects.get(soiree=soiree, cinephile=self)
-#            except Dispo.DoesNotExist:
-#                d = Dispo()
-#                d.dispo = 'N'
-#                d.soiree = soiree
-#                d.cinephile = self
-#                d.save()
-#        super(Cinephile, self).save(*args, **kwargs)
-#
 
 
 class Film(Model):
@@ -56,8 +37,17 @@ class Film(Model):
         self.slug = slugify(self.titre)
         super(Film, self).save(*args, **kwargs)
 
-        # Création des votes
+        # Création des votes & envoi des mails de notif
         N = len(Film.objects.all()) + 1
+
+        subject = u"[CineNim] Film ajouté !"
+        mailfrom = u'notifications@cine.saurel.me'
+
+        message_html = u"Hello :) <br /><br />%s a proposé un nouveau film : <a href='http://cine.saurel.me/films#%s'>%s</a>.<br />" % (self.respo.username, self.slug, self.titre )
+        message_html += u"Tu peux donc aller actualiser ton <a href='http://cine.saurel.me/votes'>classement</a> \\o/ <br /><br /> @+ !"
+        message_txt = u"Hello :)\n\n%s a proposé un nouveau film : %s (http://cine.saurel.me/films#%s' ; " % (self.respo.username, self.titre, self.slug )
+        message_txt += u"tu peux donc aller actualiser ton classement (http://cine.saurel.me/votes) \\o/ \n\n @+!"
+
         for cinephile in User.objects.all():
             try:
                 Vote.objects.get(film=self, cinephile=cinephile)
@@ -67,6 +57,10 @@ class Film(Model):
                 v.film = self
                 v.cinephile = cinephile
                 v.save()
+
+                msg = EmailMultiAlternatives(subject, message_txt, mailfrom, [cinephile.email])
+                msg.attach_alternative(message_html, "text/html")
+                msg.send()
 
     def get_categorie(self):
         return dict(CHOIX_CATEGORIE)[self.categorie]
@@ -128,7 +122,13 @@ class Soiree(Model):
 
     def save(self, *args, **kwargs):
         super(Soiree, self).save(*args, **kwargs)
-        # Création des Dispos
+
+        subject = u'[CineNim] Soirée ajoutée !'
+        mailfrom = u'notifications@cine.saurel.me'
+
+        message_html = u'Hello :) <br /><br />Le %s, une soirée %s est proposée ; tu peux donc aller mettre à jour tes <a href="http://cine.saurel.me/dispos">disponibilités</a> \\o/ <br /><br />@+ !' % (self.date, self.get_categorie())
+        message_txt = u'Hello :) \n\nLe %s, une soirée %s est proposée ; tu peux donc aller mettre à jour tes disponibilités : http://cine.saurel.me/dispos \\o/ \n\n@+ !' % (self.date, self.get_categorie())
+
         for cinephile in User.objects.all():
             try:
                 Dispo.objects.get(soiree=self, cinephile=cinephile)
@@ -138,6 +138,10 @@ class Soiree(Model):
                 d.cinephile = cinephile
                 d.dispo = 'N'
                 d.save()
+
+                msg = EmailMultiAlternatives(subject, message_txt, mailfrom, [cinephile.email])
+                msg.attach_alternative(message_html, "text/html")
+                msg.send()
 
     def get_categorie(self):
         return dict(CHOIX_CATEGORIE)[self.categorie]

@@ -125,6 +125,9 @@ LOGGING = {
 }
 
 LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = '/'
+DEFAULT_FROM_EMAIL = 'notifications@cine.saurel.me'
+DEFAULT_CHARSET = 'utf-8'
 
 TEMPLATE_CONTEXT_PROCESSORS = ( 
         "django.contrib.auth.context_processors.auth",
