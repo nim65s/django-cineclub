@@ -30,6 +30,9 @@
                             <li><a href="/about">À Propos…</a></li>
                             <li><a href="/profil">Mon profil</a></li>
                             <li><a href="/logout">Logout</a></li>
+                            {% if request.user.is_superuser %}
+                                <li><a href="/admin">Admin</a></li>
+                            {% endif %}
                         </ul>
                     </nav>
                     <!--<form class="navbar-search pull-right form-search">
