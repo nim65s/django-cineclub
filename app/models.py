@@ -82,7 +82,7 @@ class Film(Model):
 class FilmForm(ModelForm):
     class Meta:
         model = Film
-        exclude = ('respo', 'slug')
+        exclude = ('respo', 'slug', 'vu')
 
 
 class UserForm(ModelForm):
