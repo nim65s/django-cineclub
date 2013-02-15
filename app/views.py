@@ -69,6 +69,7 @@ def films(request):
         if form.is_valid():
             form.instance.respo = request.user
             form.save()
+            form = FilmForm()
             if new:
                 c['success'] = u'Film ajouté :D'
             else:
