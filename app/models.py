@@ -33,6 +33,8 @@ class Film(Model):
     realisateur = CharField(max_length=200, null=True, blank=True)
     duree = CharField(max_length=20, null=True, blank=True)
 
+    vu = BooleanField(default=False)
+
     def save(self, *args, **kwargs):
         self.slug = slugify(self.titre)
         super(Film, self).save(*args, **kwargs)

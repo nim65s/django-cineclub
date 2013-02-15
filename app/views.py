@@ -31,11 +31,11 @@ def previsions(request):
     #        c['error'] = "Échec sur l’authentification…"
 
     films = {}
-    N = len(Film.objects.all()) * len(User.objects.all()) + 1
-    for soiree in Soiree.objects.all():
+    N = len(Film.objects.filter(vu=False)) * len(User.objects.all()) + 1
+    for soiree in Soiree.objects.filter(date__gt=datetime.date.today()):
         if Dispo.objects.filter(dispo='O', soiree=soiree):
             films[soiree] = []
-            for film in Film.objects.filter(categorie=soiree.categorie):
+            for film in Film.objects.filter(categorie=soiree.categorie,vu=False):
                 score = N
                 for dispo in Dispo.objects.filter(dispo='O', soiree=soiree):
                     vote = Vote.objects.get(cinephile=dispo.cinephile, film=film)
@@ -52,7 +52,8 @@ def previsions(request):
 @login_required
 def films(request):
     c = {
-            'films': Film.objects.all(),
+            'films': Film.objects.filter(vu=False),
+            'films_vu': Film.objects.filter(vu=True),
             'edit': True
             }
     new = True
@@ -85,14 +86,14 @@ def films(request):
             c['edit'] = False
         if 'respo' in request.GET:
             respo = User.objects.get(username=request.GET['respo'])
-            c['films'] = Film.objects.filter(respo=respo)
+            c['films'] = Film.objects.filter(respo=respo,)
     c['filmform'] = form
     return render_to_response('films.html', c, context_instance=RequestContext(request))
 
 
 @login_required
 def dispos(request):
-    dispos = Dispo.objects.filter(cinephile=request.user)
+    dispos = Dispo.objects.filter(cinephile=request.user,soiree__date__gt=datetime.date.today())
     c = { 'dispos': dispos }
     if request.method == 'POST':
         for dispo in dispos:
@@ -117,7 +118,7 @@ def votes(request):
                 v.choix = i
                 v.save()
                 i += 1
-    c = { 'votes': Vote.objects.filter(cinephile=request.user).order_by("choix") }
+    c = { 'votes': Vote.objects.filter(cinephile=request.user, film__vu=False).order_by("choix") }
     return render_to_response('votes.html', c, context_instance=RequestContext(request))
 
 
