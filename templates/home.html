@@ -3,7 +3,9 @@
 {% block content %}
 <h1>Prévisions</h1>
 
-{% for soiree, liste in films.iteritems %}
+<p>/!\Les résultats se font en fonction des disponibilités des gens… donc <a href="dispos">allez renseigner les votres !</a>/!\</p>
+
+{% for soiree, liste in films %}
     <h2>{{ soiree.date }} ({{soiree.get_categorie}})</h2>
     {% for score, film in liste %}
         <p>{{ score }} » <a href="/films#{{ film.slug }}">{{ film.titre }}</a></p>

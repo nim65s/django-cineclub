@@ -19,32 +19,22 @@ def logout_view(request):
 
 def previsions(request):
     c = {}
-    #if request.method == 'POST':
-    #    username = request.POST['username']
-    #    password = request.POST['password']
-    #    user = authenticate(username=username, password=password)
-    #    if user is not None:
-    #        login(request, user)
-    #        if 'next' in request.GET:
-    #            return HttpResponseRedirect(request.GET['next'])
-    #    else:
-    #        c['error'] = "Échec sur l’authentification…"
-
-    films = {}
+    films = []
     N = len(Film.objects.filter(vu=False)) * len(User.objects.all()) + 1
-    for soiree in Soiree.objects.filter(date__gt=datetime.date.today()):
+    for soiree in Soiree.objects.order_by('date').filter(date__gt=datetime.date.today()):
         if Dispo.objects.filter(dispo='O', soiree=soiree):
-            films[soiree] = []
-            for film in Film.objects.filter(categorie=soiree.categorie,vu=False):
+            films.append((soiree,[]))
+            for film in Film.objects.filter(categorie=soiree.categorie, vu=False):
                 score = N
                 for dispo in Dispo.objects.filter(dispo='O', soiree=soiree):
                     vote = Vote.objects.get(cinephile=dispo.cinephile, film=film)
                     score -= vote.choix
                     if vote.plusse:
                         score += 1
-                films[soiree].append((score, film))
-            films[soiree].sort()
-            films[soiree].reverse()
+                films[-1][1].append((score, film))
+            films[-1][1].sort()
+            films[-1][1].reverse()
+    print films
     c['films'] = films
     return render_to_response('home.html', c, context_instance=RequestContext(request))
 
@@ -94,7 +84,7 @@ def films(request):
 
 @login_required
 def dispos(request):
-    dispos = Dispo.objects.filter(cinephile=request.user,soiree__date__gt=datetime.date.today())
+    dispos = Dispo.objects.filter(cinephile=request.user,soiree__date__gt=datetime.date.today()).order_by('soiree__date')
     c = { 'dispos': dispos }
     if request.method == 'POST':
         for dispo in dispos:
