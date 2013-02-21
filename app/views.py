@@ -21,7 +21,7 @@ def previsions(request):
     c = {}
     films = []
     N = len(Film.objects.filter(vu=False)) * len(User.objects.all()) + 1
-    for soiree in Soiree.objects.order_by('date').filter(date__gt=datetime.date.today()):
+    for soiree in Soiree.objects.order_by('date').filter(date__gte=datetime.date.today()):
         if Dispo.objects.filter(dispo='O', soiree=soiree):
             films.append((soiree,[]))
             for film in Film.objects.filter(categorie=soiree.categorie, vu=False):
@@ -84,7 +84,7 @@ def films(request):
 
 @login_required
 def dispos(request):
-    dispos = Dispo.objects.filter(cinephile=request.user,soiree__date__gt=datetime.date.today()).order_by('soiree__date')
+    dispos = Dispo.objects.filter(cinephile=request.user,soiree__date__gte=datetime.date.today()).order_by('soiree__date')
     c = { 'dispos': dispos }
     if request.method == 'POST':
         for dispo in dispos:
