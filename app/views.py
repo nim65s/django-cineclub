@@ -1,11 +1,11 @@
 #-*- coding: utf-8 -*-
 
-from django.shortcuts import render_to_response
-from django.template import RequestContext
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
 from django.http import HttpResponseRedirect
+from django.shortcuts import render
+from django.shortcuts import render_to_response, get_object_or_404, render
+from django.template import RequestContext
 
 from models import *
 
@@ -81,6 +81,24 @@ def films(request):
     c['filmform'] = form
     return render_to_response('films.html', c, context_instance=RequestContext(request))
 
+
+@login_required
+def comms(request, slug):
+    film = get_object_or_404(Film, slug=slug)
+    edit = False # Not yet implemented
+    if request.method == 'POST':
+        form = CommForm(request.POST)
+        if form.is_valid():
+            form.instance.posteur = request.user
+            form.instance.film = film
+            form.save()
+    c = {
+            'film': film,
+            'comms': film.commentaire_set.all().order_by('date'),
+            'form': CommForm(),
+            'edit': edit,
+            }
+    return render_to_response('comms.html', c, context_instance=RequestContext(request))
 
 @login_required
 def dispos(request):

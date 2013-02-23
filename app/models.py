@@ -181,3 +181,11 @@ class Commentaire(Model):
     posteur = ForeignKey(User)
     film = ForeignKey(Film)
     commentaire = TextField()
+
+    # TODO: mail \o/
+
+
+class CommForm(ModelForm):
+    class Meta:
+        model = Commentaire
+        exclude = ('date', 'posteur', 'film')

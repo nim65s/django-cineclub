@@ -14,6 +14,7 @@ urlpatterns = patterns('',
     url(r'^faq$', 'app.views.faq'),
     url(r'^about$', 'app.views.about'),
     url(r'^profil$', 'app.views.profil'),
+    url(r'^comms/(?P<slug>[^/]+)$', 'app.views.comms'),
 
     url(r'^admin/', include(admin.site.urls)),
 )
