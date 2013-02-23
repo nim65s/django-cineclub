@@ -34,7 +34,6 @@ def previsions(request):
                 films[-1][1].append((score, film))
             films[-1][1].sort()
             films[-1][1].reverse()
-    print films
     c['films'] = films
     return render_to_response('home.html', c, context_instance=RequestContext(request))
 
