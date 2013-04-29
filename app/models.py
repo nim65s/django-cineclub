@@ -182,8 +182,21 @@ class Commentaire(Model):
     film = ForeignKey(Film)
     commentaire = TextField()
 
-    # TODO: mail \o/
+    def save(self, *args, **kwargs):
+        super(Commentaire, self).save(*args, **kwargs)
 
+        subject = u'[CineNim] Nouveau commentaire sur %s' % self.film.titre
+        mailfrom = u'notifications@cine.saurel.me'
+
+        message_html = u'Hello :) <br /><br />%s a posté un nouveau commentaire sur %s: vous pouvez aller le voir <a href="http://cine.saurel.me/comms/%s">ici</a> \\o/ <br /><br />@+ !' % (self.posteur.username, self.film.titre, self.film.slug)
+        message_txt = u'Hello :) \n\n%s a posté un nouveau commentaire sur %s: vous pouvez aller le voir sur http://cine.saurel.me/comms/%s \\o/ \n\n@+ !' % (self.posteur.username, self.film.titre, self.film.slug)
+
+        msg = EmailMultiAlternatives(subject, message_txt, mailfrom, ['cinenim@list.bde.enseeiht.fr'])
+        msg.attach_alternative(message_html, "text/html")
+        msg.send()
+
+    def __unicode__(self):
+        return u'Commentaire de %s sur %s le %s: %s' % (self.posteur.username, self.film.titre, self.date, self.commentaire[:20])
 
 class CommForm(ModelForm):
     class Meta:

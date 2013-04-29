@@ -3,7 +3,7 @@
 {% block content %}
 <h1>Commentaires sur {{ film.titre }}</h1>
 <div id="{{ film.slug }}">
-    <h2>{{ film.titre }} ({{ film.get_categorie }}) {% if film.respo == request.user %}(<a href="films?edit={{ film.slug }}">edit</a>){% endif %}</h2>
+    <h2>{{ film.titre }} ({{ film.get_categorie }}) {% if film.vu %}(déjà vu) {% endif %}{% if film.respo == request.user %}(<a href="films?edit={{ film.slug }}">edit</a>){% endif %}</h2>
     <p>{{ film.description|linebreaks }}</p>
     <dl>
         <dt>respo</dt><dd>{{ film.respo.username }} − <a href="films?respo={{ film.respo.username }}">ne voir que ses films</a></dd>
