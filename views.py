@@ -36,7 +36,7 @@ def previsions(request):
             films[-1][1].sort()
             films[-1][1].reverse()
     c['films'] = films
-    return render_to_response('home.html', c, context_instance=RequestContext(request))
+    return render_to_response('cine/home.html', c, context_instance=RequestContext(request))
 
 
 @login_required
@@ -79,7 +79,7 @@ def films(request):
             respo = User.objects.get(username=request.GET['respo'])
             c['films'] = Film.objects.filter(respo=respo,)
     c['filmform'] = form
-    return render_to_response('films.html', c, context_instance=RequestContext(request))
+    return render_to_response('cine/films.html', c, context_instance=RequestContext(request))
 
 
 @login_required
@@ -98,7 +98,7 @@ def comms(request, slug):
             'form': CommForm(),
             'edit': edit,
             }
-    return render_to_response('comms.html', c, context_instance=RequestContext(request))
+    return render_to_response('cine/comms.html', c, context_instance=RequestContext(request))
 
 @login_required
 def dispos(request):
@@ -112,7 +112,7 @@ def dispos(request):
                 dispo.save()
             else:
                 print strdate, 'not in POST:', request.POST
-    return render_to_response('dispos.html', c, context_instance=RequestContext(request))
+    return render_to_response('cine/dispos.html', c, context_instance=RequestContext(request))
 
 
 @login_required
@@ -128,13 +128,13 @@ def votes(request):
                 v.save()
                 i += 1
     c = { 'votes': Vote.objects.filter(cinephile=request.user, film__vu=False).order_by("choix") }
-    return render_to_response('votes.html', c, context_instance=RequestContext(request))
+    return render_to_response('cine/votes.html', c, context_instance=RequestContext(request))
 
 
 @login_required
 def cinephiles(request):
     c = { 'cinephiles': User.objects.all() }
-    return render_to_response('cinephiles.html', c, context_instance=RequestContext(request))
+    return render_to_response('cine/cinephiles.html', c, context_instance=RequestContext(request))
 
 
 @login_required
@@ -162,12 +162,12 @@ def profil(request):
             else:
                 c['error'] = u"Mauvais «Ancien mot de passe»"
     c['form'] = form
-    return render_to_response('profil.html', c, context_instance=RequestContext(request))
+    return render_to_response('cine/profil.html', c, context_instance=RequestContext(request))
 
 
 def faq(request):
-    return render_to_response('faq.html', {}, context_instance=RequestContext(request))
+    return render_to_response('cine/faq.html', {}, context_instance=RequestContext(request))
 
 
 def about(request):
-    return render_to_response('about.html', {}, context_instance=RequestContext(request))
+    return render_to_response('cine/about.html', {}, context_instance=RequestContext(request))
