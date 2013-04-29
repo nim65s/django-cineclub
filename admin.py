@@ -7,5 +7,5 @@ from models import *
 admin.site.register(Film)
 admin.site.register(Vote)
 admin.site.register(Soiree)
-admin.site.register(Dispo)
+admin.site.register(DispoToWatch)
 admin.site.register(Commentaire)

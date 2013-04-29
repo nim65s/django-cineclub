@@ -1,4 +1,4 @@
-from app.models import *
+from cine.models import *
 
 N = len(Film.objects.all()) + 1
 
@@ -14,9 +14,9 @@ for cinephile in User.objects.all():
             v.save()
     for soiree in Soiree.objects.all():
         try:
-            Dispo.objects.get(soiree=soiree, cinephile=cinephile)
-        except Dispo.DoesNotExist:
-            d = Dispo()
+            DispoToWatch.objects.get(soiree=soiree, cinephile=cinephile)
+        except DispoToWatch.DoesNotExist:
+            d = DispoToWatch()
             d.dispo = 'N'
             d.soiree = soiree
             d.cinephile = cinephile

@@ -133,9 +133,9 @@ class Soiree(Model):
 
         for cinephile in User.objects.all():
             try:
-                Dispo.objects.get(soiree=self, cinephile=cinephile)
-            except Dispo.DoesNotExist:
-                d = Dispo()
+                DispoToWatch.objects.get(soiree=self, cinephile=cinephile)
+            except DispoToWatch.DoesNotExist:
+                d = DispoToWatch()
                 d.soiree = self
                 d.cinephile = cinephile
                 d.dispo = 'N'
@@ -158,7 +158,7 @@ class Soiree(Model):
         return u'%s:%s' % (self.date, self.categorie)
 
 
-class Dispo(Model):
+class DispoToWatch(Model):
     soiree = ForeignKey(Soiree)
     cinephile = ForeignKey(User)
 

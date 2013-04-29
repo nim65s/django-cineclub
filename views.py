@@ -22,12 +22,12 @@ def previsions(request):
     films = []
     N = len(Film.objects.filter(vu=False)) * len(User.objects.all()) + 1
     for soiree in Soiree.objects.order_by('date').filter(date__gte=date.today()):
-        if Dispo.objects.filter(dispo='O', soiree=soiree):
+        if DispoToWatch.objects.filter(dispo='O', soiree=soiree):
             films.append((soiree,[]))
             for film in Film.objects.filter(categorie=soiree.categorie, vu=False):
                 if film.respo.dispo_set.filter(soiree=soiree, dispo='O'):
                     score = N
-                    for dispo in Dispo.objects.filter(dispo='O', soiree=soiree):
+                    for dispo in DispoToWatch.objects.filter(dispo='O', soiree=soiree):
                         vote = Vote.objects.get(cinephile=dispo.cinephile, film=film)
                         score -= vote.choix
                         if vote.plusse:
@@ -102,7 +102,7 @@ def comms(request, slug):
 
 @login_required
 def dispos(request):
-    dispos = Dispo.objects.filter(cinephile=request.user,soiree__date__gte=date.today()).order_by('soiree__date')
+    dispos = DispoToWatch.objects.filter(cinephile=request.user,soiree__date__gte=date.today()).order_by('soiree__date')
     c = { 'dispos': dispos }
     if request.method == 'POST':
         for dispo in dispos:
