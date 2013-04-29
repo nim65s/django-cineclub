@@ -1,20 +1,12 @@
 #-*- coding: utf-8 -*-
 
-from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
-from django.shortcuts import render_to_response, get_object_or_404, render
-from django.template import RequestContext
+from django.shortcuts import get_object_or_404, render
 
-from models import *
+from cine.models import *
 
 from datetime import date
-
-
-def logout_view(request):
-    logout(request)
-    return previsions(request)
 
 
 def previsions(request):
@@ -36,7 +28,7 @@ def previsions(request):
             films[-1][1].sort()
             films[-1][1].reverse()
     c['films'] = films
-    return render_to_response('cine/home.html', c, context_instance=RequestContext(request))
+    return render(request, 'cine/home.html', c)
 
 
 @login_required
@@ -55,18 +47,18 @@ def films(request):
                 form = FilmForm(request.POST, instance=film)
                 new = False
             else:
-                c['error'] = u"Vous n’êtes pas respo pour ce film…"
+                messages.error(request, u"Vous n’êtes pas respo pour ce film…")
         if form.is_valid():
             form.instance.respo = request.user
             form.save()
             form = FilmForm()
             if new:
-                c['success'] = u'Film ajouté :D'
+                messages.success(request, u'Film ajouté :D')
             else:
-                c['success'] = u'Film modifié'
+                messages.success(request, u'Film modifié')
             c['edit'] = False
         else:
-            c['error'] = u'Le formulaire n’est pas valide.'
+            messages.error(request, u'Le formulaire n’est pas valide.')
     else:
         if 'edit' in request.GET:
             film = Film.objects.get(slug=request.GET['edit'])
@@ -79,7 +71,7 @@ def films(request):
             respo = User.objects.get(username=request.GET['respo'])
             c['films'] = Film.objects.filter(respo=respo,)
     c['filmform'] = form
-    return render_to_response('cine/films.html', c, context_instance=RequestContext(request))
+    return render(request, 'cine/films.html', c)
 
 
 @login_required
@@ -98,7 +90,7 @@ def comms(request, slug):
             'form': CommForm(),
             'edit': edit,
             }
-    return render_to_response('cine/comms.html', c, context_instance=RequestContext(request))
+    return render(request, 'cine/comms.html', c)
 
 @login_required
 def dispos(request):
@@ -112,7 +104,7 @@ def dispos(request):
                 dispo.save()
             else:
                 print strdate, 'not in POST:', request.POST
-    return render_to_response('cine/dispos.html', c, context_instance=RequestContext(request))
+    return render(request, 'cine/dispos.html', c)
 
 
 @login_required
@@ -128,13 +120,13 @@ def votes(request):
                 v.save()
                 i += 1
     c = { 'votes': Vote.objects.filter(cinephile=request.user, film__vu=False).order_by("choix") }
-    return render_to_response('cine/votes.html', c, context_instance=RequestContext(request))
+    return render(request, 'cine/votes.html', c)
 
 
 @login_required
 def cinephiles(request):
     c = { 'cinephiles': User.objects.all() }
-    return render_to_response('cine/cinephiles.html', c, context_instance=RequestContext(request))
+    return render(request, 'cine/cinephiles.html', c)
 
 
 @login_required
@@ -148,26 +140,26 @@ def profil(request):
                 updated_user = User.objects.get(username=request.POST['old_username'])
                 if updated_user == request.user:
                     form.save()
-                    c['success'] = u"Profil mis à jour"
+                    messages.success(request, u"Profil mis à jour")
                 else:
-                    c['error'] = u"NAMÉHO, c’est pas ton profil ça !"
+                    messages.error(request, u"NAMÉHO, c’est pas ton profil ça !")
         else:
             if request.user.check_password(request.POST['oldpw']):
                 if request.POST['newpw'] == request.POST['verpw']:
                     request.user.set_password(request.POST['newpw'])
                     request.user.save()
-                    c['success'] = u"Mot de passe mis à jour"
+                    messages.success(request, u"Mot de passe mis à jour")
                 else:
-                    c['error'] = u"Les deux mots de passe entrés ne concordent pas"
+                    messages.error(request, u"Les deux mots de passe entrés ne concordent pas")
             else:
-                c['error'] = u"Mauvais «Ancien mot de passe»"
+                messages.error(request, u"Mauvais «Ancien mot de passe»")
     c['form'] = form
-    return render_to_response('cine/profil.html', c, context_instance=RequestContext(request))
+    return render(request, 'cine/profil.html', c)
 
 
 def faq(request):
-    return render_to_response('cine/faq.html', {}, context_instance=RequestContext(request))
+    return render(request, 'cine/faq.html', {})
 
 
 def about(request):
-    return render_to_response('cine/about.html', {}, context_instance=RequestContext(request))
+    return render(request, 'cine/about.html', {})
