@@ -3,7 +3,7 @@ from cine.views import *
 
 
 urlpatterns = patterns('',
-    url(r'^$', previsions, name='previsions'),
+    url(r'^$', previsions, name='home'),
     url(r'^films$', films, name='films'),
     url(r'^dispos$', dispos, name='dispos'),
     url(r'^votes$', votes, name='votes'),
