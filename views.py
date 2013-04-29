@@ -9,7 +9,7 @@ from cine.models import *
 from datetime import date
 
 
-def previsions(request):
+def home(request):
     c = {}
     films = []
     N = len(Film.objects.filter(vu=False)) * len(User.objects.all()) + 1
@@ -127,34 +127,6 @@ def votes(request):
 def cinephiles(request):
     c = { 'cinephiles': User.objects.all() }
     return render(request, 'cine/cinephiles.html', c)
-
-
-@login_required
-def profil(request):
-    form = UserForm(instance=request.user)
-    c = {}
-    if request.method == 'POST':
-        if 'old_username' in request.POST:
-            form = UserForm(request.POST, instance=request.user)
-            if form.is_valid():
-                updated_user = User.objects.get(username=request.POST['old_username'])
-                if updated_user == request.user:
-                    form.save()
-                    messages.success(request, u"Profil mis à jour")
-                else:
-                    messages.error(request, u"NAMÉHO, c’est pas ton profil ça !")
-        else:
-            if request.user.check_password(request.POST['oldpw']):
-                if request.POST['newpw'] == request.POST['verpw']:
-                    request.user.set_password(request.POST['newpw'])
-                    request.user.save()
-                    messages.success(request, u"Mot de passe mis à jour")
-                else:
-                    messages.error(request, u"Les deux mots de passe entrés ne concordent pas")
-            else:
-                messages.error(request, u"Mauvais «Ancien mot de passe»")
-    c['form'] = form
-    return render(request, 'cine/profil.html', c)
 
 
 def faq(request):
