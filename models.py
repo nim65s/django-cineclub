@@ -3,8 +3,10 @@ from django.db.models import URLField, TextField, ImageField, BooleanField, Slug
 from django.db.models import CharField, DateField, DateTimeField, IntegerField
 from django.db.models import Model, ForeignKey, ManyToManyField
 from django.template.defaultfilters import slugify
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.forms import ModelForm
+
+from perso.settings import DEBUG
 
 from django.core.mail import EmailMultiAlternatives
 
@@ -17,6 +19,9 @@ CHOIX_CATEGORIE = (
         ('D', 'Divertissement'),
         ('C', 'Culture'),
         )
+
+def cinephiles():
+    return Group.objects.get_or_create(name='cine')[0].user_set.all()
 
 
 class Film(Model):
@@ -39,30 +44,31 @@ class Film(Model):
         self.slug = slugify(self.titre)
         super(Film, self).save(*args, **kwargs)
 
-        # Création des votes & envoi des mails de notif
-        N = len(Film.objects.all()) + 1
+        if not DEBUG:
+            # Création des votes & envoi des mails de notif
+            N = len(Film.objects.all()) + 1
 
-        subject = u"[CineNim] Film ajouté !"
-        mailfrom = u'notifications@cine.saurel.me'
+            subject = u"[CineNim] Film ajouté !"
+            mailfrom = u'notifications@cine.saurel.me'
 
-        message_html = u"Hello :) <br /><br />%s a proposé un nouveau film : <a href='http://cine.saurel.me/films#%s'>%s</a>.<br />" % (self.respo.username, self.slug, self.titre )
-        message_html += u"Tu peux donc aller actualiser ton <a href='http://cine.saurel.me/votes'>classement</a> \\o/ <br /><br /> @+ !"
-        message_txt = u"Hello :)\n\n%s a proposé un nouveau film : %s (http://cine.saurel.me/films#%s' ; " % (self.respo.username, self.titre, self.slug )
-        message_txt += u"tu peux donc aller actualiser ton classement (http://cine.saurel.me/votes) \\o/ \n\n @+!"
+            message_html = u"Hello :) <br /><br />%s a proposé un nouveau film : <a href='http://cine.saurel.me/films#%s'>%s</a>.<br />" % (self.respo.username, self.slug, self.titre )
+            message_html += u"Tu peux donc aller actualiser ton <a href='http://cine.saurel.me/votes'>classement</a> \\o/ <br /><br /> @+ !"
+            message_txt = u"Hello :)\n\n%s a proposé un nouveau film : %s (http://cine.saurel.me/films#%s' ; " % (self.respo.username, self.titre, self.slug )
+            message_txt += u"tu peux donc aller actualiser ton classement (http://cine.saurel.me/votes) \\o/ \n\n @+!"
 
-        for cinephile in User.objects.all():
-            try:
-                Vote.objects.get(film=self, cinephile=cinephile)
-            except Vote.DoesNotExist:
-                v = Vote()
-                v.choix = N
-                v.film = self
-                v.cinephile = cinephile
-                v.save()
+            for cinephile in cinephiles()
+                try:
+                    Vote.objects.get(film=self, cinephile=cinephile)
+                except Vote.DoesNotExist:
+                    v = Vote()
+                    v.choix = N
+                    v.film = self
+                    v.cinephile = cinephile
+                    v.save()
 
-                msg = EmailMultiAlternatives(subject, message_txt, mailfrom, [cinephile.email])
-                msg.attach_alternative(message_html, "text/html")
-                msg.send()
+                    msg = EmailMultiAlternatives(subject, message_txt, mailfrom, [cinephile.email])
+                    msg.attach_alternative(message_html, "text/html")
+                    msg.send()
 
     def get_categorie(self):
         return dict(CHOIX_CATEGORIE)[self.categorie]
@@ -106,25 +112,26 @@ class Soiree(Model):
     def save(self, *args, **kwargs):
         super(Soiree, self).save(*args, **kwargs)
 
-        subject = u'[CineNim] Soirée ajoutée !'
-        mailfrom = u'notifications@cine.saurel.me'
+        if not DEBUG:
+            subject = u'[CineNim] Soirée ajoutée !'
+            mailfrom = u'notifications@cine.saurel.me'
 
-        message_html = u'Hello :) <br /><br />Le %s, une soirée %s est proposée ; tu peux donc aller mettre à jour tes <a href="http://cine.saurel.me/dispos">disponibilités</a> \\o/ <br /><br />@+ !' % (self.date, self.get_categorie())
-        message_txt = u'Hello :) \n\nLe %s, une soirée %s est proposée ; tu peux donc aller mettre à jour tes disponibilités : http://cine.saurel.me/dispos \\o/ \n\n@+ !' % (self.date, self.get_categorie())
+            message_html = u'Hello :) <br /><br />Le %s, une soirée %s est proposée ; tu peux donc aller mettre à jour tes <a href="http://cine.saurel.me/dispos">disponibilités</a> \\o/ <br /><br />@+ !' % (self.date, self.get_categorie())
+            message_txt = u'Hello :) \n\nLe %s, une soirée %s est proposée ; tu peux donc aller mettre à jour tes disponibilités : http://cine.saurel.me/dispos \\o/ \n\n@+ !' % (self.date, self.get_categorie())
 
-        for cinephile in User.objects.all():
-            try:
-                DispoToWatch.objects.get(soiree=self, cinephile=cinephile)
-            except DispoToWatch.DoesNotExist:
-                d = DispoToWatch()
-                d.soiree = self
-                d.cinephile = cinephile
-                d.dispo = 'N'
-                d.save()
+            for cinephile in cinephiles():
+                try:
+                    DispoToWatch.objects.get(soiree=self, cinephile=cinephile)
+                except DispoToWatch.DoesNotExist:
+                    d = DispoToWatch()
+                    d.soiree = self
+                    d.cinephile = cinephile
+                    d.dispo = 'N'
+                    d.save()
 
-                msg = EmailMultiAlternatives(subject, message_txt, mailfrom, [cinephile.email])
-                msg.attach_alternative(message_html, "text/html")
-                msg.send()
+                    msg = EmailMultiAlternatives(subject, message_txt, mailfrom, [cinephile.email])
+                    msg.attach_alternative(message_html, "text/html")
+                    msg.send()
 
     def get_categorie(self):
         return dict(CHOIX_CATEGORIE)[self.categorie]
@@ -166,15 +173,16 @@ class Commentaire(Model):
     def save(self, *args, **kwargs):
         super(Commentaire, self).save(*args, **kwargs)
 
-        subject = u'[CineNim] Nouveau commentaire sur %s' % self.film.titre
-        mailfrom = u'notifications@cine.saurel.me'
+        if not DEBUG:
+            subject = u'[CineNim] Nouveau commentaire sur %s' % self.film.titre
+            mailfrom = u'notifications@cine.saurel.me'
 
-        message_html = u'Hello :) <br /><br />%s a posté un nouveau commentaire sur %s: vous pouvez aller le voir <a href="http://cine.saurel.me/comms/%s">ici</a> \\o/ <br /><br />@+ !' % (self.posteur.username, self.film.titre, self.film.slug)
-        message_txt = u'Hello :) \n\n%s a posté un nouveau commentaire sur %s: vous pouvez aller le voir sur http://cine.saurel.me/comms/%s \\o/ \n\n@+ !' % (self.posteur.username, self.film.titre, self.film.slug)
+            message_html = u'Hello :) <br /><br />%s a posté un nouveau commentaire sur %s: vous pouvez aller le voir <a href="http://cine.saurel.me/comms/%s">ici</a> \\o/ <br /><br />@+ !' % (self.posteur.username, self.film.titre, self.film.slug)
+            message_txt = u'Hello :) \n\n%s a posté un nouveau commentaire sur %s: vous pouvez aller le voir sur http://cine.saurel.me/comms/%s \\o/ \n\n@+ !' % (self.posteur.username, self.film.titre, self.film.slug)
 
-        msg = EmailMultiAlternatives(subject, message_txt, mailfrom, ['cinenim@list.bde.enseeiht.fr'])
-        msg.attach_alternative(message_html, "text/html")
-        msg.send()
+            msg = EmailMultiAlternatives(subject, message_txt, mailfrom, ['cinenim@list.bde.enseeiht.fr'])
+            msg.attach_alternative(message_html, "text/html")
+            msg.send()
 
     def __unicode__(self):
         return u'Commentaire de %s sur %s le %s: %s' % (self.posteur.username, self.film.titre, self.date, self.commentaire[:20])
