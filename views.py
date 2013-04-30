@@ -12,7 +12,7 @@ from datetime import date
 def home(request):
     c = {}
     films = []
-    N = len(Film.objects.filter(vu=False)) * len(cinephiles()) + 1
+    N = len(Film.objects.filter(vu=False)) * len(get_cinephiles()) + 1
     for soiree in Soiree.objects.order_by('date').filter(date__gte=date.today()):
         if DispoToWatch.objects.filter(dispo='O', soiree=soiree):
             films.append((soiree,[]))
@@ -125,7 +125,7 @@ def votes(request):
 
 @login_required
 def cinephiles(request):
-    c = { 'cinephiles': cinephiles() }
+    c = { 'cinephiles': get_cinephiles() }
     return render(request, 'cine/cinephiles.html', c)
 
 

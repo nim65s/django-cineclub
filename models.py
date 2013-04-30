@@ -20,7 +20,7 @@ CHOIX_CATEGORIE = (
         ('C', 'Culture'),
         )
 
-def cinephiles():
+def get_cinephiles():
     return Group.objects.get_or_create(name='cine')[0].user_set.all()
 
 
@@ -56,7 +56,7 @@ class Film(Model):
             message_txt = u"Hello :)\n\n%s a proposé un nouveau film : %s (http://cine.saurel.me/films#%s' ; " % (self.respo.username, self.titre, self.slug )
             message_txt += u"tu peux donc aller actualiser ton classement (http://cine.saurel.me/votes) \\o/ \n\n @+!"
 
-            for cinephile in cinephiles()
+            for cinephile in get_cinephiles():
                 try:
                     Vote.objects.get(film=self, cinephile=cinephile)
                 except Vote.DoesNotExist:
@@ -119,7 +119,7 @@ class Soiree(Model):
             message_html = u'Hello :) <br /><br />Le %s, une soirée %s est proposée ; tu peux donc aller mettre à jour tes <a href="http://cine.saurel.me/dispos">disponibilités</a> \\o/ <br /><br />@+ !' % (self.date, self.get_categorie())
             message_txt = u'Hello :) \n\nLe %s, une soirée %s est proposée ; tu peux donc aller mettre à jour tes disponibilités : http://cine.saurel.me/dispos \\o/ \n\n@+ !' % (self.date, self.get_categorie())
 
-            for cinephile in cinephiles():
+            for cinephile in get_cinephiles():
                 try:
                     DispoToWatch.objects.get(soiree=self, cinephile=cinephile)
                 except DispoToWatch.DoesNotExist:
