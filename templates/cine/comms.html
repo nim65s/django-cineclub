@@ -31,7 +31,7 @@
 {% endfor %}
 
 <h1>Nouveau Commentaire</h1>
-<form method="post" action="/comms/{{ film.slug }}">
+<form method="post" action="{% url 'cine:comms' film.slug %}">
     {% csrf_token %}
     {{ form.as_p }}
     <br>
