@@ -127,11 +127,3 @@ def votes(request):
 def cinephiles(request):
     c = { 'cinephiles': get_cinephiles() }
     return render(request, 'cine/cinephiles.html', c)
-
-
-def faq(request):
-    return render(request, 'cine/faq.html', {})
-
-
-def about(request):
-    return render(request, 'cine/about.html', {})

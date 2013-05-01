@@ -1,4 +1,6 @@
 from django.conf.urls import patterns, url
+from django.views.generic import TemplateView
+
 from cine.views import *
 
 
@@ -8,8 +10,8 @@ urlpatterns = patterns('',
     url(r'^dispos$', dispos, name='dispos'),
     url(r'^votes$', votes, name='votes'),
     url(r'^cinephiles$', cinephiles, name='cinephiles'),
-    url(r'^faq$', faq, name='faq'),
-    #url(r'^about$', 'about'),
+    url(r'^faq$', TemplateView.as_view(template_name='cine/faq.html'), name="faq"),
+    url(r'^about$', TemplateView.as_view(template_name='cine/about.html'), name="about"),
 
     url(r'^comms/(?P<slug>[^/]+)$', comms, name='comms'),
 )
