@@ -21,4 +21,3 @@ for cinephile in User.objects.all():
             d.soiree = soiree
             d.cinephile = cinephile
             d.save()
-

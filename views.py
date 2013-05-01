@@ -15,7 +15,7 @@ def home(request):
     N = len(Film.objects.filter(vu=False)) * len(get_cinephiles()) + 1
     for soiree in Soiree.objects.order_by('date').filter(date__gte=date.today()):
         if DispoToWatch.objects.filter(dispo='O', soiree=soiree):
-            films.append((soiree,[]))
+            films.append((soiree, []))
             for film in Film.objects.filter(categorie=soiree.categorie, vu=False):
                 if film.respo.dispo_set.filter(soiree=soiree, dispo='O'):
                     score = N
@@ -77,7 +77,7 @@ def films(request):
 @login_required
 def comms(request, slug):
     film = get_object_or_404(Film, slug=slug)
-    edit = False # Not yet implemented
+    edit = False  # Not yet implemented
     if request.method == 'POST':
         form = CommForm(request.POST)
         if form.is_valid():
@@ -92,10 +92,11 @@ def comms(request, slug):
             }
     return render(request, 'cine/comms.html', c)
 
+
 @login_required
 def dispos(request):
-    dispos = DispoToWatch.objects.filter(cinephile=request.user,soiree__date__gte=date.today()).order_by('soiree__date')
-    c = { 'dispos': dispos }
+    dispos = DispoToWatch.objects.filter(cinephile=request.user, soiree__date__gte=date.today()).order_by('soiree__date')
+    c = {'dispos': dispos}
     if request.method == 'POST':
         for dispo in dispos:
             strdate = dispo.soiree.date.strftime('%Y-%m-%d')
@@ -119,11 +120,11 @@ def votes(request):
                 v.choix = i
                 v.save()
                 i += 1
-    c = { 'votes': Vote.objects.filter(cinephile=request.user, film__vu=False).order_by("choix") }
+    c = {'votes': Vote.objects.filter(cinephile=request.user, film__vu=False).order_by("choix")}
     return render(request, 'cine/votes.html', c)
 
 
 @login_required
 def cinephiles(request):
-    c = { 'cinephiles': get_cinephiles() }
+    c = {'cinephiles': get_cinephiles()}
     return render(request, 'cine/cinephiles.html', c)
