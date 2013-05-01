@@ -7,10 +7,10 @@
         <div class="span9">
             {% for film in films %}
                 <div id="{{ film.slug }}">
-                    <h2>{{ film.titre }} ({{ film.get_categorie }}) {% if film.respo == request.user %}(<a href="films?edit={{ film.slug }}">edit</a>){% endif %}</h2>
+                    <h2>{{ film.titre }} ({{ film.get_categorie }}) {% if film.respo == request.user %}(<a href="{% url 'cine:films' %}?edit={{ film.slug }}">edit</a>){% endif %}</h2>
                     <p>{{ film.description|linebreaks }}</p>
                     <dl>
-                        <dt>respo</dt><dd>{{ film.respo.username }} − <a href="films?respo={{ film.respo.username }}">ne voir que ses films</a></dd>
+                        <dt>respo</dt><dd>{{ film.respo.username }} − <a href="{% url 'cine:films' %}?respo={{ film.respo.username }}">ne voir que ses films</a></dd>
                         {% if film.titre_vo %}
                             <dt>Titre VO</dt><dd>{{ film.titre_vo }}</dd>
                         {% endif %}
@@ -51,10 +51,10 @@
 <h1>Films vus</h1>
 {% for film in films_vu %}
     <div id="{{ film.slug }}">
-        <h2>{{ film.titre }} ({{ film.get_categorie }}) {% if film.respo == request.user %}(<a href="films?edit={{ film.slug }}">edit</a>){% endif %}</h2>
+        <h2>{{ film.titre }} ({{ film.get_categorie }}) {% if film.respo == request.user %}(<a href="{% url 'cine:films' %}?edit={{ film.slug }}">edit</a>){% endif %}</h2>
         <p>{{ film.description|linebreaks }}</p>
         <dl>
-            <dt>respo</dt><dd>{{ film.respo.username }} − <a href="films?respo={{ film.respo.username }}">ne voir que ses films</a></dd>
+            <dt>respo</dt><dd>{{ film.respo.username }} − <a href="{% url 'cine:films' %}?respo={{ film.respo.username }}">ne voir que ses films</a></dd>
             {% if film.titre_vo %}
                 <dt>Titre VO</dt><dd>{{ film.titre_vo }}</dd>
             {% endif %}
@@ -67,7 +67,7 @@
                     {% if film.allocine %}<a href="{{ film.allocine }}">Allociné</a>{% endif %}
                 </dd>
             {% endif %}
-            <dt>Commentaires</dt><dd>{{ film.commentaire_set.count }} − <a href="/comms/{{ film.slug }}">Aller voir / en ajouter \o/</a></dd>
+            <dt>Commentaires</dt><dd>{{ film.commentaire_set.count }} − <a href="{% url 'cine:comms' film.slug %}">Aller voir / en ajouter \o/</a></dd>
         </dl>
     </div>
 {% endfor %}

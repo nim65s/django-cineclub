@@ -5,7 +5,7 @@
 {% for cinephile in cinephiles %}
     <div>
         <h2>{{ cinephile.username }}</h2>
-        <p>{{ cinephile.first_name }} {{ cinephile.last_name }}: <a href="mailto:{{ cinephile.email }}">mail</a> − <a href="films?respo={{ cinephile.username }}">films</a></p>
+        <p>{{ cinephile.first_name }} {{ cinephile.last_name }}: <a href="mailto:{{ cinephile.email }}">mail</a> − <a href="{% url 'cine:films' %}?respo={{ cinephile.username }}">films</a></p>
     </div>
 {% endfor %}
 {% endblock %}

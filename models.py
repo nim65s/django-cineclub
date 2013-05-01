@@ -49,12 +49,12 @@ class Film(Model):
             N = len(Film.objects.all()) + 1
 
             subject = u"[CineNim] Film ajouté !"
-            mailfrom = u'notifications@cine.saurel.me'
+            mailfrom = u'cine@perso.saurel.me'
 
-            message_html = u"Hello :) <br /><br />%s a proposé un nouveau film : <a href='http://cine.saurel.me/films#%s'>%s</a>.<br />" % (self.respo.username, self.slug, self.titre )
-            message_html += u"Tu peux donc aller actualiser ton <a href='http://cine.saurel.me/votes'>classement</a> \\o/ <br /><br /> @+ !"
-            message_txt = u"Hello :)\n\n%s a proposé un nouveau film : %s (http://cine.saurel.me/films#%s' ; " % (self.respo.username, self.titre, self.slug )
-            message_txt += u"tu peux donc aller actualiser ton classement (http://cine.saurel.me/votes) \\o/ \n\n @+!"
+            message_html = u"Hello :) <br /><br />%s a proposé un nouveau film : <a href='http://perso.saurel.me/cine/films#%s'>%s</a>.<br />" % (self.respo.username, self.slug, self.titre )
+            message_html += u"Tu peux donc aller actualiser ton <a href='http://perso.saurel.me/cine/votes'>classement</a> \\o/ <br /><br /> @+ !"
+            message_txt = u"Hello :)\n\n%s a proposé un nouveau film : %s (http://perso.saurel.me/cine/films#%s' ; " % (self.respo.username, self.titre, self.slug )
+            message_txt += u"tu peux donc aller actualiser ton classement (http://perso.saurel.me/cine/votes) \\o/ \n\n @+!"
 
             for cinephile in get_cinephiles():
                 try:
@@ -114,10 +114,10 @@ class Soiree(Model):
 
         if not DEBUG:
             subject = u'[CineNim] Soirée ajoutée !'
-            mailfrom = u'notifications@cine.saurel.me'
+            mailfrom = u'cine@perso.saurel.me'
 
-            message_html = u'Hello :) <br /><br />Le %s, une soirée %s est proposée ; tu peux donc aller mettre à jour tes <a href="http://cine.saurel.me/dispos">disponibilités</a> \\o/ <br /><br />@+ !' % (self.date, self.get_categorie())
-            message_txt = u'Hello :) \n\nLe %s, une soirée %s est proposée ; tu peux donc aller mettre à jour tes disponibilités : http://cine.saurel.me/dispos \\o/ \n\n@+ !' % (self.date, self.get_categorie())
+            message_html = u'Hello :) <br /><br />Le %s, une soirée %s est proposée ; tu peux donc aller mettre à jour tes <a href="http://perso.saurel.me/cine/dispos">disponibilités</a> \\o/ <br /><br />@+ !' % (self.date, self.get_categorie())
+            message_txt = u'Hello :) \n\nLe %s, une soirée %s est proposée ; tu peux donc aller mettre à jour tes disponibilités : http://perso.saurel.me/cine/dispos \\o/ \n\n@+ !' % (self.date, self.get_categorie())
 
             for cinephile in get_cinephiles():
                 try:
@@ -175,10 +175,10 @@ class Commentaire(Model):
 
         if not DEBUG:
             subject = u'[CineNim] Nouveau commentaire sur %s' % self.film.titre
-            mailfrom = u'notifications@cine.saurel.me'
+            mailfrom = u'cine@perso.saurel.me'
 
-            message_html = u'Hello :) <br /><br />%s a posté un nouveau commentaire sur %s: vous pouvez aller le voir <a href="http://cine.saurel.me/comms/%s">ici</a> \\o/ <br /><br />@+ !' % (self.posteur.username, self.film.titre, self.film.slug)
-            message_txt = u'Hello :) \n\n%s a posté un nouveau commentaire sur %s: vous pouvez aller le voir sur http://cine.saurel.me/comms/%s \\o/ \n\n@+ !' % (self.posteur.username, self.film.titre, self.film.slug)
+            message_html = u'Hello :) <br /><br />%s a posté un nouveau commentaire sur %s: vous pouvez aller le voir <a href="http://perso.saurel.me/cine/comms/%s">ici</a> \\o/ <br /><br />@+ !' % (self.posteur.username, self.film.titre, self.film.slug)
+            message_txt = u'Hello :) \n\n%s a posté un nouveau commentaire sur %s: vous pouvez aller le voir sur http://perso.saurel.me/cine/comms/%s \\o/ \n\n@+ !' % (self.posteur.username, self.film.titre, self.film.slug)
 
             msg = EmailMultiAlternatives(subject, message_txt, mailfrom, ['cinenim@list.bde.enseeiht.fr'])
             msg.attach_alternative(message_html, "text/html")
