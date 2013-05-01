@@ -2,11 +2,15 @@
 CinéNim
 =======
 
+But
+---
 Ceci est une application de gestion d’un cinéclub. Plus ou moins.
 
-Le principe: Les gens inscrits proposent des films et donnent leur disponibilités, et trient ces derniers suivant diverses catégories.
+Principe
+--------
+Les gens inscrits proposent des films et trient tous ceux proposés par ordre de préférence.
 
-Boum paf, la présente application indique quel film on regarde à quelle date.
+Ils renseignent également leurs disponibilités, et boum paf, la présente application indique quel film on regarde à quelle date.
 
 Perso
 -----
