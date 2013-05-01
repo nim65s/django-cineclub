@@ -8,7 +8,7 @@
         {% endfor %}
     </ul>
 
-    <form action="votes" method="POST">
+    <form action="{% url 'cine:votes' %}" method="POST">
         {% csrf_token %}
         <input name="ordre" value="" type="hidden"/>
         <input type="submit" value="Voter !" />

@@ -34,7 +34,7 @@
             {% else %}
                 <h2>Ajouter : </h2>
             {% endif %}
-            <form method="post" action="films">
+            <form method="post" action="{% url 'cine:films' %}">
                 {% csrf_token %}
                 {{ filmform.as_p }}
                 <br>

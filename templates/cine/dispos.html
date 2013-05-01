@@ -3,7 +3,7 @@
 {% block content %}
 <h1>Disponibilités</h1>
 
-<form method="post" action="dispos">
+<form method="post" action="{% url 'cine:dispos' %}">
     <button type="submit" class="btn">Modifier</button>
     {% csrf_token %}
     {% for dispo in dispos %}
