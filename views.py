@@ -17,7 +17,7 @@ def home(request):
         if DispoToWatch.objects.filter(dispo='O', soiree=soiree):
             films.append((soiree, []))
             for film in Film.objects.filter(categorie=soiree.categorie, vu=False):
-                if film.respo.dispo_set.filter(soiree=soiree, dispo='O'):
+                if film.respo.dispotowatch_set.filter(soiree=soiree, dispo='O'):
                     score = N
                     for dispo in DispoToWatch.objects.filter(dispo='O', soiree=soiree):
                         vote = Vote.objects.get(cinephile=dispo.cinephile, film=film)
@@ -41,7 +41,7 @@ def films(request):
     new = True
     if request.method == 'POST':
         form = FilmForm(request.POST)
-        if 'slug' in form.data:
+        if 'slug' in form.data and form.data['slug']:
             film = Film.objects.get(slug=form.data['slug'])
             if film.respo == request.user:
                 form = FilmForm(request.POST, instance=film)

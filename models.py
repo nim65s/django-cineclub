@@ -45,33 +45,23 @@ class Film(Model):
         self.slug = slugify(self.titre)
         super(Film, self).save(*args, **kwargs)
 
-        if not DEBUG:
-            # Création des votes & envoi des mails de notif
-            N = len(Film.objects.all()) + 1
+        for cinephile in get_cinephiles():
+            vote = Vote.objects.get_or_create(film=self, cinephile=cinephile)
+            if vote[1] and not DEBUG:
+                # Création des votes & envoi des mails de notif
+                subject = u"[CineNim] Film ajouté !"
+                mailfrom = u'cine@perso.saurel.me'
 
-            subject = u"[CineNim] Film ajouté !"
-            mailfrom = u'cine@perso.saurel.me'
+                message_html = u"Hello :) <br /><br />%s a proposé un nouveau film : <a href='http://perso.saurel.me/cine/films#%s'>%s</a>.<br />" % (
+                        self.respo.username, self.slug, self.titre)
+                message_html += u"Tu peux donc aller actualiser ton <a href='http://perso.saurel.me/cine/votes'>classement</a> \\o/ <br /><br /> @+ !"
+                message_txt = u"Hello :)\n\n%s a proposé un nouveau film : %s (http://perso.saurel.me/cine/films#%s' ; " % (
+                        self.respo.username, self.titre, self.slug)
+                message_txt += u"tu peux donc aller actualiser ton classement (http://perso.saurel.me/cine/votes) \\o/ \n\n @+!"
 
-            message_html = u"Hello :) <br /><br />%s a proposé un nouveau film : <a href='http://perso.saurel.me/cine/films#%s'>%s</a>.<br />" % (
-                    self.respo.username, self.slug, self.titre)
-            message_html += u"Tu peux donc aller actualiser ton <a href='http://perso.saurel.me/cine/votes'>classement</a> \\o/ <br /><br /> @+ !"
-            message_txt = u"Hello :)\n\n%s a proposé un nouveau film : %s (http://perso.saurel.me/cine/films#%s' ; " % (
-                    self.respo.username, self.titre, self.slug)
-            message_txt += u"tu peux donc aller actualiser ton classement (http://perso.saurel.me/cine/votes) \\o/ \n\n @+!"
-
-            for cinephile in get_cinephiles():
-                try:
-                    Vote.objects.get(film=self, cinephile=cinephile)
-                except Vote.DoesNotExist:
-                    v = Vote()
-                    v.choix = N
-                    v.film = self
-                    v.cinephile = cinephile
-                    v.save()
-
-                    msg = EmailMultiAlternatives(subject, message_txt, mailfrom, [cinephile.email])
-                    msg.attach_alternative(message_html, "text/html")
-                    msg.send()
+                msg = EmailMultiAlternatives(subject, message_txt, mailfrom, [cinephile.email])
+                msg.attach_alternative(message_html, "text/html")
+                msg.send()
 
     def get_categorie(self):
         return dict(CHOIX_CATEGORIE)[self.categorie]
@@ -97,8 +87,8 @@ class FilmForm(ModelForm):
 class Vote(Model):
     film = ForeignKey(Film)
     cinephile = ForeignKey(User)
-    choix = IntegerField()
-    plusse = BooleanField(default=False)
+    choix = IntegerField(null=True)
+    plusse = BooleanField(default=False)  # TODO: NYI
 
     unique_together = ("film", "cinephile")
 
@@ -115,37 +105,29 @@ class Soiree(Model):
     def save(self, *args, **kwargs):
         super(Soiree, self).save(*args, **kwargs)
 
-        if not DEBUG:
-            subject = u'[CineNim] Soirée ajoutée !'
-            mailfrom = u'cine@perso.saurel.me'
+        for cinephile in get_cinephiles():
+            dtw = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile)
+            if not DEBUG and dtw[1]:
+                subject = u'[CineNim] Soirée ajoutée !'
+                mailfrom = u'cine@perso.saurel.me'
 
-            message_html = u'Hello :) <br /><br />Le %s, une soirée %s est proposée ; ' % (self.date, self.get_categorie())
-            message_html += u'tu peux donc aller mettre à jour tes <a href="http://perso.saurel.me/cine/dispos">disponibilités</a> \\o/ <br><br>@+ !'
-            message_txt = u'Hello :) \n\nLe %s, une soirée %s est proposée ; ' % (self.date, self.get_categorie())
-            message_html += u'tu peux donc aller mettre à jour tes disponibilités : http://perso.saurel.me/cine/dispos \\o/ \n\n@+ !'
+                message_html = u'Hello :) <br /><br />Le %s, une soirée %s est proposée ; ' % (self.date, self.get_categorie())
+                message_html += u'tu peux donc aller mettre à jour tes <a href="http://perso.saurel.me/cine/dispos">disponibilités</a> \\o/ <br><br>@+ !'
+                message_txt = u'Hello :) \n\nLe %s, une soirée %s est proposée ; ' % (self.date, self.get_categorie())
+                message_html += u'tu peux donc aller mettre à jour tes disponibilités : http://perso.saurel.me/cine/dispos \\o/ \n\n@+ !'
 
-            for cinephile in get_cinephiles():
-                try:
-                    DispoToWatch.objects.get(soiree=self, cinephile=cinephile)
-                except DispoToWatch.DoesNotExist:
-                    d = DispoToWatch()
-                    d.soiree = self
-                    d.cinephile = cinephile
-                    d.dispo = 'N'
-                    d.save()
-
-                    msg = EmailMultiAlternatives(subject, message_txt, mailfrom, [cinephile.email])
-                    msg.attach_alternative(message_html, "text/html")
-                    msg.send()
+                msg = EmailMultiAlternatives(subject, message_txt, mailfrom, [cinephile.email])
+                msg.attach_alternative(message_html, "text/html")
+                msg.send()
 
     def get_categorie(self):
         return dict(CHOIX_CATEGORIE)[self.categorie]
 
     def presents(self):
-        return ", ".join([cinephile.cinephile.username for cinephile in self.dispo_set.filter(dispo='O')])
+        return ", ".join([cinephile.cinephile.username for cinephile in self.dispotowatch_set.filter(dispo='O')])
 
     def pas_surs(self):
-        return ", ".join([cinephile.cinephile.username for cinephile in self.dispo_set.filter(dispo='N')])
+        return ", ".join([cinephile.cinephile.username for cinephile in self.dispotowatch_set.filter(dispo='N')])
 
     def __unicode__(self):
         return u'%s:%s' % (self.date, self.categorie)
