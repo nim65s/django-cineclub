@@ -1,0 +1,16 @@
+BEGIN:VCALENDAR
+PRODID:-//Æn.im//Soirees prevues pour un cine//FR
+X-WR-CALNAME:CinéNim
+X-WR-TIMEZONE:Europe/Paris
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+{% load tz %}{% for soiree in soirees %}BEGIN:VEVENT
+DTSTART:{{ soiree.date|utc|date:"Ymd\THis\Z" }}
+DTEND:{{ soiree.date|utc|date:"Ymd\THis\Z" }}
+UID:perso.saurel.me/cine - {{ soiree.date|date:"c" }}
+DESCRIPTION:Soirée CinéNim !
+LOCATION:72 Bd de Strasbourg, Toulouse
+SUMMARY:CinéNim
+END:VEVENT
+{% endfor %}END:VCALENDAR
