@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 from django.db.models import URLField, TextField, ImageField, BooleanField, SlugField
-from django.db.models import CharField, DateField, DateTimeField, IntegerField
+from django.db.models import CharField, DateTimeField, IntegerField
 from django.db.models import Model, ForeignKey, ManyToManyField
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User, Group
@@ -99,7 +99,7 @@ class Vote(Model):
 
 
 class Soiree(Model):
-    date = DateField()
+    date = DateTimeField()
     categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D')
 
     def save(self, *args, **kwargs):
@@ -131,6 +131,9 @@ class Soiree(Model):
 
     def __unicode__(self):
         return u'%s:%s' % (self.date, self.categorie)
+
+    class Meta:
+        ordering = ["date"]
 
 
 class DispoToWatch(Model):

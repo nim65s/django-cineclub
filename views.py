@@ -13,7 +13,7 @@ def home(request):
     c = {}
     films = []
     N = len(Film.objects.filter(vu=False)) * len(get_cinephiles()) + 1
-    for soiree in Soiree.objects.order_by('date').filter(date__gte=date.today()):
+    for soiree in Soiree.objects.filter(date__gte=date.today()):
         if DispoToWatch.objects.filter(dispo='O', soiree=soiree):
             films.append((soiree, []))
             for film in Film.objects.filter(categorie=soiree.categorie, vu=False):
@@ -128,3 +128,7 @@ def votes(request):
 def cinephiles(request):
     c = {'cinephiles': get_cinephiles()}
     return render(request, 'cine/cinephiles.html', c)
+
+
+def ics(request):
+    return render(request, 'cine/cinenim.ics', {'soirees': Soiree.objects.filter(date__gte=date.today())}, content_type="text/calendar; charset=UTF-8")
