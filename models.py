@@ -87,7 +87,7 @@ class FilmForm(ModelForm):
 class Vote(Model):
     film = ForeignKey(Film)
     cinephile = ForeignKey(User)
-    choix = IntegerField(null=True)
+    choix = IntegerField(default=9999)
     plusse = BooleanField(default=False)  # TODO: NYI
 
     unique_together = ("film", "cinephile")
@@ -96,6 +96,9 @@ class Vote(Model):
         if self.plusse:
             return u'%s \t %i + \t %s' % (self.film, self.choix, self.cinephile)
         return u'%s \t %i \t %s' % (self.film, self.choix, self.cinephile)
+
+    class Meta:
+        ordering = ['choix', 'film']
 
 
 class Soiree(Model):
