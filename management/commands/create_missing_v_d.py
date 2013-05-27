@@ -1,9 +1,11 @@
+#-*- coding: utf-8 -*-
+
 from django.core.management.base import BaseCommand, CommandError
 from cine.models import *
 
 class Command(BaseCommand):
     args = ''
-    help = 'Crée les votes et dispos manquant(e)s'
+    help = u'Crée les votes et dispos manquant(e)s'
 
     def handle(self, *args, **options):
         N = len(Film.objects.all()) + 1
@@ -17,6 +19,7 @@ class Command(BaseCommand):
                     v.film = film
                     v.cinephile = cinephile
                     v.save()
+                    self.stdout.write("Nouveau Vote: %s" % v)
             for soiree in Soiree.objects.all():
                 try:
                     DispoToWatch.objects.get(soiree=soiree, cinephile=cinephile)
@@ -26,3 +29,4 @@ class Command(BaseCommand):
                     d.soiree = soiree
                     d.cinephile = cinephile
                     d.save()
+                    self.stdout.write("Nouvelle Dispo: %s" % d)
