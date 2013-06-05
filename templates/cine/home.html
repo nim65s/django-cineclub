@@ -5,10 +5,15 @@
 
 <p>/!\Les résultats se font en fonction des disponibilités des gens… donc <a href="{% url 'cine:dispos' %}">allez renseigner les votres !</a>/!\</p>
 
-{% for soiree, liste in films %}
+{% for soiree, liste, autres in films %}
     <h2>{{ soiree.date }} ({{soiree.get_categorie}})</h2>
+    <h3>Films disponibles</h3>
     {% for score, film in liste %}
         <p>{{ score }} » <a href="{% url 'cine:films' %}#{{ film.slug }}">{{ film.titre }}</a></p>
+    {% endfor %}
+    <h3>Films disponibles</h3>
+    {% for score, film in autres %}
+        <p>{{ score }} » <a href="{% url 'cine:films' %}#{{ film.slug }}">{{ film.titre }}</a> ({{ film.respo.respo }} n’est pas dispo)</p>
     {% endfor %}
 {% endfor %}
 

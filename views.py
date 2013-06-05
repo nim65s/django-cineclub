@@ -15,18 +15,22 @@ def home(request):
     N = len(Film.objects.filter(vu=False)) * len(get_cinephiles()) + 1
     for soiree in Soiree.objects.filter(date__gte=date.today()):
         if DispoToWatch.objects.filter(dispo='O', soiree=soiree):
-            films.append((soiree, []))
+            films.append((soiree, [], []))
             for film in Film.objects.filter(categorie=soiree.categorie, vu=False):
+                score = N
+                for dispo in DispoToWatch.objects.filter(dispo='O', soiree=soiree):
+                    vote = Vote.objects.get(cinephile=dispo.cinephile, film=film)
+                    score -= vote.choix
+                    if vote.plusse:
+                        score += 1
                 if film.respo.dispotowatch_set.filter(soiree=soiree, dispo='O'):
-                    score = N
-                    for dispo in DispoToWatch.objects.filter(dispo='O', soiree=soiree):
-                        vote = Vote.objects.get(cinephile=dispo.cinephile, film=film)
-                        score -= vote.choix
-                        if vote.plusse:
-                            score += 1
                     films[-1][1].append((score, film))
+                else:
+                    films[-1][2].append((score, film))
             films[-1][1].sort()
             films[-1][1].reverse()
+            films[-1][2].sort()
+            films[-1][2].reverse()
     c['films'] = films
     return render(request, 'cine/home.html', c)
 
