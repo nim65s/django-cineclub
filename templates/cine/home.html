@@ -11,9 +11,9 @@
     {% for score, film in liste %}
         <p>{{ score }} » <a href="{% url 'cine:films' %}#{{ film.slug }}">{{ film.titre }}</a></p>
     {% endfor %}
-    <h3>Films disponibles</h3>
+    <h3>Films indisponibles</h3>
     {% for score, film in autres %}
-        <p>{{ score }} » <a href="{% url 'cine:films' %}#{{ film.slug }}">{{ film.titre }}</a> ({{ film.respo.respo }} n’est pas dispo)</p>
+        <p>{{ score }} » <a href="{% url 'cine:films' %}#{{ film.slug }}">{{ film.titre }}</a> ({{ film.respo.username }} n’est pas dispo)</p>
     {% endfor %}
 {% endfor %}
 
