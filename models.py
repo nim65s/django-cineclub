@@ -1,14 +1,12 @@
 #-*- coding: utf-8 -*-
+from django.conf import settings
+from django.contrib.auth.models import User, Group
+from django.core.mail import EmailMultiAlternatives
 from django.db.models import URLField, TextField, ImageField, BooleanField, SlugField
 from django.db.models import CharField, DateTimeField, IntegerField
 from django.db.models import Model, ForeignKey, ManyToManyField
-from django.template.defaultfilters import slugify
-from django.contrib.auth.models import User, Group
 from django.forms import ModelForm
-
-from perso.settings import DEBUG
-
-from django.core.mail import EmailMultiAlternatives
+from django.template.defaultfilters import slugify
 
 from email.MIMEText import MIMEText
 from email.Header import Header
@@ -47,7 +45,7 @@ class Film(Model):
 
         for cinephile in get_cinephiles():
             vote = Vote.objects.get_or_create(film=self, cinephile=cinephile)
-            if vote[1] and not DEBUG:
+            if vote[1] and not settings.DEBUG and settings.SEND_MAILS:
                 # Création des votes & envoi des mails de notif
                 subject = u"[CineNim] Film ajouté !"
                 mailfrom = u'cine@perso.saurel.me'
@@ -110,7 +108,7 @@ class Soiree(Model):
 
         for cinephile in get_cinephiles():
             dtw = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile)
-            if not DEBUG and dtw[1]:
+            if not settings.DEBUG and dtw[1] and settings.SEND_MAILS:
                 subject = u'[CineNim] Soirée ajoutée !'
                 mailfrom = u'cine@perso.saurel.me'
 
@@ -169,7 +167,7 @@ class Commentaire(Model):
     def save(self, *args, **kwargs):
         super(Commentaire, self).save(*args, **kwargs)
 
-        if not DEBUG:
+        if not settings.DEBUG and settings.SEND_MAILS:
             subject = u'[CineNim] Nouveau commentaire sur %s' % self.film.titre
             mailfrom = u'cine@perso.saurel.me'
 
