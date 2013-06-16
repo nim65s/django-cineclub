@@ -90,7 +90,7 @@ def comms(request, slug):
             form.save()
     c = {
             'film': film,
-            'comms': film.commentaire_set.all().order_by('date'),
+            'comms': film.commentaire_set.all(),
             'form': CommForm(),
             'edit': edit,
             }
@@ -99,7 +99,7 @@ def comms(request, slug):
 
 @login_required
 def dispos(request):
-    dispos = DispoToWatch.objects.filter(cinephile=request.user, soiree__date__gte=date.today()).order_by('soiree__date')
+    dispos = DispoToWatch.objects.filter(cinephile=request.user, soiree__date__gte=date.today())
     c = {'dispos': dispos}
     if request.method == 'POST':
         for dispo in dispos:
@@ -124,7 +124,7 @@ def votes(request):
                 v.choix = i
                 v.save()
                 i += 1
-    c = {'votes': Vote.objects.filter(cinephile=request.user, film__vu=False).order_by("choix")}
+    c = {'votes': Vote.objects.filter(cinephile=request.user, film__vu=False)}
     return render(request, 'cine/votes.html', c)
 
 

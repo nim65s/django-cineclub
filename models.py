@@ -156,6 +156,9 @@ class DispoToWatch(Model):
     def __unicode__(self):
         return u'%s %s %s' % (self.soiree, self.dispo, self.cinephile)
 
+    class Meta:
+        ordering = ['soiree__date']
+
 
 class Commentaire(Model):
     date = DateTimeField(auto_now=True, auto_now_add=True)
@@ -181,6 +184,9 @@ class Commentaire(Model):
 
     def __unicode__(self):
         return u'Commentaire de %s sur %s le %s: %s' % (self.posteur.username, self.film.titre, self.date, self.commentaire[:20])
+
+    class Meta:
+        ordering = ['date']
 
 
 class CommForm(ModelForm):
