@@ -13,6 +13,9 @@ from email.Header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+import logging
+logger = logging.getLogger(__name__)
+
 CHOIX_CATEGORIE = (
         ('D', 'Divertissement'),
         ('C', 'Culture'),
@@ -43,23 +46,26 @@ class Film(Model):
         self.slug = slugify(self.titre)
         super(Film, self).save(*args, **kwargs)
 
+        # Création des votes & envoi des mails de notif
+        subject = u"[CineNim] Film ajouté !"
+        mailfrom = u'cine@perso.saurel.me'
+
+        message_html = u"Hello :) <br /><br />%s a proposé un nouveau film : <a href='http://perso.saurel.me/cine/films#%s'>%s</a>.<br />" % (
+                self.respo.username, self.slug, self.titre)
+        message_html += u"Tu peux donc aller actualiser ton <a href='http://perso.saurel.me/cine/votes'>classement</a> \\o/ <br /><br /> @+ !"
+        message_txt = u"Hello :)\n\n%s a proposé un nouveau film : %s (http://perso.saurel.me/cine/films#%s' ; " % (
+                self.respo.username, self.titre, self.slug)
+        message_txt += u"tu peux donc aller actualiser ton classement (http://perso.saurel.me/cine/votes) \\o/ \n\n @+!"
+
         for cinephile in get_cinephiles():
             vote = Vote.objects.get_or_create(film=self, cinephile=cinephile)
             if vote[1] and not settings.DEBUG:
-                # Création des votes & envoi des mails de notif
-                subject = u"[CineNim] Film ajouté !"
-                mailfrom = u'cine@perso.saurel.me'
-
-                message_html = u"Hello :) <br /><br />%s a proposé un nouveau film : <a href='http://perso.saurel.me/cine/films#%s'>%s</a>.<br />" % (
-                        self.respo.username, self.slug, self.titre)
-                message_html += u"Tu peux donc aller actualiser ton <a href='http://perso.saurel.me/cine/votes'>classement</a> \\o/ <br /><br /> @+ !"
-                message_txt = u"Hello :)\n\n%s a proposé un nouveau film : %s (http://perso.saurel.me/cine/films#%s' ; " % (
-                        self.respo.username, self.titre, self.slug)
-                message_txt += u"tu peux donc aller actualiser ton classement (http://perso.saurel.me/cine/votes) \\o/ \n\n @+!"
-
-                msg = EmailMultiAlternatives(subject, message_txt, mailfrom, [cinephile.email])
-                msg.attach_alternative(message_html, "text/html")
-                msg.send()
+                try:
+                    msg = EmailMultiAlternatives(subject, message_txt, mailfrom, [cinephile.email])
+                    msg.attach_alternative(message_html, "text/html")
+                    msg.send()
+                except:
+                    logger.error(u'Le mail de nouveau film %s pour %s n’a pas été envoyé' % (self.titre, cinephile))
 
     def get_categorie(self):
         return dict(CHOIX_CATEGORIE)[self.categorie]
@@ -106,20 +112,23 @@ class Soiree(Model):
     def save(self, *args, **kwargs):
         super(Soiree, self).save(*args, **kwargs)
 
+        subject = u'[CineNim] Soirée ajoutée !'
+        mailfrom = u'cine@perso.saurel.me'
+
+        message_html = u'Hello :) <br /><br />Le %s, une soirée %s est proposée ; ' % (self.date, self.get_categorie())
+        message_html += u'tu peux donc aller mettre à jour tes <a href="http://perso.saurel.me/cine/dispos">disponibilités</a> \\o/ <br><br>@+ !'
+        message_txt = u'Hello :) \n\nLe %s, une soirée %s est proposée ; ' % (self.date, self.get_categorie())
+        message_html += u'tu peux donc aller mettre à jour tes disponibilités : http://perso.saurel.me/cine/dispos \\o/ \n\n@+ !'
+
         for cinephile in get_cinephiles():
             dtw = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile)
             if not settings.DEBUG and dtw[1]:
-                subject = u'[CineNim] Soirée ajoutée !'
-                mailfrom = u'cine@perso.saurel.me'
-
-                message_html = u'Hello :) <br /><br />Le %s, une soirée %s est proposée ; ' % (self.date, self.get_categorie())
-                message_html += u'tu peux donc aller mettre à jour tes <a href="http://perso.saurel.me/cine/dispos">disponibilités</a> \\o/ <br><br>@+ !'
-                message_txt = u'Hello :) \n\nLe %s, une soirée %s est proposée ; ' % (self.date, self.get_categorie())
-                message_html += u'tu peux donc aller mettre à jour tes disponibilités : http://perso.saurel.me/cine/dispos \\o/ \n\n@+ !'
-
-                msg = EmailMultiAlternatives(subject, message_txt, mailfrom, [cinephile.email])
-                msg.attach_alternative(message_html, "text/html")
-                msg.send()
+                try:
+                    msg = EmailMultiAlternatives(subject, message_txt, mailfrom, [cinephile.email])
+                    msg.attach_alternative(message_html, "text/html")
+                    msg.send()
+                except:
+                    logger.error(u'Le mail de nouvelle dispotowatch %s n’a pas été envoyée' % dtw[0])
 
     def get_categorie(self):
         return dict(CHOIX_CATEGORIE)[self.categorie]
@@ -176,9 +185,12 @@ class Commentaire(Model):
             message_txt = u'Hello :) \n\n%s a posté un nouveau commentaire sur %s: ' % (self.posteur.username, self.film.titre)
             message_html += u'vous pouvez aller le voir sur http://perso.saurel.me/cine/comms/%s \\o/ \n\n@+ !' % self.film.slug
 
-            msg = EmailMultiAlternatives(subject, message_txt, mailfrom, ['cinenim@list.bde.enseeiht.fr'])
-            msg.attach_alternative(message_html, "text/html")
-            msg.send()
+            try:
+                msg = EmailMultiAlternatives(subject, message_txt, mailfrom, ['cinenim@list.bde.enseeiht.fr'])
+                msg.attach_alternative(message_html, "text/html")
+                msg.send()
+            except:
+                logger.error(u'Le mail de commentaire %s n’a pas été envoyée' % self)
 
     def __unicode__(self):
         return u'Commentaire de %s sur %s le %s: %s' % (self.posteur.username, self.film.titre, self.date, self.commentaire[:20])
