@@ -45,7 +45,7 @@ class Film(Model):
 
         for cinephile in get_cinephiles():
             vote = Vote.objects.get_or_create(film=self, cinephile=cinephile)
-            if vote[1] and not settings.DEBUG and settings.SEND_MAILS:
+            if vote[1] and not settings.DEBUG:
                 # Création des votes & envoi des mails de notif
                 subject = u"[CineNim] Film ajouté !"
                 mailfrom = u'cine@perso.saurel.me'
@@ -108,7 +108,7 @@ class Soiree(Model):
 
         for cinephile in get_cinephiles():
             dtw = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile)
-            if not settings.DEBUG and dtw[1] and settings.SEND_MAILS:
+            if not settings.DEBUG and dtw[1]:
                 subject = u'[CineNim] Soirée ajoutée !'
                 mailfrom = u'cine@perso.saurel.me'
 
@@ -167,7 +167,7 @@ class Commentaire(Model):
     def save(self, *args, **kwargs):
         super(Commentaire, self).save(*args, **kwargs)
 
-        if not settings.DEBUG and settings.SEND_MAILS:
+        if not settings.DEBUG:
             subject = u'[CineNim] Nouveau commentaire sur %s' % self.film.titre
             mailfrom = u'cine@perso.saurel.me'
 
