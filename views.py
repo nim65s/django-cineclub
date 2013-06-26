@@ -57,7 +57,7 @@ def films(request):
             form.save()
             form = FilmForm()
             if new:
-                messages.success(request, u'Film ajouté :D')
+                messages.success(request, u'Film ajouté ; Allez classer ce nouveau film dans vos votes !')
             else:
                 messages.success(request, u'Film modifié')
             c['edit'] = False
