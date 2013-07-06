@@ -1,17 +1,22 @@
 #-*- coding: utf-8 -*-
 
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 from cine.models import *
 
-from datetime import date
+from datetime import datetime
+from pytz import timezone
+
+tz = timezone(settings.TIME_ZONE)
+tzloc = tz.localize
 
 class Command(BaseCommand):
     args = ''
     help = u'Affiche les gens qui ont pas voté (c’est pas bien ! :P)'
 
     def handle(self, *args, **options):
-        soiree = Soiree.objects.filter(date__gte=date.today())[0]
+        soiree = Soiree.objects.filter(date__gte=tzloc(datetime.now())[0]
         for film in Film.objects.filter(categorie=soiree.categorie, vu=False):
             for dispo in DispoToWatch.objects.filter(dispo='O', soiree=soiree):
                 vote = Vote.objects.get(cinephile=dispo.cinephile, film=film)
