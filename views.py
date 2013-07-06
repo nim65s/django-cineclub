@@ -36,6 +36,9 @@ def home(request):
             films[-1][1].reverse()
             films[-1][2].sort()
             films[-1][2].reverse()
+            if len(films[-1][1]) > 0:
+                soiree.favoris = films[-1][1][0][1]
+                soiree.save()
     c['films'] = films
     return render(request, 'cine/home.html', c)
 

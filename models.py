@@ -108,6 +108,7 @@ class Vote(Model):
 class Soiree(Model):
     date = DateTimeField()
     categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D')
+    favoris = ForeignKey(Film, null=True)
 
     def save(self, *args, **kwargs):
         super(Soiree, self).save(*args, **kwargs)
