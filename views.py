@@ -57,7 +57,7 @@ def films(request):
             form.save()
             form = FilmForm()
             if new:
-                messages.success(request, u'Film ajouté ; Allez classer ce nouveau film dans vos votes !')
+                messages.success(request, u'Allez classer ce nouveau film dans vos votes !')
             else:
                 messages.success(request, u'Film modifié')
             c['edit'] = False
@@ -100,16 +100,7 @@ def comms(request, slug):
 @login_required
 def dispos(request):
     dispos = DispoToWatch.objects.filter(cinephile=request.user, soiree__date__gte=date.today())
-    c = {'dispos': dispos}
-    if request.method == 'POST':
-        for dispo in dispos:
-            strdate = dispo.soiree.date.strftime('%Y-%m-%d')
-            if strdate in request.POST:
-                dispo.dispo = request.POST[strdate]
-                dispo.save()
-            else:
-                print strdate, 'not in POST:', request.POST
-    return render(request, 'cine/dispos.html', c)
+    return render(request, 'cine/dispos.html', {'dispos': dispos})
 
 
 @login_required
