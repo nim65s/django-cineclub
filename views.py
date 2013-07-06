@@ -1,19 +1,24 @@
 #-*- coding: utf-8 -*-
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render
 
 from cine.models import *
 
-from datetime import date
+from datetime import datetime
+from pytz import timezone
+
+tz = timezone(settings.TIME_ZONE)
+tzloc = tz.localize
 
 
 def home(request):
     c = {}
     films = []
     N = len(Film.objects.filter(vu=False)) * len(get_cinephiles()) + 1
-    for soiree in Soiree.objects.filter(date__gte=date.today()):
+    for soiree in Soiree.objects.filter(date__gte=tzloc(datetime.now())):
         if DispoToWatch.objects.filter(dispo='O', soiree=soiree):
             films.append((soiree, [], []))
             for film in Film.objects.filter(categorie=soiree.categorie, vu=False):
@@ -99,7 +104,7 @@ def comms(request, slug):
 
 @login_required
 def dispos(request):
-    dispos = DispoToWatch.objects.filter(cinephile=request.user, soiree__date__gte=date.today())
+    dispos = DispoToWatch.objects.filter(cinephile=request.user, soiree__date__gte=tzloc(datetime.now()))
     return render(request, 'cine/dispos.html', {'dispos': dispos})
 
 
@@ -126,4 +131,4 @@ def cinephiles(request):
 
 
 def ics(request):
-    return render(request, 'cine/cinenim.ics', {'soirees': Soiree.objects.filter(date__gte=date.today())}, content_type="text/calendar; charset=UTF-8")
+    return render(request, 'cine/cinenim.ics', {'soirees': Soiree.objects.filter(date__gte=tzloc(datetime.now()))}, content_type="text/calendar; charset=UTF-8")
