@@ -7,7 +7,7 @@ CALSCALE:GREGORIAN
 METHOD:PUBLISH
 {% load tz %}{% for soiree in soirees %}BEGIN:VEVENT
 DTSTART:{{ soiree.date|utc|date:"Ymd\THis\Z" }}
-DTEND:{{ soiree.date|utc|date:"Ymd\THis\Z" }}
+DTEND:{{ soiree.date|utc|date:"Ymd\T220000\Z" }}
 UID:perso.saurel.me/cine - {{ soiree.date|date:"c" }}{% if soiree.favoris %} - {{ soiree.favoris }}{% endif %}
 DESCRIPTION:{% if soiree.favoris %}Film favoris: {{ soiree.favoris }}{% else %}CinéNim{% endif %}
 LOCATION:72 Bd de Strasbourg, Toulouse
