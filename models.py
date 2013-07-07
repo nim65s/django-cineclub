@@ -70,6 +70,9 @@ class Film(Model):
     def get_categorie(self):
         return dict(CHOIX_CATEGORIE)[self.categorie]
 
+    def get_description(self):
+        return self.description.replace('\r\n','\\n')
+
     def score_absolu(self):
         score = 0
         for vote in self.vote_set.all():
