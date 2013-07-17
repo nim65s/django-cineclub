@@ -16,7 +16,7 @@ class Command(BaseCommand):
     help = u'Affiche les gens qui ont pas voté (c’est pas bien ! :P)'
 
     def handle(self, *args, **options):
-        soiree = Soiree.objects.filter(date__gte=tzloc(datetime.now())[0]
+        soiree = Soiree.objects.filter(date__gte=tzloc(datetime.now()))[0]
         for film in Film.objects.filter(categorie=soiree.categorie, vu=False):
             for dispo in DispoToWatch.objects.filter(dispo='O', soiree=soiree):
                 vote = Vote.objects.get(cinephile=dispo.cinephile, film=film)
