@@ -49,6 +49,7 @@ def films(request):
             'films': Film.objects.filter(vu=False),
             'films_vu': Film.objects.filter(vu=True),
             'edit': True
+            'respo_only': False
             }
     new = True
     if request.method == 'POST':
@@ -81,7 +82,9 @@ def films(request):
             c['edit'] = False
         if 'respo' in request.GET:
             respo = User.objects.get(username=request.GET['respo'])
-            c['films'] = Film.objects.filter(respo=respo,)
+            c['films'] = Film.objects.filter(respo=respo, vu=False)
+            c['films_vu'] = Film.objects.filter(respo=respo, vu=True)
+            c['respo_only'] = True
     c['filmform'] = form
     return render(request, 'cine/films.html', c)
 
