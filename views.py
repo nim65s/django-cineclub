@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, render
 
 from cine.models import *
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from pytz import timezone
 
 tz = timezone(settings.TIME_ZONE)
@@ -18,7 +18,7 @@ def home(request):
     c = {}
     films = []
     N = len(Film.objects.filter(vu=False)) * len(get_cinephiles()) + 1
-    for soiree in Soiree.objects.filter(date__gte=tzloc(datetime.now())):
+    for soiree in Soiree.objects.filter(date__gte=tzloc(datetime.now() + timedelta(hours=2))):
         if DispoToWatch.objects.filter(dispo='O', soiree=soiree):
             films.append((soiree, [], []))
             for film in Film.objects.filter(categorie=soiree.categorie, vu=False):
@@ -110,7 +110,7 @@ def comms(request, slug):
 
 @login_required
 def dispos(request):
-    dispos = DispoToWatch.objects.filter(cinephile=request.user, soiree__date__gte=tzloc(datetime.now()))
+    dispos = DispoToWatch.objects.filter(cinephile=request.user, soiree__date__gte=tzloc(datetime.now() + timedelta(hours=2)))
     return render(request, 'cine/dispos.html', {'dispos': dispos})
 
 
