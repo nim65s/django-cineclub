@@ -10,7 +10,7 @@
                     <h2>{{ film.titre }} ({{ film.get_categorie }}) {% if film.respo == request.user %}(<a href="{% url 'cine:films' %}?edit={{ film.slug }}">edit</a>){% endif %}</h2>
                     <p>{{ film.description|linebreaks }}</p>
                     <dl>
-                        <dt>respo</dt><dd>{{ film.respo.username }} − <a href="{% url 'cine:films' %}?respo={{ film.respo.username }}">ne voir que ses films</a></dd>
+                        <dt>respo</dt><dd>{{ film.respo.username }}{% if respo_only %} − <a href="{% url 'cine:films' %}?respo={{ film.respo.username }}">ne voir que ses films</a>{% endif %}</dd>
                         {% if film.titre_vo %}
                             <dt>Titre VO</dt><dd>{{ film.titre_vo }}</dd>
                         {% endif %}
