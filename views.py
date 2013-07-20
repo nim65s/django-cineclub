@@ -48,7 +48,7 @@ def films(request):
     c = {
             'films': Film.objects.filter(vu=False),
             'films_vu': Film.objects.filter(vu=True),
-            'edit': True
+            'edit': True,
             'respo_only': False
             }
     new = True
