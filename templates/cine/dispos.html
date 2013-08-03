@@ -22,8 +22,8 @@
 
 {% endblock %}
 
-{% block scripts_jquery %}
+{% addtoblock "js" %}
 <script>
     $('.nav-tabs').button()
 </script>
-{% endblock %}
+{% endaddtoblock %}
