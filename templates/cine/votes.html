@@ -17,7 +17,7 @@
 {% endblock %}
 
 
-{% addtoblock "js" %}
+{% block "js" %}
     <script>
         $(function() {
             $( "#sortable" ).sortable({
@@ -31,4 +31,4 @@
             $( "#sortable" ).disableSelection();
         });
     </script>
-{% endaddtoblock %}
+{% endblock %}
