@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.shortcuts import get_object_or_404, render
 
 from cine.models import *
@@ -40,6 +41,7 @@ def home(request):
                 soiree.favoris = films[-1][1][0][1]
                 soiree.save()
     c['films'] = films
+    c['nombre_films_vus'] = Film.objects.filter(vu=True).aggregate(c=Count('titre'))['c']
     return render(request, 'cine/home.html', c)
 
 

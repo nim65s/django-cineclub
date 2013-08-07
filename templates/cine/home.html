@@ -5,6 +5,8 @@
 
 <p>/!\Les résultats se font en fonction des disponibilités des gens… donc <a href="{% url 'cine:dispos' %}">allez renseigner les votres !</a>/!\</p>
 
+<p>Déjà {{ nombre_films_vus }} films vus !</p>
+
 {% for soiree, liste, autres in films %}
     <h2>{{ soiree.date }} ({{soiree.get_categorie}})</h2>
     <h3>Films disponibles</h3>
