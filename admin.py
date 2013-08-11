@@ -1,10 +1,14 @@
 #-*- coding: utf-8 -*-
 
-from django.contrib import admin
+from django.contrib.admin import site, ModelAdmin
 from models import *
 
-admin.site.register(Film)
-admin.site.register(Vote)
-admin.site.register(Soiree)
-admin.site.register(DispoToWatch)
-admin.site.register(Commentaire)
+
+class SoireeAdmin(ModelAdmin):
+    exclude = ('favoris',)
+
+site.register(Film)
+site.register(Vote)
+site.register(Soiree, SoireeAdmin)
+site.register(DispoToWatch)
+site.register(Commentaire)
