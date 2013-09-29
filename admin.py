@@ -5,7 +5,7 @@ from models import *
 
 
 class SoireeAdmin(ModelAdmin):
-    exclude = ('favoris',)
+    exclude = ('favoris', 'categorie')
 
 site.register(Film)
 site.register(Vote)

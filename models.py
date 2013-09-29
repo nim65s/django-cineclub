@@ -110,10 +110,14 @@ class Vote(Model):
 
 class Soiree(Model):
     date = DateTimeField()
-    categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D')
+    categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D', blank=True)
     favoris = ForeignKey(Film, null=True)
 
     def save(self, *args, **kwargs):
+        if Soiree.objects.latest().categorie == 'C':
+            self.categorie = 'D'
+        else:
+            self.categorie = 'C'
         super(Soiree, self).save(*args, **kwargs)
 
         subject = u'[CineNim] Soirée ajoutée !'
@@ -148,6 +152,7 @@ class Soiree(Model):
 
     class Meta:
         ordering = ["date"]
+        get_latest_by = 'date'
 
 
 class DispoToWatch(Model):
