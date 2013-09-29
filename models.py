@@ -126,7 +126,7 @@ class Soiree(Model):
         message_html = u'Hello :) <br /><br />Le %s, une soirée %s est proposée ; ' % (self.date, self.get_categorie())
         message_html += u'tu peux donc aller mettre à jour tes <a href="http://perso.saurel.me/cine/dispos">disponibilités</a> \\o/ <br><br>@+ !'
         message_txt = u'Hello :) \n\nLe %s, une soirée %s est proposée ; ' % (self.date, self.get_categorie())
-        message_html += u'tu peux donc aller mettre à jour tes disponibilités : http://perso.saurel.me/cine/dispos \\o/ \n\n@+ !'
+        message_txt += u'tu peux donc aller mettre à jour tes disponibilités : http://perso.saurel.me/cine/dispos \\o/ \n\n@+ !'
 
         for cinephile in get_cinephiles():
             dtw = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile)
