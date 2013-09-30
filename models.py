@@ -126,10 +126,11 @@ class Soiree(Model):
     favoris = ForeignKey(Film, null=True)
 
     def save(self, *args, **kwargs):
-        if Soiree.objects.latest().categorie == 'C':
-            self.categorie = 'D'
-        else:
-            self.categorie = 'C'
+        if not self.id:
+            if Soiree.objects.latest().categorie == 'C':
+                self.categorie = 'D'
+            else:
+                self.categorie = 'C'
         super(Soiree, self).save(*args, **kwargs)
 
         subject = u'[CineNim] Soirée ajoutée !'
