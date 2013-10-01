@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, render
 
@@ -14,32 +15,42 @@ from pytz import timezone
 tz = timezone(settings.TIME_ZONE)
 tzloc = tz.localize
 
+CACHE_LIMIT = 7 * 24 * 3600  # Une semaine…
+
+
+def check_votes(request):
+    if Vote.objects.filter(choix=9999, cinephile=request.user, film__vu=False):
+        messages.warning(request, u"Tu n’as pas classé certains films !")
 
 def home(request):
+    check_votes(request)
     c = {}
-    films = []
-    N = len(Film.objects.filter(vu=False)) * len(get_cinephiles()) + 1
-    for soiree in Soiree.objects.filter(date__gte=tzloc(datetime.now() - timedelta(hours=2))):
-        if DispoToWatch.objects.filter(dispo='O', soiree=soiree):
-            films.append((soiree, [], []))
-            for film in Film.objects.filter(categorie=soiree.categorie, vu=False):
-                score = N
-                for dispo in DispoToWatch.objects.filter(dispo='O', soiree=soiree):
-                    vote = Vote.objects.get(cinephile=dispo.cinephile, film=film)
-                    score -= vote.choix
-                    if vote.plusse:
-                        score += 1
-                if film.respo.dispotowatch_set.filter(soiree=soiree, dispo='O'):
-                    films[-1][1].append((score, film))
-                else:
-                    films[-1][2].append((score, film))
-            films[-1][1].sort()
-            films[-1][1].reverse()
-            films[-1][2].sort()
-            films[-1][2].reverse()
-            if len(films[-1][1]) > 0:
-                soiree.favoris = films[-1][1][0][1]
-                soiree.save()
+    films = cache.get('films')
+    if films is None:
+        films = []
+        N = len(Film.objects.filter(vu=False)) * len(get_cinephiles()) + 1
+        for soiree in Soiree.objects.filter(date__gte=tzloc(datetime.now() - timedelta(hours=2))):
+            if DispoToWatch.objects.filter(dispo='O', soiree=soiree):
+                films.append((soiree, [], []))
+                for film in Film.objects.filter(categorie=soiree.categorie, vu=False):
+                    score = N
+                    for dispo in DispoToWatch.objects.filter(dispo='O', soiree=soiree):
+                        vote = Vote.objects.get(cinephile=dispo.cinephile, film=film)
+                        score -= vote.choix
+                        if vote.plusse:
+                            score += 1
+                    if film.respo.dispotowatch_set.filter(soiree=soiree, dispo='O'):
+                        films[-1][1].append((score, film))
+                    else:
+                        films[-1][2].append((score, film))
+                films[-1][1].sort()
+                films[-1][1].reverse()
+                films[-1][2].sort()
+                films[-1][2].reverse()
+                if len(films[-1][1]) > 0:
+                    soiree.favoris = films[-1][1][0][1]
+                    soiree.save()
+        cache.set('films', films, CACHE_LIMIT)
     c['films'] = films
     c['nombre_films_vus'] = Film.objects.filter(vu=True).aggregate(c=Count('titre'))['c']
     return render(request, 'cine/home.html', c)
@@ -47,6 +58,7 @@ def home(request):
 
 @login_required
 def films(request):
+    check_votes(request)
     c = {
             'films': Film.objects.filter(vu=False),
             'films_vu': Film.objects.filter(vu=True),
@@ -55,6 +67,7 @@ def films(request):
             }
     new = True
     if request.method == 'POST':
+        cache.delete('films')
         form = FilmForm(request.POST)
         if 'slug' in form.data and form.data['slug']:
             film = Film.objects.get(slug=form.data['slug'])
@@ -112,6 +125,7 @@ def comms(request, slug):
 
 @login_required
 def dispos(request):
+    check_votes(request)
     dispos = DispoToWatch.objects.filter(cinephile=request.user, soiree__date__gte=tzloc(datetime.now() - timedelta(hours=2)))
     return render(request, 'cine/dispos.html', {'dispos': dispos})
 
@@ -119,6 +133,7 @@ def dispos(request):
 @login_required
 def votes(request):
     if request.method == 'POST':
+        cache.delete('films')
         ordre = request.POST['ordre'].split(',')[:-1]
         if ordre:
             i = 1

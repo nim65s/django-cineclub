@@ -1,7 +1,9 @@
 #-*- coding: utf-8 -*-
 from django.conf import settings
 from django.contrib.auth.models import User, Group
+from django.contrib.sites.models import Site
 from django.core.mail import EmailMultiAlternatives
+from django.core.urlresolvers import reverse
 from django.db.models import URLField, TextField, ImageField, BooleanField, SlugField
 from django.db.models import CharField, DateTimeField, IntegerField
 from django.db.models import Model, ForeignKey, ManyToManyField
@@ -25,6 +27,9 @@ CHOIX_CATEGORIE = (
 def get_cinephiles():
     return Group.objects.get_or_create(name='cine')[0].user_set.all()
 
+
+def full_url(path):
+    return u'http://%s%s' % (Site.objects.get_current().domain, path)
 
 class Film(Model):
     titre = CharField(max_length=200, unique=True)
@@ -50,12 +55,13 @@ class Film(Model):
         subject = u"[CineNim] Film ajouté !"
         mailfrom = u'cine@perso.saurel.me'
 
-        message_html = u"Hello :) <br /><br />%s a proposé un nouveau film : <a href='http://perso.saurel.me/cine/films#%s'>%s</a>.<br />" % (
-                self.respo.username, self.slug, self.titre)
-        message_html += u"Tu peux donc aller actualiser ton <a href='http://perso.saurel.me/cine/votes'>classement</a> \\o/ <br /><br /> @+ !"
-        message_txt = u"Hello :)\n\n%s a proposé un nouveau film : %s (http://perso.saurel.me/cine/films#%s' ; " % (
-                self.respo.username, self.titre, self.slug)
-        message_txt += u"tu peux donc aller actualiser ton classement (http://perso.saurel.me/cine/votes) \\o/ \n\n @+!"
+        film_url = self.get_full_url()
+        vote_url = full_url(reverse('cine:votes'))
+
+        message_html = u"Hello :) <br /><br />%s a proposé un nouveau film : <a href='%s'>%s</a>.<br />" % (self.respo.username, film_url, self.titre)
+        message_html += u"Tu peux donc aller actualiser ton <a href='%s'>classement</a> \\o/ <br /><br /> @+ !" % vote_url
+        message_txt = u"Hello :)\n\n%s a proposé un nouveau film : %s (%s)' ; " % ( self.respo.username, self.titre, film_url)
+        message_txt += u"tu peux donc aller actualiser ton classement (%s) \\o/ \n\n @+!" % vote_url
 
         for cinephile in get_cinephiles():
             vote = Vote.objects.get_or_create(film=self, cinephile=cinephile)
@@ -66,6 +72,12 @@ class Film(Model):
                     msg.send()
                 except:
                     logger.error(u'Le mail de nouveau film %s pour %s n’a pas été envoyé' % (self.titre, cinephile))
+
+    def get_absolute_url(self):
+        return reverse('cine:films') + '#%s' % self.slug
+
+    def get_full_url(self):
+        return full_url(self.get_absolute_url())
 
     def get_categorie(self):
         return dict(CHOIX_CATEGORIE)[self.categorie]
@@ -110,19 +122,26 @@ class Vote(Model):
 
 class Soiree(Model):
     date = DateTimeField()
-    categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D')
+    categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D', blank=True)
     favoris = ForeignKey(Film, null=True)
 
     def save(self, *args, **kwargs):
+        if not self.id:
+            if Soiree.objects.latest().categorie == 'C':
+                self.categorie = 'D'
+            else:
+                self.categorie = 'C'
         super(Soiree, self).save(*args, **kwargs)
 
         subject = u'[CineNim] Soirée ajoutée !'
         mailfrom = u'cine@perso.saurel.me'
 
+        dispos_url = full_url(reverse('cine:dispos'))
+
         message_html = u'Hello :) <br /><br />Le %s, une soirée %s est proposée ; ' % (self.date, self.get_categorie())
-        message_html += u'tu peux donc aller mettre à jour tes <a href="http://perso.saurel.me/cine/dispos">disponibilités</a> \\o/ <br><br>@+ !'
+        message_html += u'tu peux donc aller mettre à jour tes <a href="%s">disponibilités</a> \\o/ <br><br>@+ !' % dispos_url
         message_txt = u'Hello :) \n\nLe %s, une soirée %s est proposée ; ' % (self.date, self.get_categorie())
-        message_html += u'tu peux donc aller mettre à jour tes disponibilités : http://perso.saurel.me/cine/dispos \\o/ \n\n@+ !'
+        message_txt += u'tu peux donc aller mettre à jour tes disponibilités (%s) \\o/ \n\n@+ !' % dispos_url
 
         for cinephile in get_cinephiles():
             dtw = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile)
@@ -148,6 +167,7 @@ class Soiree(Model):
 
     class Meta:
         ordering = ["date"]
+        get_latest_by = 'date'
 
 
 class DispoToWatch(Model):
@@ -185,9 +205,9 @@ class Commentaire(Model):
             mailfrom = u'cine@perso.saurel.me'
 
             message_html = u'Hello :) <br /><br />%s a posté un nouveau commentaire sur %s: ' % (self.posteur.username, self.film.titre)
-            message_html += u'vous pouvez aller le voir <a href="http://perso.saurel.me/cine/comms/%s">ici</a> \\o/ <br /><br />@+ !' % self.film.slug
+            message_html += u'vous pouvez aller le voir <a href="%s">ici</a> \\o/ <br /><br />@+ !' % self.get_full_url()
             message_txt = u'Hello :) \n\n%s a posté un nouveau commentaire sur %s: ' % (self.posteur.username, self.film.titre)
-            message_html += u'vous pouvez aller le voir sur http://perso.saurel.me/cine/comms/%s \\o/ \n\n@+ !' % self.film.slug
+            message_txt += u'vous pouvez aller le voir sur %s \\o/ \n\n@+ !' % self.get_full_url()
 
             try:
                 msg = EmailMultiAlternatives(subject, message_txt, mailfrom, ['cinenim@list.bde.enseeiht.fr'])
@@ -195,6 +215,12 @@ class Commentaire(Model):
                 msg.send()
             except:
                 logger.error(u'Le mail de commentaire %s n’a pas été envoyée' % self)
+
+    def get_absolute_url(self):
+        return reverse('cine:comms', kwargs={'slug': self.film.slug})
+
+    def get_full_url(self):
+        return full_url(self.get_absolute_url())
 
     def __unicode__(self):
         return u'Commentaire de %s sur %s le %s: %s' % (self.posteur.username, self.film.titre, self.date, self.commentaire[:20])
