@@ -45,7 +45,7 @@ def home(request):
                 if len(films[-1][1]) > 0:
                     soiree.favoris = films[-1][1][0][1]
                     soiree.save()
-        cache.set('films', CACHE_LIMIT)
+        cache.set('films', films, CACHE_LIMIT)
     c['films'] = films
     c['nombre_films_vus'] = Film.objects.filter(vu=True).aggregate(c=Count('titre'))['c']
     return render(request, 'cine/home.html', c)
