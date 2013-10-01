@@ -23,6 +23,8 @@
     </dl>
 </div>
 
+{{ disqus }}
+
 {% for comm in comms %}
     <div id="{{ forloop.counter }}">
         <h2>{{ comm.posteur.username }}, le {{ comm.date }}</h2>
