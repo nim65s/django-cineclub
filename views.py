@@ -18,7 +18,12 @@ tzloc = tz.localize
 CACHE_LIMIT = 7 * 24 * 3600  # Une semaine…
 
 
+def check_votes():
+    if Vote.objects.filter(choix=9999, cinephile=request.user, film__vu=False):
+        messages.warning(request, u"Tu n’as pas classé certains films !")
+
 def home(request):
+    check_votes()
     c = {}
     films = cache.get('films')
     if films is None:
@@ -53,6 +58,7 @@ def home(request):
 
 @login_required
 def films(request):
+    check_votes()
     c = {
             'films': Film.objects.filter(vu=False),
             'films_vu': Film.objects.filter(vu=True),
@@ -119,6 +125,7 @@ def comms(request, slug):
 
 @login_required
 def dispos(request):
+    check_votes()
     dispos = DispoToWatch.objects.filter(cinephile=request.user, soiree__date__gte=tzloc(datetime.now() - timedelta(hours=2)))
     return render(request, 'cine/dispos.html', {'dispos': dispos})
 
