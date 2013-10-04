@@ -6,7 +6,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.core.urlresolvers import reverse
 from django.db.models import URLField, TextField, ImageField, BooleanField, SlugField
 from django.db.models import CharField, DateTimeField, IntegerField
-from django.db.models import Model, ForeignKey, ManyToManyField
+from django.db.models import Model, ForeignKey, ManyToManyField, Manager
 from django.forms import ModelForm
 from django.template.defaultfilters import slugify
 
@@ -16,7 +16,13 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 import logging
+from datetime import datetime, timedelta
+from pytz import timezone
+
 logger = logging.getLogger(__name__)
+tz = timezone(settings.TIME_ZONE)
+tzloc = tz.localize
+
 
 CHOIX_CATEGORIE = (
         ('D', 'Divertissement'),
@@ -120,10 +126,18 @@ class Vote(Model):
         ordering = ['choix', 'film']
 
 
+class SoireeAVenirManager(Manager):
+    def get_query_set(self):
+        return super(SoireeAVenirManager, self).get_query_set().filter(date__gte=tzloc(datetime.now() - timedelta(hours=5)))
+
+
 class Soiree(Model):
     date = DateTimeField()
     categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D', blank=True)
     favoris = ForeignKey(Film, null=True)
+
+    objects = Manager()
+    a_venir = SoireeAVenirManager()
 
     def save(self, *args, **kwargs):
         if not self.id:

@@ -9,12 +9,6 @@ from django.shortcuts import get_object_or_404, render
 
 from cine.models import *
 
-from datetime import datetime, timedelta
-from pytz import timezone
-
-tz = timezone(settings.TIME_ZONE)
-tzloc = tz.localize
-
 CACHE_LIMIT = 7 * 24 * 3600  # Une semaine…
 
 
@@ -29,7 +23,7 @@ def home(request):
     if films is None:
         films = []
         N = len(Film.objects.filter(vu=False)) * len(get_cinephiles()) + 1
-        for soiree in Soiree.objects.filter(date__gte=tzloc(datetime.now() - timedelta(hours=2))):
+        for soiree in Soiree.a_venir.all():
             if DispoToWatch.objects.filter(dispo='O', soiree=soiree):
                 films.append((soiree, [], []))
                 for film in Film.objects.filter(categorie=soiree.categorie, vu=False):
@@ -126,7 +120,7 @@ def comms(request, slug):
 @login_required
 def dispos(request):
     check_votes(request)
-    dispos = DispoToWatch.objects.filter(cinephile=request.user, soiree__date__gte=tzloc(datetime.now() - timedelta(hours=2)))
+    dispos = DispoToWatch.objects.filter(cinephile=request.user, soiree__in=Soiree.a_venir.all())
     return render(request, 'cine/dispos.html', {'dispos': dispos})
 
 
@@ -154,4 +148,4 @@ def cinephiles(request):
 
 
 def ics(request):
-    return render(request, 'cine/cinenim.ics', {'soirees': Soiree.objects.filter(date__gte=tzloc(datetime.now()))}, content_type="text/calendar; charset=UTF-8")
+    return render(request, 'cine/cinenim.ics', {'soirees': Soiree.a_venir.all()}, content_type="text/calendar; charset=UTF-8")
