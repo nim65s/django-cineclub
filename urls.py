@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView
 
-from cine.views import *
+from .views import *
 
 
 urlpatterns = patterns('',

@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from dajax.core import Dajax
 from dajaxice.decorators import dajaxice_register
 
-from cine.models import *
+from .models import *
 
 from datetime import datetime
 from pytz import timezone

@@ -7,7 +7,7 @@ from django.core.cache import cache
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, render
 
-from cine.models import *
+from .models import *
 
 CACHE_LIMIT = 7 * 24 * 3600  # Une semaine…
 
