@@ -15,7 +15,7 @@ CACHE_LIMIT = 7 * 24 * 3600  # Une semaine…
 
 def check_votes(request):
     if request.user in get_cinephiles() and Vote.objects.filter(choix=9999, cinephile=request.user, film__vu=False).exists():
-        messages.warning(request, u'<a href="%s">Tu n’as pas classé certains films !</a>' % reverse('cine:votes')
+        messages.warning(request, u'<a href="%s">Tu n’as pas classé certains films !</a>' % reverse('cine:votes'))
 
 def home(request):
     check_votes(request)
