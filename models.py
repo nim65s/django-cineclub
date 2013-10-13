@@ -47,6 +47,7 @@ class Film(Model):
     allocine = URLField(blank=True, null=True, verbose_name=u"Allociné")
     realisateur = CharField(max_length=200, null=True, blank=True, verbose_name=u"Réalisateur")
     duree = CharField(max_length=20, null=True, blank=True, verbose_name=u"Durée")
+    duree_min = IntegerField("Durée en minutes", null=True)
 
     vu = BooleanField(default=False)
 

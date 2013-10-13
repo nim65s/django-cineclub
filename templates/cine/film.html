@@ -7,7 +7,8 @@
         {% if film.annee_sortie %}<dt>Année de sortie</dt><dd>{{ film.annee_sortie }}</dd>{% endif %}
         {% if film.titre_vo %}<dt>Titre VO</dt><dd>{{ film.titre_vo }}</dd>{% endif %}
         {% if film.realisateur %}<dt>Réalisateur</dt><dd>{{ film.realisateur }}</dd>{% endif %}
-        {% if film.duree %}<dt>Durée</dt><dd>{{ film.duree }}</dd>{% endif %}
+        {% if film.duree_min %}<dt>Durée</dt><dd>{{ film.duree_min }} minutes</dd>{% else %}
+        {% if film.duree %}<dt>Durée</dt><dd>{{ film.duree }}</dd>{% endif %}{% endif %}
         {% if film.imdb or film.allocine %}
             <dt>Lien(s)</dt>
             <dd>

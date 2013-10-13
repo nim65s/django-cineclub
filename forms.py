@@ -8,4 +8,4 @@ from .models import Film
 class FilmForm(ModelForm):
     class Meta:
         model = Film
-        exclude = ('respo', 'slug', 'vu')
+        exclude = ('respo', 'slug', 'vu', 'duree')
