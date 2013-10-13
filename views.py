@@ -128,6 +128,15 @@ class FilmUpdateView(GroupRequiredMixin, FilmActionMixin, UpdateView):
         return redirect('cine:films')
 
 
+class LegacyCommsRedirectView(RedirectView):
+    query_string = True
+    # TODO 1.6: pattern_name à la place du get_machin
+
+    def get_redirect_url(self, *args, **kwargs):
+        film = get_object_or_404(Film, slug=self.kwargs['slug'])
+        return reverse('cine:film', kwargs={'slug': film.slug})
+
+
 class FilmDetailView(CheckVotesMixin, DetailView):
     model = Film
 

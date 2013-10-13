@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     url(r'^film/maj/(?P<slug>[^/]+)$', FilmUpdateView.as_view(), name='maj_film'),
     url(r'^film/vu/(?P<slug>[^/]+)$', FilmVuView.as_view(), name='film_vu'),
     url(r'^film/(?P<slug>[^/]+)$', FilmDetailView.as_view(), name='film'),
+    url(r'^comms/(?P<slug>[^/]+)$', LegacyCommsRedirectView.as_view()),
 
     url(r'^dispos$', DispoListView.as_view(), name='dispos'),
     url(r'^cinephiles$', CinephileListView.as_view(), name='cinephiles'),
