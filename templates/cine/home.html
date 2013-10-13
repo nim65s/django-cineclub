@@ -5,7 +5,7 @@
 
 <p>/!\Les résultats se font en fonction des disponibilités des gens… donc <a href="{% url 'cine:dispos' %}">allez renseigner les votres !</a>/!\</p>
 
-<p>Déjà {{ nombre_films_vus }} films vus !</p>
+<p>Déjà {{ nombre_films_vus }} films vus ; et il en reste {{ nombre_films_c }} à voir dans la catégorie Culture, et {{ nombre_films_d }} dans la catégorie Divertissement !</p>
 
 <p><a href="http://perso.saurel.me{% url 'cine:ics' %}">Téléchargez</a>, ou même <a href="webcal://perso.saurel.me{% url 'cine:ics' %}">abonnez-vous</a> au calendrier CinéNim !</p>
 

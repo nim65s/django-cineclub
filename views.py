@@ -54,6 +54,8 @@ def home(request):
                     soiree.save()
         cache.set('films', films, CACHE_LIMIT)
     c['films'] = films
+    c['nombre_films_c'] = Film.objects.filter(vu=False, categorie='C').aggregate(c=Count('titre'))['c']
+    c['nombre_films_d'] = Film.objects.filter(vu=False, categorie='D').aggregate(c=Count('titre'))['c']
     c['nombre_films_vus'] = Film.objects.filter(vu=True).aggregate(c=Count('titre'))['c']
     return render(request, 'cine/home.html', c)
 
