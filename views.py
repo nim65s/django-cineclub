@@ -98,6 +98,15 @@ class FilmActionMixin(CheckVotesMixin):
         return super(FilmActionMixin, self).form_valid(form)
 
 
+class FiltreCategorieMixin(object):
+    def get_queryset(self):
+        queryset = super(FiltreCategorieMixin, self).get_queryset()
+        cat = self.request.GET.get("cat")
+        if cat:
+            return queryset.filter(categorie=cat)
+        return queryset
+
+
 class FilmCreateView(GroupRequiredMixin, FilmActionMixin, CreateView):
     group_required = u'cine'
     action = u"Créé"
@@ -123,15 +132,15 @@ class FilmDetailView(CheckVotesMixin, DetailView):
     model = Film
 
 
-class FilmListView(CheckVotesMixin, ListView):
+class FilmListView(CheckVotesMixin, FiltreCategorieMixin, ListView):
     queryset = Film.objects.filter(vu=False)
 
 
-class FilmVuListView(CheckVotesMixin, ListView):
+class FilmVuListView(CheckVotesMixin, FiltreCategorieMixin, ListView):
     queryset = Film.objects.filter(vu=True)
 
 
-class FilmDeListView(CheckVotesMixin, ListView):
+class FilmDeListView(CheckVotesMixin, FiltreCategorieMixin, ListView):
     def get_queryset(self):
         return Film.objects.filter(respo__username=self.kwargs['username'])
 
