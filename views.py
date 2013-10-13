@@ -6,8 +6,13 @@ from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db.models import Count
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.utils.safestring import mark_safe
+from django.views.generic import CreateView, UpdateView, DetailView, ListView
+from django.views.generic.base import RedirectView
+
+
+from braces.views import GroupRequiredMixin, SuperuserRequiredMixin
 
 from .models import *
 
@@ -17,6 +22,7 @@ CACHE_LIMIT = 7 * 24 * 3600  # Une semaine…
 def check_votes(request):
     if request.user in get_cinephiles() and Vote.objects.filter(choix=9999, cinephile=request.user, film__vu=False).exists():
         messages.warning(request, mark_safe(u'<a href="%s">Tu n’as pas classé certains films !</a>' % reverse('cine:votes')))
+
 
 def home(request):
     check_votes(request)
@@ -53,80 +59,6 @@ def home(request):
 
 
 @login_required
-def films(request):
-    check_votes(request)
-    c = {
-            'films': Film.objects.filter(vu=False),
-            'films_vu': Film.objects.filter(vu=True),
-            'edit': True,
-            'respo_only': False
-            }
-    new = True
-    if request.method == 'POST':
-        cache.delete('films')
-        form = FilmForm(request.POST)
-        if 'slug' in form.data and form.data['slug']:
-            film = Film.objects.get(slug=form.data['slug'])
-            if film.respo == request.user:
-                form = FilmForm(request.POST, instance=film)
-                new = False
-            else:
-                messages.error(request, u"Vous n’êtes pas respo pour ce film…")
-        if form.is_valid():
-            form.instance.respo = request.user
-            form.save()
-            form = FilmForm()
-            if new:
-                messages.success(request, u'Allez classer ce nouveau film dans vos votes !')
-            else:
-                messages.success(request, u'Film modifié')
-            c['edit'] = False
-        else:
-            messages.error(request, u'Le formulaire n’est pas valide.')
-    else:
-        if 'edit' in request.GET:
-            film = Film.objects.get(slug=request.GET['edit'])
-            c['slug'] = film.slug
-            form = FilmForm(instance=film)
-        else:
-            form = FilmForm()
-            c['edit'] = False
-        if 'respo' in request.GET:
-            respo = User.objects.get(username=request.GET['respo'])
-            c['films'] = Film.objects.filter(respo=respo, vu=False)
-            c['films_vu'] = Film.objects.filter(respo=respo, vu=True)
-            c['respo_only'] = True
-    c['filmform'] = form
-    return render(request, 'cine/films.html', c)
-
-
-@login_required
-def comms(request, slug):
-    film = get_object_or_404(Film, slug=slug)
-    edit = False  # Not yet implemented
-    if request.method == 'POST':
-        form = CommForm(request.POST)
-        if form.is_valid():
-            form.instance.posteur = request.user
-            form.instance.film = film
-            form.save()
-    c = {
-            'film': film,
-            'comms': film.commentaire_set.all(),
-            'form': CommForm(),
-            'edit': edit,
-            }
-    return render(request, 'cine/comms.html', c)
-
-
-@login_required
-def dispos(request):
-    check_votes(request)
-    dispos = DispoToWatch.objects.filter(cinephile=request.user, soiree__in=Soiree.a_venir.all())
-    return render(request, 'cine/dispos.html', {'dispos': dispos})
-
-
-@login_required
 def votes(request):
     if request.method == 'POST':
         cache.delete('films')
@@ -143,11 +75,82 @@ def votes(request):
     return render(request, 'cine/votes.html', c)
 
 
-@login_required
-def cinephiles(request):
-    c = {'cinephiles': get_cinephiles()}
-    return render(request, 'cine/cinephiles.html', c)
-
-
 def ics(request):
     return render(request, 'cine/cinenim.ics', {'soirees': Soiree.a_venir.all()}, content_type="text/calendar; charset=UTF-8")
+
+
+class CheckVotesMixin(object):
+    def get(self, request, *args, **kwargs):
+        if request.user in get_cinephiles() and Vote.objects.filter(choix=9999, cinephile=request.user, film__vu=False).exists():
+            messages.warning(request, mark_safe(u'<a href="%s">Tu n’as pas classé certains films !</a>' % reverse('cine:votes')))
+        return super(CheckVotesMixin, self).get(request, *args, **kwargs)
+
+
+class FilmActionMixin(CheckVotesMixin):
+    model = Film
+    form_class = FilmForm
+    # TODO 1.6: fields à la place de form_class
+
+    def form_valid(self, form):
+        messages.info(self.request, u"Film %s" % self.action)
+        return super(FilmActionMixin, self).form_valid(form)
+
+
+class FilmCreateView(GroupRequiredMixin, FilmActionMixin, CreateView):
+    group_required = u'cine'
+    action = u"Créé"
+
+    def form_valid(self, form):
+        cache.delete('films')
+        form.instance.respo = self.request.user
+        return super(FilmCreateView, self).form_valid(form)
+
+
+class FilmUpdateView(GroupRequiredMixin, FilmActionMixin, UpdateView):
+    group_required = u'cine'
+    action = u"modifié"
+
+    def form_valid(self, form):
+        if form.instance.respo == self.request.user or self.request.user.is_superuser():
+            return super(FilmUpdateView, self).form_valid(form)
+
+
+class FilmDetailView(CheckVotesMixin, DetailView):
+    model = Film
+
+
+class FilmListView(CheckVotesMixin, ListView):
+    queryset = Film.objects.filter(vu=False)
+
+
+class FilmVuListView(CheckVotesMixin, ListView):
+    queryset = Film.objects.filter(vu=True)
+
+
+class FilmDeListView(CheckVotesMixin, ListView):
+    def get_queryset(self):
+        return Film.objects.filter(respo__username=self.kwargs['username'])
+
+
+class FilmVuView(SuperuserRequiredMixin, RedirectView):
+    permanent = False
+
+    def get_redirect_url(self, *args, **kwargs):
+        cache.delete('films')
+        film = get_object_or_404(Film, slug=kwargs['slug'])
+        film.vu = True
+        film.save()
+        return reverse('cine:films')
+
+
+class CinephileListView(GroupRequiredMixin, CheckVotesMixin, ListView):
+    group_required = u'cine'
+    queryset = User.objects.filter(groups__name='cine')
+    template_name = 'cine/cinephile_list.html'
+
+
+class DispoListView(GroupRequiredMixin, CheckVotesMixin, ListView):
+    group_required = u'cine'
+
+    def get_queryset(self):
+        return DispoToWatch.objects.filter(cinephile=self.request.user, soiree__in=Soiree.a_venir.all())

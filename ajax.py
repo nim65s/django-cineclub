@@ -1,19 +1,15 @@
 #-*- coding: utf-8 -*-
 
-from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 
 from dajax.core import Dajax
 from dajaxice.decorators import dajaxice_register
 
-from .models import *
+from .models import DispoToWatch, tzloc
 
 from datetime import datetime
-from pytz import timezone
 
-tz = timezone(settings.TIME_ZONE)
-tzloc = tz.localize
 
 @dajaxice_register
 def dispo(request, date, dispo):

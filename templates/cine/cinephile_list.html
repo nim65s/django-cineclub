@@ -1,0 +1,11 @@
+{% extends "cine/cine.html" %}
+
+{% block content %}
+<h1>Cinéphiles</h1>
+{% for cinephile in object_list %}
+    <div>
+        <h2>{{ cinephile.username }}</h2>
+        <p>{{ cinephile.get_full_name }}: <a href="mailto:{{ cinephile.email }}">mail</a> − <a href="{% url 'cine:films_de' username=cinephile.username %}">films</a></p>
+    </div>
+{% endfor %}
+{% endblock %}

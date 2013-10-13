@@ -25,11 +25,12 @@ CHOIX_CATEGORIE = (
 
 
 def get_cinephiles():
-    return Group.objects.get_or_create(name='cine')[0].user_set.all()
+    return User.objects.filter(groups__name='cine')
 
 
 def full_url(path):
     return u'http://%s%s' % (Site.objects.get_current().domain, path)
+
 
 class Film(Model):
     titre = CharField(max_length=200, unique=True)
@@ -64,7 +65,7 @@ class Film(Model):
                 cinephine.email_user(u'[CinéNim] Film ajouté !', message)
 
     def get_absolute_url(self):
-        return reverse('cine:films') + '#%s' % self.slug
+        return reverse('cine:film', kwargs={'slug': self.slug})
 
     def get_full_url(self):
         return full_url(self.get_absolute_url())
