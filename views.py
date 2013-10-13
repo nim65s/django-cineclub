@@ -98,7 +98,7 @@ class FilmActionMixin(CheckVotesMixin):
         return super(FilmActionMixin, self).form_valid(form)
 
 
-class FilmCreateView(GroupRequiredMixin, CreateView):
+class FilmCreateView(GroupRequiredMixin, FilmActionMixin, CreateView):
     group_required = u'cine'
     action = u"Créé"
 
