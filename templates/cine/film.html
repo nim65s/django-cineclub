@@ -4,6 +4,7 @@
     <dl>
         <dt>Vu</dt><dd>{% if film.vu %}Oui{% else %}Non{% if request.user.is_superuser %}<form method="get" action="{% url 'cine:film_vu' slug=film.slug %}"><button type="submit" class="btn">Ça y est !</button></form>{% endif %}{% endif %}</p>
         <dt>Respo</dt><dd><a href="{% url 'cine:films_de' username=film.respo %}">{{ film.respo }}</a></dd>
+        {% if film.annee_sortie %}<dt>Année de sortie</dt><dd>{{ film.annee_sortie }}</dd>{% endif %}
         {% if film.titre_vo %}<dt>Titre VO</dt><dd>{{ film.titre_vo }}</dd>{% endif %}
         {% if film.realisateur %}<dt>Réalisateur</dt><dd>{{ film.realisateur }}</dd>{% endif %}
         {% if film.duree %}<dt>Durée</dt><dd>{{ film.duree }}</dd>{% endif %}

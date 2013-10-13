@@ -22,6 +22,8 @@ CHOIX_CATEGORIE = (
         ('C', 'Culture'),
         )
 
+CHOIX_ANNEES = [(annee, annee) for annee in range(datetime.now().year + 1, 1900, -1)]
+
 
 def get_cinephiles():
     return User.objects.filter(groups__name='cine')
@@ -38,12 +40,13 @@ class Film(Model):
     slug = SlugField(unique=True, blank=True)
 
     categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D')
+    annee_sortie = IntegerField(max_length=4, choices=CHOIX_ANNEES, blank=True, null=True, verbose_name=u"Année de sortie")
 
-    titre_vo = CharField(max_length=200, blank=True, null=True)
-    imdb = URLField(blank=True, null=True)
-    allocine = URLField(blank=True, null=True)
-    realisateur = CharField(max_length=200, null=True, blank=True)
-    duree = CharField(max_length=20, null=True, blank=True)
+    titre_vo = CharField(max_length=200, blank=True, null=True, verbose_name=u"Titre en Version Originale")
+    imdb = URLField(blank=True, null=True, verbose_name="IMDB")
+    allocine = URLField(blank=True, null=True, verbose_name=u"Allociné")
+    realisateur = CharField(max_length=200, null=True, blank=True, verbose_name=u"Réalisateur")
+    duree = CharField(max_length=20, null=True, blank=True, verbose_name=u"Durée")
 
     vu = BooleanField(default=False)
 
