@@ -14,7 +14,8 @@ from django.views.generic.base import RedirectView
 from braces.views import GroupRequiredMixin, SuperuserRequiredMixin
 
 from .forms import FilmForm
-from .models import get_cinephiles, Film, Vote, Soiree, DispoToWatch, CHOIX_CATEGORIE_DICT
+from .models import Film, Vote, Soiree, DispoToWatch
+from .models import get_cinephiles, get_verbose_name, CHOIX_CATEGORIE_DICT
 
 CACHE_LIMIT = 7 * 24 * 3600  # Une semaine…
 
@@ -146,10 +147,10 @@ class FilmListView(CheckVotesMixin, ListView):
             list_titre += u" à voir"
         if get('respo'):
             list_titre += u" de %s" % get('respo')
-        if get('cat'):
+        if get('cat') and get('cat') in "CD":
             list_titre += u" dans la catégorie %s" % CHOIX_CATEGORIE_DICT[get('cat')]
-        if get('tri'):
-            list_titre += u" triés par %s" % get('tri')
+        if get_verbose_name(Film, get('tri')):
+            list_titre += u" triés par %s" % get_verbose_name(Film, get('tri'))
 
         context['list_titre'] = list_titre
         return context
@@ -158,7 +159,7 @@ class FilmListView(CheckVotesMixin, ListView):
         queryset = super(FilmListView, self).get_queryset()
         get = self.request.GET.get
 
-        if get('cat'):
+        if get('cat') and get('cat') in "CD":
             queryset = queryset.filter(categorie=get('cat'))
         if get('vus') == "vus":
             queryset = queryset.filter(vu=True)
@@ -166,7 +167,7 @@ class FilmListView(CheckVotesMixin, ListView):
             queryset = queryset.filter(vu=False)
         if get('respo'):
             queryset = queryset.filter(respo__username=get('respo'))
-        if get('tri'):
+        if get_verbose_name(Film, get('tri')):
             queryset = queryset.order_by(get('tri'))
 
         return queryset

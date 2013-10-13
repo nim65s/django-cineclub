@@ -34,6 +34,13 @@ def full_url(path):
     return u'http://%s%s' % (Site.objects.get_current().domain, path)
 
 
+def get_verbose_name(model, name):
+    try:
+        return model._meta.get_field_by_name(name)[0].verbose_name
+    except:
+        return None
+
+
 class Film(Model):
     titre = CharField(max_length=200, unique=True)
     respo = ForeignKey(User)
@@ -48,7 +55,7 @@ class Film(Model):
     allocine = URLField(blank=True, null=True, verbose_name=u"Allociné")
     realisateur = CharField(max_length=200, null=True, blank=True, verbose_name=u"Réalisateur")
     duree = CharField(max_length=20, null=True, blank=True, verbose_name=u"Durée")
-    duree_min = IntegerField("Durée en minutes", null=True)
+    duree_min = IntegerField(u"Durée en minutes", null=True)
 
     vu = BooleanField(default=False)
 

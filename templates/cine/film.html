@@ -5,13 +5,13 @@
     </h2>
     <p>{{ film.description|linebreaks }}</p>
     <dl>
-        {% if not request.GET.respo %}<dt>Respo</dt><dd><a href="{% url 'cine:films' %}?{% url_replace request 'respo' film.respo %}">{{ film.respo }}</a></dd>{% endif %}
-        {% if not request.GET.cat %}<dt>Catégorie</dt><dd><a href="{% url 'cine:films' %}?{% url_replace request 'cat' film.categorie %}">{{ film.get_categorie }}</a></dd>{% endif %}
+        {% if not request.GET.respo %}<dt>Respo</dt><dd><a href="{% films_url request 'respo' film.respo %}">{{ film.respo }}</a></dd>{% endif %}
+        {% if not request.GET.cat %}<dt>Catégorie</dt><dd><a href="{% films_url request 'cat' film.categorie %}">{{ film.get_categorie }}</a></dd>{% endif %}
         {% if not request.GET.vus %}<dt>Vu</dt><dd>
             {% if film.vu %}
-                <a href="{% url 'cine:films' %}?{% url_replace request 'vus' 'vus' %}">Oui</a>
+                <a href="{% films_url request 'vus' 'vus' %}">Oui</a>
             {% else %}
-                <a href="{% url 'cine:films' %}?{% url_replace request 'vus' 'a_voir' %}">Non</a>
+                <a href="{% films_url request 'vus' 'a_voir' %}">Non</a>
                 {% if request.user.is_superuser %} <a href="{% url 'cine:film_vu' slug=film.slug %}">Ça y est \o/</a>{% endif %}
             {% endif %}</dd>
         {% endif %}
