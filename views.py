@@ -145,7 +145,7 @@ class FilmListView(CheckVotesMixin, ListView):
             list_titre += u" vus"
         elif get('vus') == "a_voir":
             list_titre += u" à voir"
-        if get('respo'):
+        if get('respo') and get('respo') != 'tous':
             list_titre += u" de %s" % get('respo')
         if get('cat') and get('cat') in "CD":
             list_titre += u" dans la catégorie %s" % CHOIX_CATEGORIE_DICT[get('cat')]
@@ -153,6 +153,7 @@ class FilmListView(CheckVotesMixin, ListView):
             list_titre += u" triés par %s" % get_verbose_name(Film, get('tri'))
 
         context['list_titre'] = list_titre
+        context['respos'] = User.objects.filter(pk__in=Film.objects.values('respo').distinct())
         return context
 
     def get_queryset(self):
@@ -165,7 +166,7 @@ class FilmListView(CheckVotesMixin, ListView):
             queryset = queryset.filter(vu=True)
         elif get('vus') == "a_voir":
             queryset = queryset.filter(vu=False)
-        if get('respo'):
+        if get('respo') and get('respo') != 'tous':
             queryset = queryset.filter(respo__username=get('respo'))
         if get_verbose_name(Film, get('tri')):
             queryset = queryset.order_by(get('tri'))
