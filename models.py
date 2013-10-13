@@ -21,6 +21,7 @@ CHOIX_CATEGORIE = (
         ('D', 'Divertissement'),
         ('C', 'Culture'),
         )
+CHOIX_CATEGORIE_DICT = dict(CHOIX_CATEGORIE)
 
 CHOIX_ANNEES = [(annee, annee) for annee in range(datetime.now().year + 1, 1900, -1)]
 
@@ -74,7 +75,7 @@ class Film(Model):
         return full_url(self.get_absolute_url())
 
     def get_categorie(self):
-        return dict(CHOIX_CATEGORIE)[self.categorie]
+        return CHOIX_CATEGORIE_DICT[self.categorie]
 
     def get_description(self):
         return self.description.replace('\r\n','\\n')
@@ -140,7 +141,7 @@ class Soiree(Model):
                 cinephile.email_user(u'[CinéNim] Soirée Ajoutée !', message)
 
     def get_categorie(self):
-        return dict(CHOIX_CATEGORIE)[self.categorie]
+        return CHOIX_CATEGORIE_DICT[self.categorie]
 
     def presents(self):
         return ", ".join([cinephile.cinephile.username for cinephile in self.dispotowatch_set.filter(dispo='O')])
