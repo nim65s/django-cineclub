@@ -36,7 +36,7 @@ def full_url(path):
 
 def get_verbose_name(model, name):
     try:
-        return model._meta.get_field_by_name(name)[0].verbose_name
+        return model._meta.get_field(name).verbose_name
     except:
         return None
 
