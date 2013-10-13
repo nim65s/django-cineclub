@@ -2,7 +2,7 @@
     <h2><a href="{{ film.get_absolute_url }}">{{ film.titre }}</a> {% if object_list and not request.GET.cat %}(<a href="?cat={{ film.categorie }}">{{ film.get_categorie }}</a>) {% endif %}{% if film.respo == request.user or request.user.is_superuser %}(<a href="{% url 'cine:maj_film' slug=film.slug %}">edit</a>){% endif %}</h2>
     <p>{{ film.description|linebreaks }}</p>
     <dl>
-        <dt>Vu</dt><dd>{% if film.vu %}Oui{% else %}Non{% if request.user.is_superuser %}<form method="get" action="{% url 'cine:film_vu' slug=film.slug %}"><button type="submit" class="btn">Ça y est !</button></form>{% endif %}{% endif %}</p>
+        <dt>Vu</dt><dd>{% if film.vu %}Oui{% else %}Non{% if request.user.is_superuser %}<form method="get" action="{% url 'cine:film_vu' slug=film.slug %}"><button type="submit" class="btn">Ça y est !</button></form>{% endif %}{% endif %}</dd>
         <dt>Respo</dt><dd><a href="{% url 'cine:films_de' username=film.respo %}">{{ film.respo }}</a></dd>
         {% if film.annee_sortie %}<dt>Année de sortie</dt><dd>{{ film.annee_sortie }}</dd>{% endif %}
         {% if film.titre_vo %}<dt>Titre VO</dt><dd>{{ film.titre_vo }}</dd>{% endif %}
