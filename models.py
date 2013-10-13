@@ -55,7 +55,7 @@ class Film(Model):
         film_url = self.get_full_url()
         vote_url = full_url(reverse('cine:votes'))
 
-        message = u"Hello :)\n\n%s a proposé un nouveau film : %s (%s)' ; " % ( self.respo.username, self.titre, film_url)
+        message = u"Hello :)\n\n%s a proposé un nouveau film : %s (%s)' ; " % ( self.respo, self.titre, film_url)
         message += u"tu peux donc aller actualiser ton classement (%s) \\o/ \n\n @+!" % vote_url
 
         for cinephile in get_cinephiles():
