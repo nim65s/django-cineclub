@@ -1,5 +1,5 @@
 <div id="{{ film.slug }}">
-    <h2><a href="{{ film.get_absolute_url }}">{{ film.titre }}</a> (<a href="?cat={{ film.categorie }}">{{ film.get_categorie }}</a>) {% if film.respo == request.user or request.user.is_superuser %}(<a href="{% url 'cine:maj_film' slug=film.slug %}">edit</a>){% endif %}</h2>
+    <h2><a href="{{ film.get_absolute_url }}">{{ film.titre }}</a> {% if object_list %}(<a href="?cat={{ film.categorie }}">{{ film.get_categorie }}</a>) {% endif %}{% if film.respo == request.user or request.user.is_superuser %}(<a href="{% url 'cine:maj_film' slug=film.slug %}">edit</a>){% endif %}</h2>
     <p>{{ film.description|linebreaks }}</p>
     <dl>
         <dt>Vu</dt><dd>{% if film.vu %}Oui{% else %}Non{% if request.user.is_superuser %}<form method="get" action="{% url 'cine:film_vu' slug=film.slug %}"><button type="submit" class="btn">Ça y est !</button></form>{% endif %}{% endif %}</p>
