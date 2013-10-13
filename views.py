@@ -5,7 +5,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
-from django.db.models import Count
 from django.shortcuts import get_object_or_404, render, redirect
 from django.utils.safestring import mark_safe
 from django.views.generic import CreateView, UpdateView, DetailView, ListView
@@ -54,9 +53,9 @@ def home(request):
                     soiree.save()
         cache.set('films', films, CACHE_LIMIT)
     c['films'] = films
-    c['nombre_films_c'] = Film.objects.filter(vu=False, categorie='C').aggregate(c=Count('titre'))['c']
-    c['nombre_films_d'] = Film.objects.filter(vu=False, categorie='D').aggregate(c=Count('titre'))['c']
-    c['nombre_films_vus'] = Film.objects.filter(vu=True).aggregate(c=Count('titre'))['c']
+    c['nombre_films_c'] = Film.objects.filter(vu=False, categorie='C').count()
+    c['nombre_films_d'] = Film.objects.filter(vu=False, categorie='D').count()
+    c['nombre_films_vus'] = Film.objects.filter(vu=True).count()
     return render(request, 'cine/home.html', c)
 
 
