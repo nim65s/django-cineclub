@@ -1,13 +1,24 @@
-<div id="{{ film.slug }}">
-    <h2><a href="{{ film.get_absolute_url }}">{{ film.titre }}</a> {% if object_list and not request.GET.cat %}(<a href="?cat={{ film.categorie }}">{{ film.get_categorie }}</a>) {% endif %}{% if film.respo == request.user or request.user.is_superuser %}(<a href="{% url 'cine:maj_film' slug=film.slug %}">edit</a>){% endif %}</h2>
+{% load cine_extra %}<div id="{{ film.slug }}">
+    <h2>
+        <a href="{{ film.get_absolute_url }}">{{ film.titre }}</a>
+        {% if film.respo == request.user or request.user.is_superuser %}(<a href="{% url 'cine:maj_film' slug=film.slug %}">edit</a>){% endif %}
+    </h2>
     <p>{{ film.description|linebreaks }}</p>
     <dl>
-        <dt>Vu</dt><dd>{% if film.vu %}Oui{% else %}Non{% if request.user.is_superuser %}<form method="get" action="{% url 'cine:film_vu' slug=film.slug %}"><button type="submit" class="btn">Ça y est !</button></form>{% endif %}{% endif %}</dd>
-        <dt>Respo</dt><dd><a href="{% url 'cine:films_de' username=film.respo %}">{{ film.respo }}</a></dd>
+        {% if not request.GET.respo %}<dt>Respo</dt><dd><a href="{% url 'cine:films' %}?{% url_replace request 'respo' film.respo %}">{{ film.respo }}</a></dd>{% endif %}
+        {% if not request.GET.cat %}<dt>Catégorie</dt><dd><a href="{% url 'cine:films' %}?{% url_replace request 'cat' film.categorie %}">{{ film.get_categorie }}</a></dd>{% endif %}
+        {% if not request.GET.vus %}<dt>Vu</dt><dd>
+            {% if film.vu %}
+                <a href="{% url 'cine:films' %}?{% url_replace request 'vus' 'vus' %}">Oui</a>
+            {% else %}
+                <a href="{% url 'cine:films' %}?{% url_replace request 'vus' 'a_voir' %}">Non</a>
+                {% if request.user.is_superuser %} <a href="{% url 'cine:film_vu' slug=film.slug %}">Ça y est \o/</a>{% endif %}
+            {% endif %}</dd>
+        {% endif %}
         {% if film.annee_sortie %}<dt>Année de sortie</dt><dd>{{ film.annee_sortie }}</dd>{% endif %}
-        {% if film.titre_vo %}<dt>Titre VO</dt><dd>{{ film.titre_vo }}</dd>{% endif %}
         {% if film.realisateur %}<dt>Réalisateur</dt><dd>{{ film.realisateur }}</dd>{% endif %}
         {% if film.duree_min %}<dt>Durée</dt><dd>{{ film.duree_min }} minutes</dd>{% else %}
+        {% if film.titre_vo %}<dt>Titre VO</dt><dd>{{ film.titre_vo }}</dd>{% endif %}
         {% if film.duree %}<dt>Durée</dt><dd>{{ film.duree }}</dd>{% endif %}{% endif %}
         {% if film.imdb or film.allocine %}
             <dt>Lien(s)</dt>
@@ -16,7 +27,6 @@
                 {% if film.allocine %}<a href="{{ film.allocine }}">Allociné</a>{% endif %}
             </dd>
         {% endif %}
-        {% comment %}<dt>Commentaires</dt><dd>{{ film.commentaire_set.count }} − <a href="{% url 'cine:comms' film.slug %}">Aller voir / en ajouter \o/</a></dd> {% endcomment %}
     </dl>
 </div>
 

@@ -9,8 +9,6 @@ urlpatterns = patterns('',
     url(r'^votes$', votes, name='votes'),
 
     url(r'^films$', FilmListView.as_view(), name='films'),
-    url(r'^films/vus$', FilmVuListView.as_view(), name='films_vus'),
-    url(r'^films/de/(?P<username>[^/]+)$', FilmDeListView.as_view(), name='films_de'),
 
     url(r'^film/ajout$', FilmCreateView.as_view(), name='ajout_film'),
     url(r'^film/maj/(?P<slug>[^/]+)$', FilmUpdateView.as_view(), name='maj_film'),

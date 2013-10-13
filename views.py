@@ -14,7 +14,7 @@ from django.views.generic.base import RedirectView
 from braces.views import GroupRequiredMixin, SuperuserRequiredMixin
 
 from .forms import FilmForm
-from .models import get_cinephiles, Film, Vote, Soiree, DispoToWatch
+from .models import get_cinephiles, Film, Vote, Soiree, DispoToWatch, CHOIX_CATEGORIE_DICT
 
 CACHE_LIMIT = 7 * 24 * 3600  # Une semaine…
 
@@ -98,15 +98,6 @@ class FilmActionMixin(CheckVotesMixin):
         return super(FilmActionMixin, self).form_valid(form)
 
 
-class FiltreCategorieMixin(object):
-    def get_queryset(self):
-        queryset = super(FiltreCategorieMixin, self).get_queryset()
-        cat = self.request.GET.get("cat")
-        if cat:
-            return queryset.filter(categorie=cat)
-        return queryset
-
-
 class FilmCreateView(GroupRequiredMixin, FilmActionMixin, CreateView):
     group_required = u'cine'
     action = u"Créé"
@@ -134,34 +125,54 @@ class LegacyCommsRedirectView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         film = get_object_or_404(Film, slug=self.kwargs['slug'])
-        return reverse('cine:film', kwargs={'slug': film.slug})
+        return film.get_absolute_url()
 
 
 class FilmDetailView(CheckVotesMixin, DetailView):
     model = Film
 
 
-class FilmListView(CheckVotesMixin, FiltreCategorieMixin, ListView):
-    queryset = Film.objects.filter(vu=False)
-
-
-class FilmVuListView(CheckVotesMixin, FiltreCategorieMixin, ListView):
-    queryset = Film.objects.filter(vu=True)
-
-
-class FilmDeListView(CheckVotesMixin, FiltreCategorieMixin, ListView):
-    def get_queryset(self):
-        return Film.objects.filter(respo__username=self.kwargs['username'])
+class FilmListView(CheckVotesMixin, ListView):
+    model = Film
 
     def get_context_data(self, **kwargs):
-        context = super(FilmDeListView, self).get_context_data(**kwargs)
-        context['username'] = self.kwargs['username']
+        context = super(FilmListView, self).get_context_data(**kwargs)
+        list_titre = u"Films"
+        get = self.request.GET.get
+
+        if get('vus') == "vus":
+            list_titre += u" vus"
+        elif get('vus') == "a_voir":
+            list_titre += u" à voir"
+        if get('respo'):
+            list_titre += u" de %s" % get('respo')
+        if get('cat'):
+            list_titre += u" dans la catégorie %s" % CHOIX_CATEGORIE_DICT[get('cat')]
+        if get('tri'):
+            list_titre += u" triés par %s" % get('tri')
+
+        context['list_titre'] = list_titre
         return context
+
+    def get_queryset(self):
+        queryset = super(FilmListView, self).get_queryset()
+        get = self.request.GET.get
+
+        if get('cat'):
+            queryset = queryset.filter(categorie=get('cat'))
+        if get('vus') == "vus":
+            queryset = queryset.filter(vu=True)
+        elif get('vus') == "a_voir":
+            queryset = queryset.filter(vu=False)
+        if get('respo'):
+            queryset = queryset.filter(respo__username=get('respo'))
+        if get('tri'):
+            queryset = queryset.order_by(get('tri'))
+
+        return queryset
 
 
 class FilmVuView(SuperuserRequiredMixin, RedirectView):
-    permanent = False
-
     def get_redirect_url(self, *args, **kwargs):
         cache.delete('films')
         film = get_object_or_404(Film, slug=kwargs['slug'])

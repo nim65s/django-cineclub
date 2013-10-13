@@ -13,11 +13,11 @@
     <h2>{{ soiree.date }} ({{soiree.get_categorie}})</h2>
     <h3>Films disponibles</h3>
     {% for score, film in liste %}
-        <p>{{ score }} » <a href="{% url 'cine:film' slug=film.slug %}">{{ film.titre }}</a></p>
+        <p>{{ score }} » <a href="{{ film.get_absolute_url }}">{{ film.titre }}</a></p>
     {% endfor %}
     <h3>Films indisponibles</h3>
     {% for score, film in autres %}
-        <p>{{ score }} » <a href="{% url 'cine:film' slug=film.slug %}">{{ film.titre }}</a> ({{ film.respo }} n’a pas précisé qu’il était disponible)</p>
+        <p>{{ score }} » <a href="{{ film.get_absolute_url }}">{{ film.titre }}</a> ({{ film.respo }} n’a pas précisé qu’il était disponible)</p>
     {% endfor %}
 {% endfor %}
 
