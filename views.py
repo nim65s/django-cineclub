@@ -103,7 +103,6 @@ class FilmCreateView(GroupRequiredMixin, FilmActionMixin, CreateView):
     action = u"Créé"
 
     def form_valid(self, form):
-        print 'TOTO'
         cache.delete('films')
         form.instance.respo = self.request.user
         return super(FilmCreateView, self).form_valid(form)
