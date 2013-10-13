@@ -1,6 +1,6 @@
 {% extends "cine/cine.html" %}
 
 {% block content %}
-<h1>Films{% if object_list.0.vu %} Vus{% endif %}</h1>
+<h1>Films {% if username %}de {{ username }}{% else %}{% if object_list.0.vu %} Vus{% else %} à voir{% endif %}{% endif %}</h1>
 {% for film in object_list %}{% include 'cine/film.html' %}{% endfor %}
 {% endblock %}

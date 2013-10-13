@@ -6,7 +6,6 @@ from django.core.urlresolvers import reverse
 from django.db.models import URLField, TextField, ImageField, BooleanField, SlugField
 from django.db.models import CharField, DateTimeField, IntegerField
 from django.db.models import Model, ForeignKey, ManyToManyField, Manager
-from django.forms import ModelForm
 from django.template.defaultfilters import slugify
 
 import logging
@@ -86,12 +85,6 @@ class Film(Model):
 
     def __unicode__(self):
         return self.titre
-
-
-class FilmForm(ModelForm):
-    class Meta:
-        model = Film
-        exclude = ('respo', 'slug', 'vu')
 
 
 class Vote(Model):

@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render, redirect
@@ -10,10 +11,10 @@ from django.utils.safestring import mark_safe
 from django.views.generic import CreateView, UpdateView, DetailView, ListView
 from django.views.generic.base import RedirectView
 
-
 from braces.views import GroupRequiredMixin, SuperuserRequiredMixin
 
-from .models import *
+from .forms import FilmForm
+from .models import get_cinephiles, Film, Vote, Soiree, DispoToWatch
 
 CACHE_LIMIT = 7 * 24 * 3600  # Une semaine…
 
@@ -29,7 +30,7 @@ def home(request):
     films = cache.get('films')
     if films is None:
         films = []
-        N = len(Film.objects.filter(vu=False)) * len(get_cinephiles()) + 1
+        N = Film.objects.filter(vu=False).count() * User.objects.filter(groups__name='cine').count() + 1
         for soiree in Soiree.a_venir.all():
             if DispoToWatch.objects.filter(dispo='O', soiree=soiree):
                 films.append((soiree, [], []))
@@ -97,11 +98,12 @@ class FilmActionMixin(CheckVotesMixin):
         return super(FilmActionMixin, self).form_valid(form)
 
 
-class FilmCreateView(GroupRequiredMixin, FilmActionMixin, CreateView):
+class FilmCreateView(GroupRequiredMixin, CreateView):
     group_required = u'cine'
     action = u"Créé"
 
     def form_valid(self, form):
+        print 'TOTO'
         cache.delete('films')
         form.instance.respo = self.request.user
         return super(FilmCreateView, self).form_valid(form)
@@ -114,6 +116,8 @@ class FilmUpdateView(GroupRequiredMixin, FilmActionMixin, UpdateView):
     def form_valid(self, form):
         if form.instance.respo == self.request.user or self.request.user.is_superuser():
             return super(FilmUpdateView, self).form_valid(form)
+        messages.error(self.request, u'Vous n’avez pas le droit de modifier ce film')
+        return redirect('cine:films')
 
 
 class FilmDetailView(CheckVotesMixin, DetailView):
@@ -131,6 +135,11 @@ class FilmVuListView(CheckVotesMixin, ListView):
 class FilmDeListView(CheckVotesMixin, ListView):
     def get_queryset(self):
         return Film.objects.filter(respo__username=self.kwargs['username'])
+
+    def get_context_data(self, **kwargs):
+        context = super(FilmDeListView, self).get_context_data(**kwargs)
+        context['username'] = self.kwargs['username']
+        return context
 
 
 class FilmVuView(SuperuserRequiredMixin, RedirectView):
