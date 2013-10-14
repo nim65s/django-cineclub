@@ -19,7 +19,6 @@ urlpatterns = patterns('',
     url(r'^dispos$', DispoListView.as_view(), name='dispos'),
     url(r'^cinephiles$', CinephileListView.as_view(), name='cinephiles'),
 
-    url(r'^faq$', TemplateView.as_view(template_name='cine/faq.html'), name="faq"),
     url(r'^about$', TemplateView.as_view(template_name='cine/about.html'), name="about"),
 
     url(r'^cinenim.ics$', ics, name='ics'),
