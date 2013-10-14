@@ -114,7 +114,7 @@ class FilmUpdateView(GroupRequiredMixin, FilmActionMixin, UpdateView):
     action = u"modifié"
 
     def form_valid(self, form):
-        if form.instance.respo == self.request.user or self.request.user.is_superuser():
+        if form.instance.respo == self.request.user or self.request.user.is_superuser:
             return super(FilmUpdateView, self).form_valid(form)
         messages.error(self.request, u'Vous n’avez pas le droit de modifier ce film')
         return redirect('cine:films')
