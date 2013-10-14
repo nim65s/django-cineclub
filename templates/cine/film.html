@@ -3,6 +3,7 @@
         <a href="{{ film.get_absolute_url }}">{{ film.titre }}</a>
         {% if film.respo == request.user or request.user.is_superuser %}(<a href="{% url 'cine:maj_film' slug=film.slug %}">edit</a>){% endif %}
     </h2>
+    {% if film.imdb_poster_url %}<img src="{{ film.imdb_poster_url }}" alt="poster pour {{ film }}" class="pull-right" />{% endif %}
     <p>{{ film.description|linebreaks }}</p>
     <dl>
         {% if not request.GET.respo or request.GET.respo = 'tous'%}<dt>Respo</dt><dd><a href="{% films_url request 'respo' film.respo %}">{{ film.respo }}</a></dd>{% endif %}
@@ -28,5 +29,6 @@
             </dd>
         {% endif %}
     </dl>
+    <div class="clearfix"></div>
 </div>
 

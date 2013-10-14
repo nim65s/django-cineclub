@@ -8,7 +8,10 @@ from django.db.models import CharField, DateTimeField, IntegerField
 from django.db.models import Model, ForeignKey, ManyToManyField, Manager
 from django.template.defaultfilters import slugify
 
+import json
 import logging
+import re
+import requests
 from datetime import datetime, timedelta
 from pytz import timezone
 
@@ -24,6 +27,8 @@ CHOIX_CATEGORIE = (
 CHOIX_CATEGORIE_DICT = dict(CHOIX_CATEGORIE)
 
 CHOIX_ANNEES = [(annee, annee) for annee in range(datetime.now().year + 1, 1900, -1)]
+
+IMDB_API_URL = 'http://mymovieapi.com/'
 
 
 def get_cinephiles():
@@ -59,8 +64,13 @@ class Film(Model):
 
     vu = BooleanField(default=False)
 
+    imdb_poster_url = URLField(blank=True, null=True)
+
     def save(self, *args, **kwargs):
         self.slug = slugify(self.titre)
+        poster = self.get_imdb_poster()
+        if poster:
+            self.imdb_poster_url = poster
         super(Film, self).save(*args, **kwargs)
 
         # Création des votes & envoi des mails de notif
@@ -94,6 +104,31 @@ class Film(Model):
             if vote.plusse:
                 score += 1
         return score
+
+    # TODO imdb error handling…
+    # TODO imdb: year, directors, rating, runtime, title
+
+    def get_imdb_json(self):
+        if not self.imdb:
+            return None
+        search = re.search('imdb.*/title/(tt[0-9]+)', self.imdb)
+        if search is None:
+            return None
+        imdb_id = search.groups()[0]
+        req = requests.get(IMDB_API_URL, params={'id': imdb_id})
+        if req.status_code == requests.codes.ok:
+            return req.json()
+        else:
+            return None
+
+    def get_imdb_poster(self):
+        req = self.get_imdb_json()
+        if req is None:
+            return None
+        try:
+            return req['poster']['cover']
+        except:
+            return None
 
     def __unicode__(self):
         return self.titre
