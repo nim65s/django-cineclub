@@ -6,6 +6,8 @@ from django.core.urlresolvers import reverse
 from django.db.models import URLField, TextField, ImageField, BooleanField, SlugField
 from django.db.models import CharField, DateTimeField, IntegerField
 from django.db.models import Model, ForeignKey, ManyToManyField, Manager
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
 from django.template.defaultfilters import slugify
 
 import json
@@ -13,7 +15,9 @@ import logging
 import re
 import requests
 from datetime import datetime, timedelta
+from PIL import Image
 from pytz import timezone
+from StringIO import StringIO
 
 logger = logging.getLogger(__name__)
 tz = timezone(settings.TIME_ZONE)
@@ -28,8 +32,8 @@ CHOIX_CATEGORIE_DICT = dict(CHOIX_CATEGORIE)
 
 CHOIX_ANNEES = [(annee, annee) for annee in range(datetime.now().year + 1, 1900, -1)]
 
-IMDB_API_URL = 'http://mymovieapi.com/'
-
+#IMDB_API_URL = 'http://mymovieapi.com/'
+IMDB_API_URL = 'http://www.omdbapi.com/'
 
 def get_cinephiles():
     return User.objects.filter(groups__name='cine')
@@ -65,12 +69,20 @@ class Film(Model):
     vu = BooleanField(default=False)
 
     imdb_poster_url = URLField(blank=True, null=True)
+    imdb_poster = ImageField(upload_to='cine/posters', blank=True, null=True)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.titre)
         poster = self.get_imdb_poster()
-        if poster:
+        if poster and poster != self.imdb_poster_url:
             self.imdb_poster_url = poster
+            img = requests.get(poster)
+            if img.status_code == requests.codes.ok:
+                img_temp = NamedTemporaryFile(delete=True)
+                img_temp.write(img.content)
+                img_temp.flush()
+                self.imdb_poster.save(self.slug, File(img_temp))
+                img_temp.close()
         super(Film, self).save(*args, **kwargs)
 
         # Création des votes & envoi des mails de notif
@@ -115,7 +127,7 @@ class Film(Model):
         if search is None:
             return None
         imdb_id = search.groups()[0]
-        req = requests.get(IMDB_API_URL, params={'id': imdb_id})
+        req = requests.get(IMDB_API_URL, params={'i': imdb_id})
         if req.status_code == requests.codes.ok:
             return req.json()
         else:
@@ -126,7 +138,7 @@ class Film(Model):
         if req is None:
             return None
         try:
-            return req['poster']['cover']
+            return req['Poster']
         except:
             return None
 
