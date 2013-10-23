@@ -68,6 +68,8 @@ class Film(Model):
 
     vu = BooleanField(default=False)
 
+    imdb_id = CharField(max_length=10, verbose_name=u"id IMDB")
+
     imdb_poster_url = URLField(blank=True, null=True)
     imdb_poster = ImageField(upload_to='cine/posters', blank=True, null=True)
 
