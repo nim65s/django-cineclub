@@ -1,9 +1,10 @@
-{% extends "main.html" %}
+{% extends "zinnia/skeleton.html" %}
 
 {% block titre %}Nim’s web.log: CinéNim \o/ β{% endblock %}
 {% block soustitre %}CinéNim \o/ β{% endblock %}
 
 {% block nav %}
+  <ul class="nav navbar-nav">
     <li><a href="{% url 'cine:home' %}">Prévisions</a></li>
     <li><a href="{% url 'cine:films' %}">Films</a></li>
     <li><a href="{% url 'cine:ajout_film' %}">Ajouter un film</a></li>
@@ -11,4 +12,5 @@
     <li><a href="{% url 'cine:votes' %}">Votes</a></li>
     <li><a href="{% url 'cine:cinephiles' %}">Cinéphiles</a></li>
     <li><a href="{% url 'cine:about' %}">À propos de CinéNim</a></li>
+  </ul>
 {% endblock %}
