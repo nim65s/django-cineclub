@@ -149,7 +149,7 @@ class FilmListView(CheckVotesMixin, ListView):
         elif get('vus') == "a_voir":
             list_titre += u" à voir"
         if get('respo') and get('respo') != 'tous':
-            list_titre += u" de %s" % get('respo')
+            list_titre += u" proposés par %s" % get('respo')
         if get('cat') and get('cat') in "CD":
             list_titre += u" dans la catégorie %s" % CHOIX_CATEGORIE_DICT[get('cat')]
         if get_verbose_name(Film, get('tri')):
