@@ -169,10 +169,13 @@ class Soiree(Model):
 
     def save(self, *args, **kwargs):
         if not self.id:
-            if Soiree.objects.latest().categorie == 'C':
-                self.categorie = 'D'
-            else:
-                self.categorie = 'C'
+            try:
+                if Soiree.objects.latest().categorie == 'C':
+                    self.categorie = 'D'
+                else:
+                    self.categorie = 'C'
+            except:
+                self.categorie = 'D'  # Si c’est la première soirée
         super(Soiree, self).save(*args, **kwargs)
 
         dispos_url = full_url(reverse('cine:dispos'))
