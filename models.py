@@ -70,21 +70,18 @@ class Film(Model):
 
     imdb_id = CharField(max_length=10, verbose_name=u"id IMDB")
 
-    imdb_poster_url = URLField(blank=True, null=True)
+    imdb_poster_url = URLField(blank=True, null=True, verbose_name=u"URL du poster")
     imdb_poster = ImageField(upload_to='cine/posters', blank=True, null=True)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.titre)
-        poster = self.get_imdb_poster()
-        if poster and poster != self.imdb_poster_url:
-            self.imdb_poster_url = poster
-            img = requests.get(poster)
-            if img.status_code == requests.codes.ok:
-                img_temp = NamedTemporaryFile(delete=True)
-                img_temp.write(img.content)
-                img_temp.flush()
-                self.imdb_poster.save(self.slug, File(img_temp))
-                img_temp.close()
+        img = requests.get(self.imdb_poster_url)
+        if img.status_code == requests.codes.ok:
+            img_temp = NamedTemporaryFile(delete=True)
+            img_temp.write(img.content)
+            img_temp.flush()
+            self.imdb_poster.save(self.slug, File(img_temp), save=False)
+            img_temp.close()
         super(Film, self).save(*args, **kwargs)
 
         # Création des votes & envoi des mails de notif
@@ -119,30 +116,24 @@ class Film(Model):
                 score += 1
         return score
 
-    # TODO imdb error handling…
-    # TODO imdb: year, directors, rating, runtime, title
-
-    def get_imdb_json(self):
-        if not self.imdb:
-            return None
-        search = re.search('imdb.*/title/(tt[0-9]+)', self.imdb)
-        if search is None:
-            return None
-        imdb_id = search.groups()[0]
+    @staticmethod
+    def get_imdb_dict(imdb_id):
+        if imdb_id is None:
+            return {}
         req = requests.get(IMDB_API_URL, params={'i': imdb_id})
-        if req.status_code == requests.codes.ok:
-            return req.json()
-        else:
-            return None
-
-    def get_imdb_poster(self):
-        req = self.get_imdb_json()
-        if req is None:
-            return None
-        try:
-            return req['Poster']
-        except:
-            return None
+        if req.status_code != requests.codes.ok:
+            return {}
+        imdb_infos = req.json()
+        return {
+                'realisateur': imdb_infos['Director'],
+                'description': imdb_infos['Plot'],
+                'imdb_poster_url': imdb_infos['Poster'],
+                'annee_sortie': imdb_infos['Year'],
+                'titre': imdb_infos['Title'],
+                'titre_vo': imdb_infos['Title'],
+                'duree_min': timedelta(**dict([(key, int(value) if value else 0) for key, value in re.search(r'((?P<hours>\d+) h )?(?P<minutes>\d+) min', imdb_infos['Runtime']).groupdict().items()])).seconds / 60,  # TGCM
+                'imdb_id': imdb_id,
+                }
 
     def __unicode__(self):
         return self.titre

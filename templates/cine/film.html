@@ -21,10 +21,10 @@
         {% if film.duree_min %}<dt>Durée</dt><dd>{{ film.duree_min }} minutes</dd>{% else %}
         {% if film.titre_vo %}<dt>Titre VO</dt><dd>{{ film.titre_vo }}</dd>{% endif %}
         {% if film.duree %}<dt>Durée</dt><dd>{{ film.duree }}</dd>{% endif %}{% endif %}
-        {% if film.imdb or film.allocine %}
+        {% if film.imdb_id or film.allocine %}
             <dt>Lien(s)</dt>
             <dd>
-                {% if film.imdb %}<a href="{{ film.imdb }}">IMDB</a>{% endif %}
+                {% if film.imdb_id %}<a href="http://www.imdb.com/title/{{ film.imdb_id }}/">IMDB</a>{% endif %}
                 {% if film.allocine %}<a href="{{ film.allocine }}">Allociné</a>{% endif %}
             </dd>
         {% endif %}

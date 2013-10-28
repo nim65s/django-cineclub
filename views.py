@@ -108,6 +108,9 @@ class FilmCreateView(GroupRequiredMixin, FilmActionMixin, CreateView):
         form.instance.respo = self.request.user
         return super(FilmCreateView, self).form_valid(form)
 
+    def get_initial(self):
+        return Film.get_imdb_dict(self.request.GET.get('imdb_id'))
+
 
 class FilmUpdateView(GroupRequiredMixin, FilmActionMixin, UpdateView):
     group_required = u'cine'
