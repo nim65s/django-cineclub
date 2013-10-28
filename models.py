@@ -118,22 +118,20 @@ class Film(Model):
 
     @staticmethod
     def get_imdb_dict(imdb_id):
-        if imdb_id is None:
+        try:
+            imdb_infos = requests.get(IMDB_API_URL, params={'i': imdb_id}).json()
+            return {
+                    'realisateur': imdb_infos['Director'],
+                    'description': imdb_infos['Plot'],
+                    'imdb_poster_url': imdb_infos['Poster'],
+                    'annee_sortie': imdb_infos['Year'],
+                    'titre': imdb_infos['Title'],
+                    'titre_vo': imdb_infos['Title'],
+                    'duree_min': timedelta(**dict([(key, int(value) if value else 0) for key, value in re.search(r'((?P<hours>\d+) h )?(?P<minutes>\d+) min', imdb_infos['Runtime']).groupdict().items()])).seconds / 60,  # TGCM
+                    'imdb_id': imdb_id,
+                    }
+        except:
             return {}
-        req = requests.get(IMDB_API_URL, params={'i': imdb_id})
-        if req.status_code != requests.codes.ok:
-            return {}
-        imdb_infos = req.json()
-        return {
-                'realisateur': imdb_infos['Director'],
-                'description': imdb_infos['Plot'],
-                'imdb_poster_url': imdb_infos['Poster'],
-                'annee_sortie': imdb_infos['Year'],
-                'titre': imdb_infos['Title'],
-                'titre_vo': imdb_infos['Title'],
-                'duree_min': timedelta(**dict([(key, int(value) if value else 0) for key, value in re.search(r'((?P<hours>\d+) h )?(?P<minutes>\d+) min', imdb_infos['Runtime']).groupdict().items()])).seconds / 60,  # TGCM
-                'imdb_id': imdb_id,
-                }
 
     def __unicode__(self):
         return self.titre
