@@ -7,9 +7,19 @@
 <form method="post" action="" class="form-horizontal" role="form">
     {% csrf_token %}
     {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
-    {% for field in form.visible_fields %}<div class="form-group">
+    {% for field in form.visible_fields %}<div class="form-group{% if field.errors %} has-error{% endif %}">
         <label for="{{ field.id_for_label }}" class="col-sm-2 control-label">{{ field.label }}</label>
-        <div class="col-sm-10">{{ field|add_class:"form-control" }}</div>
+        <div class="col-sm-10">
+            {% if field.errors %}<span class="help-block">{{ field.errors}}</span>{% endif %}
+            {% if field|field_type == "integerfield" %}
+                {{ field|add_class:"form-control"|attr:"type:number" }}
+            {% elif field|field_type == "urlfield" %}
+                {{ field|add_class:"form-control"|attr:"type:url" }}
+            {% else %}
+                {{ field|add_class:"form-control" }}
+            {% endif %}
+            {% if field.help_text %}<span class="help-block">{{ field.help_text}}</span>{% endif %}
+        </div>
     </div>{% endfor %}
     <div class="form-group"><div class="col-sm-offset-2 col-sm-10">
         <button type="submit" class="btn">C’est bon \o/</button>

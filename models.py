@@ -59,7 +59,7 @@ class Film(Model):
     categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D')
     annee_sortie = IntegerField(max_length=4, choices=CHOIX_ANNEES, blank=True, null=True, verbose_name=u"Année de sortie")
 
-    titre_vo = CharField(max_length=200, blank=True, null=True, verbose_name=u"Titre en Version Originale")
+    titre_vo = CharField(max_length=200, blank=True, null=True, verbose_name=u"Titre en VO")
     imdb = URLField(blank=True, null=True, verbose_name="IMDB")
     allocine = URLField(blank=True, null=True, verbose_name=u"Allociné")
     realisateur = CharField(max_length=200, null=True, blank=True, verbose_name=u"Réalisateur")
@@ -68,7 +68,7 @@ class Film(Model):
 
     vu = BooleanField(default=False)
 
-    imdb_id = CharField(max_length=10, verbose_name=u"id IMDB")
+    imdb_id = CharField(max_length=10, verbose_name=u"id IMDB", null=True, blank=True)
 
     imdb_poster_url = URLField(blank=True, null=True, verbose_name=u"URL du poster")
     imdb_poster = ImageField(upload_to='cine/posters', blank=True, null=True)
