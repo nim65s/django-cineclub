@@ -2,17 +2,19 @@
 
 {% block content %}
     <h1>Votes !</h1>
+    <form action="" method="POST" class="text-center">
+        {% csrf_token %}
+        <input name="ordre" value="" type="hidden"/>
+        <button type="submit" class="btn">Voter !</button>
+    </form>
+
+    <br>
+
     <ul id="sortable">
         {% for vote in votes %}
         <li class="ui-state-default" data-slug="{{ vote.film.slug }}"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>{{ vote.film.titre }} (<a style="color: #08c;" href="{{ vote.film.get_absolute_url }}">lien</a>)</li>
         {% endfor %}
     </ul>
-
-    <form action="" method="POST">
-        {% csrf_token %}
-        <input name="ordre" value="" type="hidden"/>
-        <input type="submit" value="Voter !" />
-    </form>
 {% endblock %}
 
 
