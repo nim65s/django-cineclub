@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from cine.models import *
 
+
 class Command(BaseCommand):
     args = ''
     help = u'Crée les votes et dispos manquant(e)s et supprime ceux des non-cinéphiles'

@@ -35,6 +35,7 @@ CHOIX_ANNEES = [(annee, annee) for annee in range(datetime.now().year + 1, 1900,
 #IMDB_API_URL = 'http://mymovieapi.com/'
 IMDB_API_URL = 'http://www.omdbapi.com/'
 
+
 def get_cinephiles():
     return User.objects.filter(groups__name='cine')
 
@@ -88,7 +89,7 @@ class Film(Model):
         film_url = self.get_full_url()
         vote_url = full_url(reverse('cine:votes'))
 
-        message = u"Hello :)\n\n%s a proposé un nouveau film : %s (%s)' ; " % ( self.respo, self.titre, film_url)
+        message = u"Hello :)\n\n%s a proposé un nouveau film : %s (%s)' ; " % (self.respo, self.titre, film_url)
         message += u"tu peux donc aller actualiser ton classement (%s) \\o/ \n\n @+!" % vote_url
 
         for cinephile in get_cinephiles():
@@ -106,7 +107,7 @@ class Film(Model):
         return CHOIX_CATEGORIE_DICT[self.categorie]
 
     def get_description(self):
-        return self.description.replace('\r\n','\\n')
+        return self.description.replace('\r\n', '\\n')
 
     def score_absolu(self):
         score = 0
@@ -128,7 +129,10 @@ class Film(Model):
                     'annee_sortie': imdb_infos['Year'],
                     'titre': imdb_infos['Title'],
                     'titre_vo': imdb_infos['Title'],
-                    'duree_min': timedelta(**dict([(key, int(value) if value else 0) for key, value in re.search(r'((?P<hours>\d+) h )?(?P<minutes>\d+) min', imdb_infos['Runtime']).groupdict().items()])).seconds / 60,  # TGCM
+                    'duree_min': timedelta(**dict([
+                        (key, int(value) if value else 0) for key, value in
+                        re.search(r'((?P<hours>\d+) h )?(?P<minutes>\d+) min', imdb_infos['Runtime']).groupdict().items()
+                        ])).seconds / 60,  # TGCM
                     'imdb_id': imdb_id,
                     }
         except:

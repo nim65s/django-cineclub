@@ -11,6 +11,7 @@ from pytz import timezone
 tz = timezone(settings.TIME_ZONE)
 tzloc = tz.localize
 
+
 class Command(BaseCommand):
     args = ''
     help = u'Affiche les gens qui ont pas voté (c’est pas bien ! :P)'
