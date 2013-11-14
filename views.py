@@ -1,21 +1,20 @@
 #-*- coding: utf-8 -*-
 
+from braces.views import GroupRequiredMixin, SuperuserRequiredMixin
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.safestring import mark_safe
-from django.views.generic import CreateView, UpdateView, DetailView, ListView
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
 from django.views.generic.base import RedirectView
 
-from braces.views import GroupRequiredMixin, SuperuserRequiredMixin
-
 from .forms import FilmForm
-from .models import Film, Vote, Soiree, DispoToWatch
-from .models import get_cinephiles, get_verbose_name, CHOIX_CATEGORIE_DICT
+from .models import CHOIX_CATEGORIE_DICT, DispoToWatch, Film, get_cinephiles, get_verbose_name, Soiree, Vote
 
 CACHE_LIMIT = 7 * 24 * 3600  # Une semaine…
 

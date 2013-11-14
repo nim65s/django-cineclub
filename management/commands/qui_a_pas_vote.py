@@ -1,12 +1,12 @@
 #-*- coding: utf-8 -*-
 
-from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
+from datetime import datetime
+
+from pytz import timezone
 
 from cine.models import *
-
-from datetime import datetime
-from pytz import timezone
+from django.conf import settings
+from django.core.management.base import BaseCommand, CommandError
 
 tz = timezone(settings.TIME_ZONE)
 tzloc = tz.localize

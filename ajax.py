@@ -1,14 +1,14 @@
 #-*- coding: utf-8 -*-
 
-from django.core.cache import cache
-from django.shortcuts import get_object_or_404
+from datetime import datetime
 
 from dajax.core import Dajax
 from dajaxice.decorators import dajaxice_register
 
-from .models import DispoToWatch, tzloc
+from django.core.cache import cache
+from django.shortcuts import get_object_or_404
 
-from datetime import datetime
+from .models import DispoToWatch, tzloc
 
 
 @dajaxice_register

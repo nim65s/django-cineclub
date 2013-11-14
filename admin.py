@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 
-from django.contrib.admin import site, ModelAdmin
+from django.contrib.admin import ModelAdmin, site
 from models import *
 
 

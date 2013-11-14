@@ -3,7 +3,6 @@ from django.views.generic import TemplateView
 
 from .views import *
 
-
 urlpatterns = patterns('',
     url(r'^$', home, name='home'),
     url(r'^votes$', votes, name='votes'),

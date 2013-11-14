@@ -1,23 +1,23 @@
 #-*- coding: utf-8 -*-
-from django.conf import settings
-from django.contrib.auth.models import User, Group
-from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
-from django.db.models import URLField, TextField, ImageField, BooleanField, SlugField
-from django.db.models import CharField, DateTimeField, IntegerField
-from django.db.models import Model, ForeignKey, ManyToManyField, Manager
-from django.core.files import File
-from django.core.files.temp import NamedTemporaryFile
-from django.template.defaultfilters import slugify
-
 import json
 import logging
 import re
-import requests
 from datetime import datetime, timedelta
+from StringIO import StringIO
+
+import requests
 from PIL import Image
 from pytz import timezone
-from StringIO import StringIO
+
+from django.conf import settings
+from django.contrib.auth.models import Group, User
+from django.contrib.sites.models import Site
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
+from django.core.urlresolvers import reverse
+from django.db.models import (BooleanField, CharField, DateTimeField, ForeignKey, ImageField, IntegerField, Manager, ManyToManyField, Model, SlugField,
+                              TextField, URLField)
+from django.template.defaultfilters import slugify
 
 logger = logging.getLogger(__name__)
 tz = timezone(settings.TIME_ZONE)
