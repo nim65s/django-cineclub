@@ -1,12 +1,16 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
 
 from cine.models import *
 from django.core.management.base import BaseCommand, CommandError
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Command(BaseCommand):
     args = ''
-    help = u'Crée les votes et dispos manquant(e)s et supprime ceux des non-cinéphiles'
+    help = 'Crée les votes et dispos manquant(e)s et supprime ceux des non-cinéphiles'
 
     def handle(self, *args, **options):
         N = len(Film.objects.all()) + 1
@@ -22,7 +26,7 @@ class Command(BaseCommand):
                         v.film = film
                         v.cinephile = cinephile
                         v.save()
-                        self.stdout.write(u"Nouveau Vote: %s" % v)
+                        self.stdout.write("Nouveau Vote: %s" % v)
                 for soiree in Soiree.objects.all():
                     try:
                         DispoToWatch.objects.get(soiree=soiree, cinephile=cinephile)
@@ -32,11 +36,11 @@ class Command(BaseCommand):
                         d.soiree = soiree
                         d.cinephile = cinephile
                         d.save()
-                        self.stdout.write(u"Nouvelle Dispo: %s" % d)
+                        self.stdout.write("Nouvelle Dispo: %s" % d)
             else:
                 for dtw in cinephile.dispotowatch_set.all():
-                    self.stdout.write(u"suppression de la dtw: %s" % dtw)
+                    self.stdout.write("suppression de la dtw: %s" % dtw)
                     dtw.delete()
                 for vote in cinephile.vote_set.all():
-                    self.stdout.write(u"suppression du vote: %s" % vote)
+                    self.stdout.write("suppression du vote: %s" % vote)
                     vote.delete()

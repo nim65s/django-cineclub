@@ -1,4 +1,6 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
 
 from braces.views import GroupRequiredMixin, SuperuserRequiredMixin
 
@@ -21,7 +23,7 @@ CACHE_LIMIT = 7 * 24 * 3600  # Une semaine…
 
 def check_votes(request):
     if request.user in get_cinephiles() and Vote.objects.filter(choix=9999, cinephile=request.user, film__vu=False).exists():
-        messages.warning(request, mark_safe(u'<a href="%s">Tu n’as pas classé certains films !</a>' % reverse('cine:votes')))
+        messages.warning(request, mark_safe('<a href="%s">Tu n’as pas classé certains films !</a>' % reverse('cine:votes')))
 
 
 def home(request):
@@ -84,7 +86,7 @@ def ics(request):
 class CheckVotesMixin(object):
     def get(self, request, *args, **kwargs):
         if request.user in get_cinephiles() and Vote.objects.filter(choix=9999, cinephile=request.user, film__vu=False).exists():
-            messages.warning(request, mark_safe(u'<a href="%s">Tu n’as pas classé certains films !</a>' % reverse('cine:votes')))
+            messages.warning(request, mark_safe('<a href="%s">Tu n’as pas classé certains films !</a>' % reverse('cine:votes')))
         return super(CheckVotesMixin, self).get(request, *args, **kwargs)
 
 
@@ -94,13 +96,13 @@ class FilmActionMixin(CheckVotesMixin):
     # TODO 1.6: fields à la place de form_class
 
     def form_valid(self, form):
-        messages.info(self.request, u"Film %s" % self.action)
+        messages.info(self.request, "Film %s" % self.action)
         return super(FilmActionMixin, self).form_valid(form)
 
 
 class FilmCreateView(GroupRequiredMixin, FilmActionMixin, CreateView):
-    group_required = u'cine'
-    action = u"Créé"
+    group_required = 'cine'
+    action = "Créé"
 
     def form_valid(self, form):
         cache.delete('films')
@@ -112,13 +114,13 @@ class FilmCreateView(GroupRequiredMixin, FilmActionMixin, CreateView):
 
 
 class FilmUpdateView(GroupRequiredMixin, FilmActionMixin, UpdateView):
-    group_required = u'cine'
-    action = u"modifié"
+    group_required = 'cine'
+    action = "modifié"
 
     def form_valid(self, form):
         if form.instance.respo == self.request.user or self.request.user.is_superuser:
             return super(FilmUpdateView, self).form_valid(form)
-        messages.error(self.request, u'Vous n’avez pas le droit de modifier ce film')
+        messages.error(self.request, 'Vous n’avez pas le droit de modifier ce film')
         return redirect('cine:films')
 
 
@@ -140,19 +142,19 @@ class FilmListView(CheckVotesMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(FilmListView, self).get_context_data(**kwargs)
-        list_titre = u"Films"
+        list_titre = "Films"
         get = self.request.GET.get
 
         if get('vus') == "vus":
-            list_titre += u" vus"
+            list_titre += " vus"
         elif get('vus') == "a_voir":
-            list_titre += u" à voir"
+            list_titre += " à voir"
         if get('respo') and get('respo') != 'tous':
-            list_titre += u" proposés par %s" % get('respo')
+            list_titre += " proposés par %s" % get('respo')
         if get('cat') and get('cat') in "CD":
-            list_titre += u" dans la catégorie %s" % CHOIX_CATEGORIE_DICT[get('cat')]
+            list_titre += " dans la catégorie %s" % CHOIX_CATEGORIE_DICT[get('cat')]
         if get_verbose_name(Film, get('tri')):
-            list_titre += u" triés par %s" % get_verbose_name(Film, get('tri'))
+            list_titre += " triés par %s" % get_verbose_name(Film, get('tri'))
 
         context['list_titre'] = list_titre
         context['respos'] = User.objects.filter(pk__in=Film.objects.values('respo').distinct())
@@ -186,13 +188,13 @@ class FilmVuView(SuperuserRequiredMixin, RedirectView):
 
 
 class CinephileListView(GroupRequiredMixin, CheckVotesMixin, ListView):
-    group_required = u'cine'
+    group_required = 'cine'
     queryset = User.objects.filter(groups__name='cine')
     template_name = 'cine/cinephile_list.html'
 
 
 class DispoListView(GroupRequiredMixin, CheckVotesMixin, ListView):
-    group_required = u'cine'
+    group_required = 'cine'
 
     def get_queryset(self):
         return DispoToWatch.objects.filter(cinephile=self.request.user, soiree__in=Soiree.a_venir.all())

@@ -1,4 +1,7 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
+
 import json
 import logging
 import re
@@ -18,6 +21,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import (BooleanField, CharField, DateTimeField, ForeignKey, ImageField, IntegerField, Manager, ManyToManyField, Model, SlugField,
                               TextField, URLField)
 from django.template.defaultfilters import slugify
+from django.utils.encoding import python_2_unicode_compatible
 
 logger = logging.getLogger(__name__)
 tz = timezone(settings.TIME_ZONE)
@@ -32,7 +36,6 @@ CHOIX_CATEGORIE_DICT = dict(CHOIX_CATEGORIE)
 
 CHOIX_ANNEES = [(annee, annee) for annee in range(datetime.now().year + 1, 1900, -1)]
 
-#IMDB_API_URL = 'http://mymovieapi.com/'
 IMDB_API_URL = 'http://www.omdbapi.com/'
 
 
@@ -41,7 +44,7 @@ def get_cinephiles():
 
 
 def full_url(path):
-    return u'http://%s%s' % (Site.objects.get_current().domain, path)
+    return 'http://%s%s' % (Site.objects.get_current().domain, path)
 
 
 def get_verbose_name(model, name):
@@ -51,6 +54,7 @@ def get_verbose_name(model, name):
         return None
 
 
+@python_2_unicode_compatible
 class Film(Model):
     titre = CharField(max_length=200, unique=True)
     respo = ForeignKey(User)
@@ -58,20 +62,20 @@ class Film(Model):
     slug = SlugField(unique=True, blank=True)
 
     categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D')
-    annee_sortie = IntegerField(max_length=4, choices=CHOIX_ANNEES, blank=True, null=True, verbose_name=u"Année de sortie")
+    annee_sortie = IntegerField(max_length=4, choices=CHOIX_ANNEES, blank=True, null=True, verbose_name="Année de sortie")
 
-    titre_vo = CharField(max_length=200, blank=True, null=True, verbose_name=u"Titre en VO")
+    titre_vo = CharField(max_length=200, blank=True, null=True, verbose_name="Titre en VO")
     imdb = URLField(blank=True, null=True, verbose_name="IMDB")
-    allocine = URLField(blank=True, null=True, verbose_name=u"Allociné")
-    realisateur = CharField(max_length=200, null=True, blank=True, verbose_name=u"Réalisateur")
-    duree = CharField(max_length=20, null=True, blank=True, verbose_name=u"Durée")
-    duree_min = IntegerField(u"Durée en minutes", null=True)
+    allocine = URLField(blank=True, null=True, verbose_name="Allociné")
+    realisateur = CharField(max_length=200, null=True, blank=True, verbose_name="Réalisateur")
+    duree = CharField(max_length=20, null=True, blank=True, verbose_name="Durée")
+    duree_min = IntegerField("Durée en minutes", null=True)
 
     vu = BooleanField(default=False)
 
-    imdb_id = CharField(max_length=10, verbose_name=u"id IMDB", null=True, blank=True)
+    imdb_id = CharField(max_length=10, verbose_name="id IMDB", null=True, blank=True)
 
-    imdb_poster_url = URLField(blank=True, null=True, verbose_name=u"URL du poster")
+    imdb_poster_url = URLField(blank=True, null=True, verbose_name="URL du poster")
     imdb_poster = ImageField(upload_to='cine/posters', blank=True, null=True)
 
     def save(self, *args, **kwargs):
@@ -89,13 +93,13 @@ class Film(Model):
         film_url = self.get_full_url()
         vote_url = full_url(reverse('cine:votes'))
 
-        message = u"Hello :)\n\n%s a proposé un nouveau film : %s (%s)' ; " % (self.respo, self.titre, film_url)
-        message += u"tu peux donc aller actualiser ton classement (%s) \\o/ \n\n @+!" % vote_url
+        message = "Hello :)\n\n%s a proposé un nouveau film : %s (%s)' ; " % (self.respo, self.titre, film_url)
+        message += "tu peux donc aller actualiser ton classement (%s) \\o/ \n\n @+!" % vote_url
 
         for cinephile in get_cinephiles():
             vote = Vote.objects.get_or_create(film=self, cinephile=cinephile)
             if vote[1] and not settings.DEBUG:
-                cinephile.email_user(u'[CinéNim] Film ajouté !', message)
+                cinephile.email_user('[CinéNim] Film ajouté !', message)
 
     def get_absolute_url(self):
         return reverse('cine:film', kwargs={'slug': self.slug})
@@ -138,10 +142,11 @@ class Film(Model):
         except:
             return {}
 
-    def __unicode__(self):
+    def __str__(self):
         return self.titre
 
 
+@python_2_unicode_compatible
 class Vote(Model):
     film = ForeignKey(Film)
     cinephile = ForeignKey(User)
@@ -150,10 +155,10 @@ class Vote(Model):
 
     unique_together = ("film", "cinephile")
 
-    def __unicode__(self):
+    def __str__(self):
         if self.plusse:
-            return u'%s \t %i + \t %s' % (self.film, self.choix, self.cinephile)
-        return u'%s \t %i \t %s' % (self.film, self.choix, self.cinephile)
+            return '%s \t %i + \t %s' % (self.film, self.choix, self.cinephile)
+        return '%s \t %i \t %s' % (self.film, self.choix, self.cinephile)
 
     class Meta:
         ordering = ['choix', 'film']
@@ -164,6 +169,7 @@ class SoireeAVenirManager(Manager):
         return super(SoireeAVenirManager, self).get_query_set().filter(date__gte=tzloc(datetime.now() - timedelta(hours=5)))
 
 
+@python_2_unicode_compatible
 class Soiree(Model):
     date = DateTimeField()
     categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D', blank=True)
@@ -185,13 +191,13 @@ class Soiree(Model):
 
         dispos_url = full_url(reverse('cine:dispos'))
 
-        message = u'Hello :) \n\nLe %s, une soirée %s est proposée ; ' % (self.date, self.get_categorie())
-        message += u'tu peux donc aller mettre à jour tes disponibilités (%s) \\o/ \n\n@+ !' % dispos_url
+        message = 'Hello :) \n\nLe %s, une soirée %s est proposée ; ' % (self.date, self.get_categorie())
+        message += 'tu peux donc aller mettre à jour tes disponibilités (%s) \\o/ \n\n@+ !' % dispos_url
 
         for cinephile in get_cinephiles():
             dtw = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile)
             if not settings.DEBUG and dtw[1]:
-                cinephile.email_user(u'[CinéNim] Soirée Ajoutée !', message)
+                cinephile.email_user('[CinéNim] Soirée Ajoutée !', message)
 
     def get_categorie(self):
         return CHOIX_CATEGORIE_DICT[self.categorie]
@@ -202,14 +208,15 @@ class Soiree(Model):
     def pas_surs(self):
         return ", ".join([cinephile.cinephile.username for cinephile in self.dispotowatch_set.filter(dispo='N')])
 
-    def __unicode__(self):
-        return u'%s:%s' % (self.date, self.categorie)
+    def __str__(self):
+        return '%s:%s' % (self.date, self.categorie)
 
     class Meta:
         ordering = ["date"]
         get_latest_by = 'date'
 
 
+@python_2_unicode_compatible
 class DispoToWatch(Model):
     soiree = ForeignKey(Soiree)
     cinephile = ForeignKey(User)
@@ -224,8 +231,8 @@ class DispoToWatch(Model):
 
     dispo = CharField(max_length=1, choices=CHOIX_DISPO, default='N')
 
-    def __unicode__(self):
-        return u'%s %s %s' % (self.soiree, self.dispo, self.cinephile)
+    def __str__(self):
+        return '%s %s %s' % (self.soiree, self.dispo, self.cinephile)
 
     class Meta:
         ordering = ['soiree__date']

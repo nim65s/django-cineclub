@@ -1,4 +1,5 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 from datetime import datetime
 
@@ -7,14 +8,16 @@ from pytz import timezone
 from cine.models import *
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
+from django.utils.encoding import python_2_unicode_compatible
 
 tz = timezone(settings.TIME_ZONE)
 tzloc = tz.localize
 
 
+@python_2_unicode_compatible
 class Command(BaseCommand):
     args = ''
-    help = u'Affiche les gens qui ont pas voté (c’est pas bien ! :P)'
+    help = 'Affiche les gens qui ont pas voté (c’est pas bien ! :P)'
 
     def handle(self, *args, **options):
         soiree = Soiree.objects.filter(date__gte=tzloc(datetime.now()))[0]
@@ -22,4 +25,4 @@ class Command(BaseCommand):
             for dispo in DispoToWatch.objects.filter(dispo='O', soiree=soiree):
                 vote = Vote.objects.get(cinephile=dispo.cinephile, film=film)
                 if vote.choix == 9999:
-                    print u'%s n’a pas voté pour %s' % (dispo.cinephile, film)
+                    print '%s n’a pas voté pour %s' % (dispo.cinephile, film)
