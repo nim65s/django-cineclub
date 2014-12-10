@@ -173,6 +173,7 @@ class SoireeAVenirManager(Manager):
 class Soiree(Model):
     date = DateTimeField()
     categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D', blank=True)
+    hote = ForeignKey(User)
     favoris = ForeignKey(Film, null=True)
 
     objects = Manager()
@@ -191,7 +192,7 @@ class Soiree(Model):
 
         dispos_url = full_url(reverse('cine:dispos'))
 
-        message = 'Hello :) \n\nLe %s, une soirée %s est proposée ; ' % (self.date, self.get_categorie())
+        message = 'Hello :) \n\n%s a proposé une soirée %s le %s ; ' % (self.hote, self.get_categorie(), self.date)
         message += 'tu peux donc aller mettre à jour tes disponibilités (%s) \\o/ \n\n@+ !' % dispos_url
 
         for cinephile in get_cinephiles():
