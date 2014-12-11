@@ -3,7 +3,6 @@
 from __future__ import unicode_literals
 
 import json
-import logging
 import re
 from datetime import datetime, timedelta
 from StringIO import StringIO
@@ -23,9 +22,7 @@ from django.db.models import (BooleanField, CharField, DateTimeField, ForeignKey
 from django.template.defaultfilters import slugify
 from django.utils.encoding import python_2_unicode_compatible
 
-logger = logging.getLogger(__name__)
-tz = timezone(settings.TIME_ZONE)
-tzloc = tz.localize
+tzloc = timezone(settings.TIME_ZONE).localize
 
 
 CHOIX_CATEGORIE = (
@@ -150,13 +147,12 @@ class Vote(Model):
     cinephile = ForeignKey(User)
     choix = IntegerField(default=9999)
 
-    unique_together = ("film", "cinephile")
-
     def __str__(self):
         return '%s \t %i \t %s' % (self.film, self.choix, self.cinephile)
 
     class Meta:
         ordering = ['choix', 'film']
+        unique_together = ("film", "cinephile")
 
 
 class SoireeAVenirManager(Manager):
@@ -171,18 +167,10 @@ class Soiree(Model):
     hote = ForeignKey(User)
     favoris = ForeignKey(Film, null=True)
 
-    objects = Manager()
     a_venir = SoireeAVenirManager()
+    objects = Manager()
 
     def save(self, *args, **kwargs):
-        if not self.id:
-            try:
-                if Soiree.objects.latest().categorie == 'C':
-                    self.categorie = 'D'
-                else:
-                    self.categorie = 'C'
-            except:
-                self.categorie = 'D'  # Si c’est la première soirée
         super(Soiree, self).save(*args, **kwargs)
 
         dispos_url = full_url(reverse('cine:dispos'))
@@ -226,11 +214,16 @@ class Soiree(Model):
         ordering = ["date"]
         get_latest_by = 'date'
 
+class DisposAVenirManager(Manager):
+    def get_query_set(self):
+        return super(DisposAVenirManager, self).get_query_set().filter(soiree__date__gte=tzloc(datetime.now() - timedelta(hours=5)))
 
 @python_2_unicode_compatible
 class DispoToWatch(Model):
     soiree = ForeignKey(Soiree)
     cinephile = ForeignKey(User)
+
+    objects = DisposAVenirManager()
 
     unique_together = ("soiree", "cinephile")
 

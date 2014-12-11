@@ -1,0 +1,10 @@
+#-*- coding: utf-8 -*-
+
+from django.contrib import messages
+
+from models import get_cinephiles, Vote
+
+class CheckVoteMiddleware(object):
+    def process_request(self, request):
+        if request.user.groups.filter(name='cine').exists() and request.user.vote_set.filter(choix=9999, film__vu=False).exists():
+                messages.warning(request, mark_safe('<a href="%s">Tu n’as pas classé certains films !</a>' % reverse('cine:votes')))

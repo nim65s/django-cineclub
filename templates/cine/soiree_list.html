@@ -3,16 +3,29 @@
 
 {% block content %}
 
-<h1>Soirées à venir</h1>
 
-<p><a href="{% url 'cine:ajout_soiree' %}">Proposez-en une chez vous !</a></p>
+<h1>Soirées à venir</h1>
 
 {% for soiree in object_list %}
     <h2>{{ soiree.date }} chez {{ soiree.hote }} – {{soiree.get_categorie}}</h2>
+
+    {% dispo_buttons request.user soiree %}
+
+
+    <h3>Présents</h3>
+    <p id="presents-{{ soiree.date|date:"Y-m-d_H-i" }}"> {{ soiree.presents }}</p>
+    <h3>Pas sûrs</h3>
+    <p id="pas_surs-{{ soiree.date|date:"Y-m-d_H-i" }}"> {{ soiree.pas_surs }}</p>
+    <h3>Films</h3>
     {% for score, film, dispo in soiree.score_films %}
     <p {% if not dispo %}class="text-muted"{% endif %}>{{ score }} » <a href="{{ film.get_absolute_url }}">{{ film.titre }}</a> – {{ film.respo }}</p>
     {% endfor %}
 {% endfor %}
 
+<hr>
+
+<p><a href="{% url 'cine:ajout_soiree' %}">Proposez-en une chez vous !</a></p>
+
+<p><a href="http://perso.saurel.me{% url 'cine:ics' %}">Téléchargez</a>, ou même <a href="webcal://perso.saurel.me{% url 'cine:ics' %}">abonnez-vous</a> au calendrier CinéNim !</p>
 
 {% endblock %}

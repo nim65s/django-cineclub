@@ -5,7 +5,7 @@ X-WR-TIMEZONE:Europe/Paris
 VERSION:2.0
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
-{% load tz %}{% for soiree in soirees %}BEGIN:VEVENT
+{% load tz %}{% for soiree in object_list %}BEGIN:VEVENT
 DTSTART:{{ soiree.date|utc|date:"Ymd\THis\Z" }}
 DTEND:{{ soiree.date|utc|date:"Ymd\T220000\Z" }}
 UID:perso.saurel.me/cine - {{ soiree.date|date:"c" }}{% if soiree.favoris %} - {{ soiree.favoris }}{% endif %}
