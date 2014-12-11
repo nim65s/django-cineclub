@@ -117,8 +117,6 @@ class Film(Model):
         score = 0
         for vote in self.vote_set.all():
             score -= vote.choix
-            if vote.plusse:
-                score += 1
         return score
 
     @staticmethod
@@ -151,13 +149,10 @@ class Vote(Model):
     film = ForeignKey(Film)
     cinephile = ForeignKey(User)
     choix = IntegerField(default=9999)
-    plusse = BooleanField(default=False)  # TODO: NYI
 
     unique_together = ("film", "cinephile")
 
     def __str__(self):
-        if self.plusse:
-            return '%s \t %i + \t %s' % (self.film, self.choix, self.cinephile)
         return '%s \t %i \t %s' % (self.film, self.choix, self.cinephile)
 
     class Meta:
@@ -208,6 +203,21 @@ class Soiree(Model):
 
     def pas_surs(self):
         return ", ".join([cinephile.cinephile.username for cinephile in self.dispotowatch_set.filter(dispo='N')])
+
+    def score_films(self):
+        films = []
+        N = Film.objects.filter(vu=False).count() * User.objects.filter(groups__name='cine').count() + 1
+        for film in Film.objects.filter(categorie=self.categorie, vu=False):
+            score = N
+            for dispo in self.dispotowatch_set.filter(dispo='O'):
+                score -= film.vote_set.get(cinephile=dispo.cinephile).choix
+            films.append((score, film, film.respo.dispotowatch_set.get(soiree=self).dispo == 'O'))
+        films.sort()
+        films.reverse()
+        return films
+
+    def get_absolute_url(self):
+        return reverse('cine:home')
 
     def __str__(self):
         return '%s:%s' % (self.date, self.categorie)

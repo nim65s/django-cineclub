@@ -9,7 +9,7 @@
 
 <p><a href="http://perso.saurel.me{% url 'cine:ics' %}">Téléchargez</a>, ou même <a href="webcal://perso.saurel.me{% url 'cine:ics' %}">abonnez-vous</a> au calendrier CinéNim !</p>
 
-{% if user.is_superuser %}<p><a href="/admin/cine/soiree/add/">Ajouter une soirée</a></p>{% endif %}
+<p><a href="/admin/cine/soiree/add/">Ajouter une soirée</a></p>
 
 {% for soiree, liste, autres in films %}
     <h2>{{ soiree.date }} ({{soiree.get_categorie}})</h2>

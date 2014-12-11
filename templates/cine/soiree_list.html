@@ -1,0 +1,18 @@
+{% extends "cine/cine.html" %}
+{% load cine_extra %}
+
+{% block content %}
+
+<h1>Soirées à venir</h1>
+
+<p><a href="{% url 'cine:ajout_soiree' %}">Proposez-en une chez vous !</a></p>
+
+{% for soiree in object_list %}
+    <h2>{{ soiree.date }} chez {{ soiree.hote }} – {{soiree.get_categorie}}</h2>
+    {% for score, film, dispo in soiree.score_films %}
+    <p {% if not dispo %}class="text-muted"{% endif %}>{{ score }} » <a href="{{ film.get_absolute_url }}">{{ film.titre }}</a> – {{ film.respo }}</p>
+    {% endfor %}
+{% endfor %}
+
+
+{% endblock %}

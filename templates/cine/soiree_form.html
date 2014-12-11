@@ -1,0 +1,30 @@
+{% extends "cine/cine.html" %}
+{% load widget_tweaks bootstrap3 staticfiles %}
+
+{% block content %}
+
+<h1>Proposer une soiree</h1>
+<form method="post" action="" class="form-horizontal" role="form">
+    {% csrf_token %}
+    {% bootstrap_form form layout="horizontal" %}
+    {% buttons %}
+        <button type="submit" class="btn">C’est bon \o/</button>
+    {% endbuttons %}
+</form>
+
+{% endblock %}
+
+{% block "js" %}
+
+<!-- https://github.com/eternicode/bootstrap-datepicker -->
+<script src="{% static "js/bootstrap-datepicker.js" %}"></script>
+<script>
+    $('#id_date').datepicker({
+        format: "dd/mm/yyyy",
+        weekStart: 1,
+        autoclose: true,
+        todayHighlight: true
+    });
+</script>
+
+{% endblock %}

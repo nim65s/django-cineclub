@@ -41,8 +41,6 @@ def home(request):
                     for dispo in DispoToWatch.objects.filter(dispo='O', soiree=soiree):
                         vote = Vote.objects.get(cinephile=dispo.cinephile, film=film)
                         score -= vote.choix
-                        if vote.plusse:
-                            score += 1
                     if film.respo.dispotowatch_set.filter(soiree=soiree, dispo='O'):
                         films[-1][1].append((score, film))
                     else:
@@ -198,3 +196,19 @@ class DispoListView(GroupRequiredMixin, CheckVotesMixin, ListView):
 
     def get_queryset(self):
         return DispoToWatch.objects.filter(cinephile=self.request.user, soiree__in=Soiree.a_venir.all())
+
+
+class SoireeListView(GroupRequiredMixin, CheckVotesMixin, ListView):
+    group_required = 'cine'
+    queryset = Soiree.a_venir.all()
+
+
+class SoireeCreateView(GroupRequiredMixin, CheckVotesMixin, CreateView):
+    group_required = 'cine'
+    model = Soiree
+    fields = ['date', 'categorie']
+
+    def form_valid(self, form):
+        #cache.delete('films')
+        form.instance.hote = self.request.user
+        return super(SoireeCreateView, self).form_valid(form)
