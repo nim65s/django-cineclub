@@ -15,6 +15,7 @@ register = template.Library()
 def films_url(request, key, value):
     return "%s%s" % (reverse('cine:films'), url_get(request, key, value))
 
+
 @register.simple_tag
 def dispo_buttons(user, soiree):
     if not user.groups.filter(name='cine').exists():
@@ -32,5 +33,3 @@ def dispo_buttons(user, soiree):
             'P': 'active' if dispo == 'P' else '',
             'N': 'active' if dispo == 'N' else '',
             }
-
-

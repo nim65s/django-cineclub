@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from django.contrib.admin import ModelAdmin, site
-from models import *
+from models import Film, Vote, Soiree, DispoToWatch
 
 
 class SoireeAdmin(ModelAdmin):

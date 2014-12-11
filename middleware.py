@@ -1,8 +1,9 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from django.contrib import messages
+from django.core.urlresolvers import reverse
+from django.utils.safestring import mark_safe
 
-from models import get_cinephiles, Vote
 
 class CheckVoteMiddleware(object):
     def process_request(self, request):

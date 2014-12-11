@@ -2,22 +2,19 @@
 
 from __future__ import unicode_literals
 
-import json
 import re
 from datetime import datetime, timedelta
-from StringIO import StringIO
 
 import requests
-from PIL import Image
 from pytz import timezone
 
 from django.conf import settings
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.core.urlresolvers import reverse
-from django.db.models import (BooleanField, CharField, DateTimeField, ForeignKey, ImageField, IntegerField, Manager, ManyToManyField, Model, SlugField,
+from django.db.models import (BooleanField, CharField, DateTimeField, ForeignKey, ImageField, IntegerField, Manager, Model, SlugField,
                               TextField, URLField)
 from django.template.defaultfilters import slugify
 from django.utils.encoding import python_2_unicode_compatible
@@ -214,9 +211,11 @@ class Soiree(Model):
         ordering = ["date"]
         get_latest_by = 'date'
 
+
 class DisposAVenirManager(Manager):
     def get_query_set(self):
         return super(DisposAVenirManager, self).get_query_set().filter(soiree__date__gte=tzloc(datetime.now() - timedelta(hours=5)))
+
 
 @python_2_unicode_compatible
 class DispoToWatch(Model):

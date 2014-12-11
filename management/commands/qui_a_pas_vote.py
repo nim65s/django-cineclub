@@ -1,16 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals
 
-from datetime import datetime
-
-from pytz import timezone
-
-from cine.models import *
-from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
-
-tz = timezone(settings.TIME_ZONE)
-tzloc = tz.localize
+from cine.models import Soiree, Vote
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
@@ -18,9 +10,6 @@ class Command(BaseCommand):
     help = 'Affiche les gens qui ont pas voté (c’est pas bien ! :P)'
 
     def handle(self, *args, **options):
-        soiree = Soiree.objects.filter(date__gte=tzloc(datetime.now()))[0]
-        for film in Film.objects.filter(categorie=soiree.categorie, vu=False):
-            for dispo in DispoToWatch.objects.filter(dispo='O', soiree=soiree):
-                vote = Vote.objects.get(cinephile=dispo.cinephile, film=film)
-                if vote.choix == 9999:
-                    print('%s n’a pas voté pour %s' % (dispo.cinephile, film))
+        dispos = Soiree.a_venir.first().dispotowatch_set.filter(dispo='O').values_list('cinephile', flat=True)
+        for vote in Vote.objects.filter(choix=9999, film__vu=False, cinephile__in=dispos):
+            print('%s n’a pas voté pour %s' % (vote.cinephile, vote.film))
