@@ -14,8 +14,7 @@ from django.contrib.sites.models import Site
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.core.urlresolvers import reverse
-from django.db.models import (BooleanField, CharField, DateTimeField, ForeignKey, ImageField, IntegerField, Manager, Model, SlugField,
-                              TextField, URLField)
+from django.db.models import BooleanField, CharField, DateTimeField, ForeignKey, ImageField, IntegerField, Manager, Model, SlugField, TextField, URLField
 from django.template.defaultfilters import slugify
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -191,9 +190,9 @@ class Soiree(Model):
 
     def score_films(self):
         films = []
-        N = Film.objects.filter(vu=False).count() * User.objects.filter(groups__name='cine').count() + 1
+        n = Film.objects.filter(vu=False).count() * User.objects.filter(groups__name='cine').count() + 1
         for film in Film.objects.filter(categorie=self.categorie, vu=False):
-            score = N
+            score = n
             for dispo in self.dispotowatch_set.filter(dispo='O'):
                 score -= film.vote_set.get(cinephile=dispo.cinephile).choix
             films.append((score, film, film.respo.dispotowatch_set.get(soiree=self).dispo == 'O'))

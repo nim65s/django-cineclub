@@ -2,7 +2,7 @@
 
 from __future__ import unicode_literals
 
-from cine.models import Film, User, DispoToWatch, Vote, Soiree
+from cine.models import DispoToWatch, Film, Soiree, User, Vote
 from django.core.management.base import BaseCommand
 
 
@@ -11,14 +11,14 @@ class Command(BaseCommand):
     help = 'Crée les votes et dispos manquant(e)s et supprime ceux des non-cinéphiles'
 
     def handle(self, *args, **options):
-        N = len(Film.objects.all()) + 1
+        n = len(Film.objects.all()) + 1
         for cinephile in User.objects.filter(groups__name='cine'):
             for film in Film.objects.all():
                 try:
                     Vote.objects.get(film=film, cinephile=cinephile)
                 except Vote.DoesNotExist:
                     v = Vote()
-                    v.choix = N
+                    v.choix = n
                     v.film = film
                     v.cinephile = cinephile
                     v.save()
