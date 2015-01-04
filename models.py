@@ -37,7 +37,7 @@ def get_cinephiles():
 
 
 def full_url(path):
-    return 'http://%s%s' % (Site.objects.get_current().domain, path)
+    return 'https://%s%s' % (Site.objects.get_current().domain, path)
 
 
 def get_verbose_name(model, name):
@@ -169,7 +169,7 @@ class Soiree(Model):
     def save(self, *args, **kwargs):
         super(Soiree, self).save(*args, **kwargs)
 
-        dispos_url = full_url(reverse('cine:dispos'))
+        dispos_url = full_url(reverse('cine:home'))
 
         message = 'Hello :) \n\n%s a proposé une soirée %s le %s ; ' % (self.hote, self.get_categorie(), self.date)
         message += 'tu peux donc aller mettre à jour tes disponibilités (%s) \\o/ \n\n@+ !' % dispos_url
