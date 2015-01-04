@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from cine.models import DispoToWatch
 from django import template
+from django.core.mail import mail_admins
 from django.core.urlresolvers import reverse
 from perso.templatetags.perso_extra import url_get
 
@@ -19,7 +20,9 @@ def films_url(request, key, value):
 def dispo_buttons(user, soiree):
     if not user.groups.filter(name='cine').exists():
         return ''
-    dispo = DispoToWatch.objects.get(soiree=soiree, cinephile=user).dispo
+    dtw, created = DispoToWatch.objects.get_or_create(soiree=soiree, cinephile=user)
+    if created:
+        mail_admins('DispoToWatch Créée sans raisons', '%s / %s' % (soiree, user))
     return """
     <div class="btn-group" data-toggle="buttons">
         <label class="btn %(O)s btn-success" onclick="Dajaxice.cine.dispo(Dajax.process,{'date':'%(date)s','dispo':'O'});">
@@ -31,7 +34,7 @@ def dispo_buttons(user, soiree):
     </div>
     """ % {
             'date': soiree.date.strftime('%Y-%m-%d_%H-%M'),
-            'O': 'active' if dispo == 'O' else '',
-            'P': 'active' if dispo == 'P' else '',
-            'N': 'active' if dispo == 'N' else '',
+            'O': 'active' if dtw.dispo == 'O' else '',
+            'P': 'active' if dtw.dispo == 'P' else '',
+            'N': 'active' if dtw.dispo == 'N' else '',
             }
