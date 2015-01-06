@@ -218,7 +218,6 @@ class Soiree(Model):
                 self.favoris = scores[0][1]
                 self.save()
 
-
     def __str__(self):
         return '%s:%s' % (self.date, self.categorie)
 
