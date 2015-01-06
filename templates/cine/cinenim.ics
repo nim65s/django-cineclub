@@ -8,9 +8,9 @@ METHOD:PUBLISH
 {% load tz %}{% for soiree in object_list %}BEGIN:VEVENT
 DTSTART:{{ soiree.date|utc|date:"Ymd\THis\Z" }}
 DTEND:{{ soiree.date|utc|date:"Ymd\T220000\Z" }}
-UID:perso.saurel.me/cine - {{ soiree.date|date:"c" }}{% if soiree.favoris %} - {{ soiree.favoris }}{% endif %}
+UID:saurel.me/cine - {{ soiree.date|date:"c" }}{% if soiree.favoris %} - {{ soiree.favoris }}{% endif %}
 DESCRIPTION:{% if soiree.favoris %}{{ soiree.favoris.get_description }}{% else %}CinéNim{% endif %}
-LOCATION:72 Bd de Strasbourg, Toulouse
-SUMMARY:CinéNim : {{ soiree.get_categorie }}{% if soiree.favoris %} ; favoris: {{ soiree.favoris }}{% endif %}
+LOCATION:Chez {{ soiree.hote }}
+SUMMARY:CinéNim : {{ soiree.get_categorie }}{% if soiree.favoris %} ; favori: {{ soiree.favoris }}{% endif %}
 END:VEVENT
 {% endfor %}END:VCALENDAR

@@ -143,6 +143,11 @@ class Vote(Model):
     cinephile = ForeignKey(User)
     choix = IntegerField(default=9999)
 
+    def save(self, *args, **kwargs):
+        super(Vote, self).save(*args, **kwargs)
+        for soiree in Soiree.a_venir.all():
+            soiree.update_favori()
+
     def __str__(self):
         return '%s \t %i \t %s' % (self.film, self.choix, self.cinephile)
 
@@ -175,7 +180,10 @@ class Soiree(Model):
         message += 'tu peux donc aller mettre à jour tes disponibilités (%s) \\o/ \n\n@+ !' % dispos_url
 
         for cinephile in get_cinephiles():
-            dtw = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile)
+            if cinephile == self.hote:
+                dtw = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile, dispo='O')
+            else:
+                dtw = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile)
             if not settings.DEBUG and dtw[1]:
                 cinephile.email_user('[CinéNim] Soirée Ajoutée !', message)
 
@@ -202,6 +210,14 @@ class Soiree(Model):
 
     def get_absolute_url(self):
         return reverse('cine:home')
+
+    def update_favori(self):
+        if self.dispotowatch_set.filter(dispo='O').exists():
+            scores = self.score_films()
+            if scores:
+                self.favoris = scores[0][1]
+                self.save()
+
 
     def __str__(self):
         return '%s:%s' % (self.date, self.categorie)
@@ -232,6 +248,10 @@ class DispoToWatch(Model):
             )
 
     dispo = CharField(max_length=1, choices=CHOIX_DISPO, default='N')
+
+    def save(self, *args, **kwargs):
+        super(DispoToWatch, self).save(*args, **kwargs)
+        self.soiree.update_favori()
 
     def __str__(self):
         return '%s %s %s' % (self.soiree, self.dispo, self.cinephile)
