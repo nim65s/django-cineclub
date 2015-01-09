@@ -12,11 +12,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import CreateView, ListView, UpdateView
 from django.views.generic.base import RedirectView
 
-from .models import CHOIX_CATEGORIE_DICT, Film, get_verbose_name, Soiree, Vote
-
-# c['nombre_films_c'] = Film.objects.filter(vu=False, categorie='C').count()
-# c['nombre_films_d'] = Film.objects.filter(vu=False, categorie='D').count()
-# c['nombre_films_vus'] = Film.objects.filter(vu=True).count()
+from .models import CHOIX_CATEGORIE_DICT, DispoToWatch, Film, Soiree, Vote, get_verbose_name
 
 
 class CinephileRequiredMixin(GroupRequiredMixin):
@@ -136,3 +132,12 @@ class SoireeCreateView(CinephileRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.hote = self.request.user
         return super(SoireeCreateView, self).form_valid(form)
+
+
+class DTWUpdateView(CinephileRequiredMixin, UpdateView):
+    def get(self, request, *args, **kwargs):
+        dtw = get_object_or_404(DispoToWatch, soiree__pk=kwargs['pk'], cinephile=request.user)
+        dtw.dispo = kwargs['dispo']
+        dtw.save()
+        messages.info(request, "Disponibilité mise à jour !")
+        return redirect('cine:home')

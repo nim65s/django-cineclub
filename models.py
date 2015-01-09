@@ -157,8 +157,8 @@ class Vote(Model):
 
 
 class SoireeAVenirManager(Manager):
-    def get_query_set(self):
-        return super(SoireeAVenirManager, self).get_query_set().filter(date__gte=tzloc(datetime.now() - timedelta(hours=5)))
+    def get_queryset(self):
+        return super(SoireeAVenirManager, self).get_queryset().filter(date__gte=tzloc(datetime.now() - timedelta(hours=5)))
 
 
 @python_2_unicode_compatible
@@ -227,8 +227,8 @@ class Soiree(Model):
 
 
 class DisposAVenirManager(Manager):
-    def get_query_set(self):
-        return super(DisposAVenirManager, self).get_query_set().filter(soiree__date__gte=tzloc(datetime.now() - timedelta(hours=5)))
+    def get_queryset(self):
+        return super(DisposAVenirManager, self).get_queryset().filter(soiree__date__gte=tzloc(datetime.now() - timedelta(hours=5)))
 
 
 @python_2_unicode_compatible

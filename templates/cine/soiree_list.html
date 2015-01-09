@@ -1,5 +1,4 @@
 {% extends "cine/cine.html" %}
-{% load cine_extra %}
 
 {% block content %}
 
@@ -9,13 +8,13 @@
 {% for soiree in object_list %}
     <h2>{{ soiree.date }} chez {{ soiree.hote }} – {{soiree.get_categorie}}</h2>
 
-    {% dispo_buttons request.user soiree %}
-
+    <a href="{% url 'cine:dtw' soiree.pk 'O' %}" class="btn btn-success">Je serai là !</a> –
+    <a href="{% url 'cine:dtw' soiree.pk 'P' %}" class="btn btn-warning">Je ne serai pas là…</a>
 
     <h3>Présents</h3>
-    <p id="presents-{{ soiree.date|date:"Y-m-d_H-i" }}"> {{ soiree.presents }}</p>
+    <p>{{ soiree.presents }}</p>
     <h3>Pas sûrs</h3>
-    <p id="pas_surs-{{ soiree.date|date:"Y-m-d_H-i" }}"> {{ soiree.pas_surs }}</p>
+    <p>{{ soiree.pas_surs }}</p>
     <h3>Films</h3>
     {% for score, film, dispo in soiree.score_films %}
     <p {% if not dispo %}class="text-muted"{% endif %}>{{ score }} » <a href="{{ film.get_absolute_url }}">{{ film.titre }}</a> – {{ film.respo }}</p>
