@@ -127,7 +127,7 @@ class CinephileListView(CinephileRequiredMixin, ListView):
 
 class SoireeCreateView(CinephileRequiredMixin, CreateView):
     model = Soiree
-    fields = ['date', 'categorie']
+    fields = ['date', 'time', 'categorie']
 
     def form_valid(self, form):
         form.instance.hote = self.request.user

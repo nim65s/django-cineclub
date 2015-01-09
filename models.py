@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 
 import requests
 from pytz import timezone
@@ -14,7 +14,7 @@ from django.contrib.sites.models import Site
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.core.urlresolvers import reverse
-from django.db.models import BooleanField, CharField, DateTimeField, ForeignKey, ImageField, IntegerField, Manager, Model, SlugField, TextField, URLField
+from django.db.models import BooleanField, CharField, DateField, ForeignKey, ImageField, IntegerField, Manager, Model, SlugField, TextField, TimeField, URLField
 from django.template.defaultfilters import slugify
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -163,7 +163,8 @@ class SoireeAVenirManager(Manager):
 
 @python_2_unicode_compatible
 class Soiree(Model):
-    date = DateTimeField()
+    date = DateField()
+    time = TimeField('heure', default=time(20, 30))
     categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D', blank=True)
     hote = ForeignKey(User)
     favoris = ForeignKey(Film, null=True)
@@ -250,7 +251,6 @@ class DispoToWatch(Model):
 
     def save(self, *args, **kwargs):
         super(DispoToWatch, self).save(*args, **kwargs)
-        self.soiree.update_favori()
 
     def __str__(self):
         return '%s %s %s' % (self.soiree, self.dispo, self.cinephile)

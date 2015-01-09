@@ -15,16 +15,8 @@
 {% endblock %}
 
 {% block "js" %}
-
-<!-- https://github.com/eternicode/bootstrap-datepicker -->
-<script src="{% static "js/bootstrap-datepicker.js" %}"></script>
 <script>
-    $('#id_date').datepicker({
-        format: "dd/mm/yyyy",
-        weekStart: 1,
-        autoclose: true,
-        todayHighlight: true
-    });
+    $('#id_date').attr({type: 'date'});
+    $('#id_time').attr({type: 'time'});
 </script>
-
 {% endblock %}
