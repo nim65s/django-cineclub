@@ -91,7 +91,7 @@ class Film(Model):
 
         for cinephile in get_cinephiles():
             vote = Vote.objects.get_or_create(film=self, cinephile=cinephile)
-            if vote[1] and not settings.DEBUG:
+            if vote[1] and not settings.DEBUG and not settings.INTEGRATION:
                 cinephile.email_user('[CinéNim] Film ajouté !', message)
 
     def get_absolute_url(self):
@@ -185,7 +185,7 @@ class Soiree(Model):
                 dtw = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile, dispo='O')
             else:
                 dtw = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile)
-            if not settings.DEBUG and dtw[1]:
+            if not settings.DEBUG and not settings.INTEGRATION and dtw[1]:
                 cinephile.email_user('[CinéNim] Soirée Ajoutée !', message)
 
     def get_categorie(self):
