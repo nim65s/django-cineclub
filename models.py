@@ -177,9 +177,8 @@ class Soiree(Model):
 
         dispos_url = full_url(reverse('cine:home'))
 
-        message = 'Hello :) \n\n%s a proposé une soirée %s le %s ; ' % (self.hote, self.get_categorie(), self.date)
-        message += 'tu peux donc aller mettre à jour tes disponibilités (%s) \\o/ \n\n@+ !' % dispos_url
-
+        message = 'Hello :) \n\n%s a proposé une soirée %s %s à %s; tu peux donc aller mettre à jour tes disponibilités (%s) \\o/\n\n@+!'
+        message %= (self.hote, self.get_categorie(), self.date.strftime('%A %d %B'), self.time.strftime('%H:%M'), dispos_url)
         for cinephile in get_cinephiles():
             if cinephile == self.hote:
                 dtw = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile, dispo='O')
