@@ -4,7 +4,7 @@ from django.conf.urls import patterns, url
 from django.views.generic import DetailView, ListView, RedirectView
 
 from .models import Film, Soiree
-from .views import ICS, CinephileListView, DTWUpdateView, FilmCreateView, FilmListView, FilmUpdateView, FilmVuView, SoireeCreateView, votes
+from .views import ICS, AdressUpdateView, CinephileListView, DTWUpdateView, FilmCreateView, FilmListView, FilmUpdateView, FilmVuView, SoireeCreateView, votes
 
 urlpatterns = patterns('',
     url(r'^votes$', votes, name='votes'),
@@ -21,6 +21,7 @@ urlpatterns = patterns('',
     url(r'^comms/(?P<slug>[^/]+)$', RedirectView.as_view(pattern_name='film')),
 
     url(r'^cinephiles$', CinephileListView.as_view(), name='cinephiles'),
+    url(r'^adress$', AdressUpdateView.as_view(), name='adress'),
 
     url(r'^cinenim.ics$', ICS.as_view(), name='ics'),
 )

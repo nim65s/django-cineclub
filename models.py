@@ -14,7 +14,8 @@ from django.contrib.sites.models import Site
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.core.urlresolvers import reverse
-from django.db.models import BooleanField, CharField, DateField, ForeignKey, ImageField, IntegerField, Manager, Model, SlugField, TextField, TimeField, URLField
+from django.db.models import (BooleanField, CharField, DateField, ForeignKey, ImageField, IntegerField, Manager, Model, OneToOneField, SlugField, TextField,
+                              TimeField, URLField)
 from django.template.defaultfilters import slugify
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -208,15 +209,18 @@ class Soiree(Model):
         films.reverse()
         return films
 
-    def get_absolute_url(self):
-        return reverse('cine:home')
-
     def update_favori(self):
         if self.dispotowatch_set.filter(dispo='O').exists():
             scores = self.score_films()
             if scores:
                 self.favoris = scores[0][1]
                 self.save()
+
+    def has_adress(self):
+        return Adress.objects.filter(user=self.hote).exists()
+
+    def adress(self):
+        return self.hote.adress.adresse.replace('\n', ' ').replace(' ', '+')
 
     def __str__(self):
         return '%s:%s' % (self.date, self.categorie)
@@ -256,3 +260,12 @@ class DispoToWatch(Model):
 
     class Meta:
         ordering = ['soiree__date']
+
+
+@python_2_unicode_compatible
+class Adress(Model):
+    user = OneToOneField(User)
+    adresse = TextField()
+
+    def __str__(self):
+        return 'Adresse de %s' % self.user

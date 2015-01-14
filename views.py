@@ -7,12 +7,12 @@ from braces.views import GroupRequiredMixin, SuperuserRequiredMixin
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import CreateView, ListView, UpdateView
 from django.views.generic.base import RedirectView
 
-from .models import CHOIX_CATEGORIE_DICT, DispoToWatch, Film, Soiree, Vote, get_verbose_name
+from .models import CHOIX_CATEGORIE_DICT, Adress, DispoToWatch, Film, Soiree, Vote, get_verbose_name
 
 
 class CinephileRequiredMixin(GroupRequiredMixin):
@@ -131,7 +131,13 @@ class SoireeCreateView(CinephileRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.hote = self.request.user
+        messages.info(self.request, "Soirée Créée")
         return super(SoireeCreateView, self).form_valid(form)
+
+    def get_success_url(self):
+        if self.object.has_adress():
+            return reverse('cine:home')
+        return reverse('cine:adress')
 
 
 class DTWUpdateView(CinephileRequiredMixin, UpdateView):
@@ -141,3 +147,15 @@ class DTWUpdateView(CinephileRequiredMixin, UpdateView):
         dtw.save()
         messages.info(request, "Disponibilité mise à jour !")
         return redirect('cine:home')
+
+
+class AdressUpdateView(CinephileRequiredMixin, UpdateView):
+    fields = ['adresse']
+    success_url = reverse_lazy('cine:home')
+
+    def get_object(self, queryset=None):
+        return Adress.objects.get_or_create(user=self.request.user)[0]
+
+    def form_valid(self, form):
+        messages.info(self.request, "Adresse mise à jour")
+        return super(AdressUpdateView, self).form_valid(form)
