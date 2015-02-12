@@ -10,7 +10,7 @@ DTSTART:{{ soiree.dtstart }}
 DTEND:{{ soiree.dtend }}
 UID:saurel.me/cine - {{ soiree.date|date:"c" }}{% if soiree.favoris %} - {{ soiree.favoris }}{% endif %}
 DESCRIPTION:{% if soiree.favoris %}{{ soiree.favoris.get_description }}{% else %}CinéNim{% endif %}
-LOCATION:Chez {{ soiree.hote }}
-SUMMARY:CinéNim : {{ soiree.get_categorie }}{% if soiree.favoris %} ; favori: {{ soiree.favoris }}{% endif %}
+LOCATION:{% if soiree.has_adress %}{{ soiree.hote.adress.adresse }}{% else %}Chez {{ soiree.hote }}{% endif %}
+SUMMARY:CinéNim : {{ soiree.get_categorie }} chez {{ soiree.hote }}{% if soiree.favoris %} ({{ soiree.favoris }}){% endif %}
 END:VEVENT
 {% endfor %}END:VCALENDAR
