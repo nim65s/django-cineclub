@@ -5,9 +5,9 @@ X-WR-TIMEZONE:Europe/Paris
 VERSION:2.0
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
-{% load tz %}{% for soiree in object_list %}BEGIN:VEVENT
-DTSTART:{{ soiree.date|utc|date:"Ymd\THis\Z" }}
-DTEND:{{ soiree.date|utc|date:"Ymd\T220000\Z" }}
+{% for soiree in object_list %}BEGIN:VEVENT
+DTSTART:{{ soiree.dtstart }}
+DTEND:{{ soiree.dtend }}
 UID:saurel.me/cine - {{ soiree.date|date:"c" }}{% if soiree.favoris %} - {{ soiree.favoris }}{% endif %}
 DESCRIPTION:{% if soiree.favoris %}{{ soiree.favoris.get_description }}{% else %}CinéNim{% endif %}
 LOCATION:Chez {{ soiree.hote }}

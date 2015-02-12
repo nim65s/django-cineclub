@@ -188,6 +188,14 @@ class Soiree(Model):
             if not settings.DEBUG and not settings.INTEGRATION and dtw[1]:
                 cinephile.email_user('[CinéNim] Soirée Ajoutée !', message)
 
+    def dtstart(self, time=None):
+        if time is None:
+            time = self.time
+        return tzloc(datetime(self.date.year, self.date.month, self.date.day, time.hour, time.minute)).astimezone(timezone('utc')).strftime('%Y%m%dT%H%M%SZ')
+
+    def dtend(self):
+        return self.dtstart(time(23, 59))
+
     def get_categorie(self):
         return CHOIX_CATEGORIE_DICT[self.categorie]
 
