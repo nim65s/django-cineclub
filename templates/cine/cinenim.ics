@@ -9,7 +9,7 @@ METHOD:PUBLISH
 DTSTART:{{ soiree.dtstart }}
 DTEND:{{ soiree.dtend }}
 SUMMARY:CinéNim : {{ soiree.get_categorie }} chez {{ soiree.hote }}{% if soiree.favoris %} ({{ soiree.favoris }}){% endif %}
-LOCATION:{% if soiree.has_adress %}{{ soiree.hote.adress.adresse }}{% else %}Chez {{ soiree.hote }}{% endif %}
+LOCATION:{% if soiree.has_adress %}{{ soiree.adress_ics }}{% else %}Chez {{ soiree.hote }}{% endif %}
 STATUS: CONFIRMED
 DESCRIPTION:{% if soiree.favoris %}{{ soiree.favoris.get_description }}{% else %}CinéNim{% endif %}
 UID:saurel.me/cine - {{ soiree.date|date:"c" }}{% if soiree.favoris %} - {{ soiree.favoris }}{% endif %}

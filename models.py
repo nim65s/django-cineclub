@@ -234,8 +234,11 @@ class Soiree(Model):
     def has_adress(self):
         return Adress.objects.filter(user=self.hote).exists()
 
-    def adress(self):
-        return self.hote.adress.adresse.replace('\n', ' ').replace(' ', '+')
+    def adress_ics(self):
+        return self.hote.adress.adresse.replace('\n', ' ')
+
+    def adress_query(self):
+        return self.adress_ics().replace(' ', '+')
 
     def __str__(self):
         return '%s:%s' % (self.date, self.categorie)

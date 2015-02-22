@@ -10,8 +10,8 @@
 
     <p>{% if soiree.has_adress %}
         {{ soiree.hote.adress.adresse|linebreaks }}<br>
-        <a href="https://maps.google.fr/?q={{ soiree.adress }}">Google Maps</a> –
-        <a href="https://nominatim.openstreetmap.org/?q={{ soiree.adress }}">Open Stree Maps</a>
+        <a href="https://maps.google.fr/?q={{ soiree.adress_query }}">Google Maps</a> –
+        <a href="https://nominatim.openstreetmap.org/?q={{ soiree.adress_query }}">Open Stree Maps</a>
     {% else %}
         {{ soiree.hote }} n’a pas encore renseigné son adresse…
     {% endif %}</p>
