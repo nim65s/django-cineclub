@@ -28,7 +28,7 @@ CHOIX_CATEGORIE = (
         )
 CHOIX_CATEGORIE_DICT = dict(CHOIX_CATEGORIE)
 
-CHOIX_ANNEES = [(annee, annee) for annee in range(datetime.now().year + 1, 1900, -1)]
+CHOIX_ANNEES = [(annee, annee) for annee in range(datetime.now().year + 2, 1900, -1)]
 
 IMDB_API_URL = 'http://www.omdbapi.com/'
 
@@ -73,27 +73,34 @@ class Film(Model):
     imdb_poster = ImageField(upload_to='cine/posters', blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.titre)
-        img = requests.get(self.imdb_poster_url)
-        if img.status_code == requests.codes.ok:
-            img_temp = NamedTemporaryFile(delete=True)
-            img_temp.write(img.content)
-            img_temp.flush()
-            self.imdb_poster.save(self.slug, File(img_temp), save=False)
-            img_temp.close()
+        update = self.pk is None
+        if not update:
+            orig = Film.objects.get(pk=self.pk)
+            if orig.slug != self.slug or orig.imdb_poster_url != self.imdb_poster_url:
+                update = True
+        if update:
+            self.slug = slugify(self.titre)
+            img = requests.get(self.imdb_poster_url)
+            if img.status_code == requests.codes.ok:
+                img_temp = NamedTemporaryFile(delete=True)
+                img_temp.write(img.content)
+                img_temp.flush()
+                self.imdb_poster.save(self.slug, File(img_temp), save=False)
+                img_temp.close()
         super(Film, self).save(*args, **kwargs)
 
-        # Création des votes & envoi des mails de notif
-        film_url = self.get_full_url()
-        vote_url = full_url(reverse('cine:votes'))
+        if update:
+            # Création des votes & envoi des mails de notif
+            film_url = self.get_full_url()
+            vote_url = full_url(reverse('cine:votes'))
 
-        message = "Hello :)\n\n%s a proposé un nouveau film : %s (%s)' ; " % (self.respo, self.titre, film_url)
-        message += "tu peux donc aller actualiser ton classement (%s) \\o/ \n\n @+!" % vote_url
+            message = "Hello :)\n\n%s a proposé un nouveau film : %s (%s)' ; " % (self.respo, self.titre, film_url)
+            message += "tu peux donc aller actualiser ton classement (%s) \\o/ \n\n @+!" % vote_url
 
-        for cinephile in get_cinephiles():
-            vote = Vote.objects.get_or_create(film=self, cinephile=cinephile)
-            if vote[1] and not settings.DEBUG and not settings.INTEGRATION:
-                cinephile.email_user('[CinéNim] Film ajouté !', message)
+            for cinephile in get_cinephiles():
+                vote = Vote.objects.get_or_create(film=self, cinephile=cinephile)
+                if vote[1] and settings.PROD:
+                    cinephile.email_user('[CinéNim] Film ajouté !', message)
 
     def get_absolute_url(self):
         return reverse('cine:film', kwargs={'slug': self.slug})
@@ -146,8 +153,8 @@ class Vote(Model):
 
     def save(self, *args, **kwargs):
         super(Vote, self).save(*args, **kwargs)
-        for soiree in Soiree.a_venir.all():
-            soiree.update_favori()
+        #for soiree in Soiree.a_venir.all():
+        #    soiree.update_favori()
 
     def __str__(self):
         return '%s \t %i \t %s' % (self.film, self.choix, self.cinephile)
