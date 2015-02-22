@@ -153,8 +153,8 @@ class Vote(Model):
 
     def save(self, *args, **kwargs):
         super(Vote, self).save(*args, **kwargs)
-        #for soiree in Soiree.a_venir.all():
-        #    soiree.update_favori()
+        # for soiree in Soiree.a_venir.all():
+        #     soiree.update_favori()
 
     def __str__(self):
         return '%s \t %i \t %s' % (self.film, self.choix, self.cinephile)
@@ -235,7 +235,7 @@ class Soiree(Model):
         return Adress.objects.filter(user=self.hote).exists()
 
     def adress_ics(self):
-        return self.hote.adress.adresse.replace('\n', ' ')
+        return self.hote.adress.adresse.replace('\n', ' ').replace('\r', '')
 
     def adress_query(self):
         return self.adress_ics().replace(' ', '+')
