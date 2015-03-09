@@ -90,17 +90,20 @@ class Film(Model):
         super(Film, self).save(*args, **kwargs)
 
         if update:
-            # Création des votes & envoi des mails de notif
-            film_url = self.get_full_url()
-            vote_url = full_url(reverse('cine:votes'))
+            self.nouveau()
 
-            message = "Hello :)\n\n%s a proposé un nouveau film : %s (%s)' ; " % (self.respo, self.titre, film_url)
-            message += "tu peux donc aller actualiser ton classement (%s) \\o/ \n\n @+!" % vote_url
+    def nouveau(self):
+        # Création des votes & envoi des mails de notif
+        film_url = self.get_full_url()
+        vote_url = full_url(reverse('cine:votes'))
 
-            for cinephile in get_cinephiles():
-                vote = Vote.objects.get_or_create(film=self, cinephile=cinephile)
-                if vote[1] and settings.PROD:
-                    cinephile.email_user('[CinéNim] Film ajouté !', message)
+        message = "Hello :)\n\n%s a proposé un nouveau film : %s (%s)' ; " % (self.respo, self.titre, film_url)
+        message += "tu peux donc aller actualiser ton classement (%s) \\o/ \n\n @+!" % vote_url
+
+        for cinephile in get_cinephiles():
+            vote = Vote.objects.get_or_create(film=self, cinephile=cinephile)
+            if vote[1] and settings.PROD:
+                cinephile.email_user('[CinéNim] Film ajouté !', message)
 
     def get_absolute_url(self):
         return reverse('cine:film', kwargs={'slug': self.slug})
@@ -182,7 +185,9 @@ class Soiree(Model):
 
     def save(self, *args, **kwargs):
         super(Soiree, self).save(*args, **kwargs)
+        self.nouvelle()
 
+    def nouvelle(self):
         dispos_url = full_url(reverse('cine:home'))
 
         message = 'Hello :) \n\n%s a proposé une soirée %s %s à %s; tu peux donc aller mettre à jour tes disponibilités (%s) \\o/\n\n@+!'
