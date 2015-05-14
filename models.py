@@ -56,7 +56,7 @@ class Film(Model):
     slug = SlugField(unique=True, blank=True)
 
     categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D')
-    annee_sortie = IntegerField(max_length=4, choices=CHOIX_ANNEES, blank=True, null=True, verbose_name="Année de sortie")
+    annee_sortie = IntegerField(choices=CHOIX_ANNEES, blank=True, null=True, verbose_name="Année de sortie")
 
     titre_vo = CharField(max_length=200, blank=True, null=True, verbose_name="Titre en VO")
     imdb = URLField(blank=True, null=True, verbose_name="IMDB")
