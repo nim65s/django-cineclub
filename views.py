@@ -31,7 +31,7 @@ def votes(request):
                 v.choix = i
                 v.save()
                 i += 1
-    c = {'votes': Vote.objects.filter(cinephile=request.user, film__vu=False)}
+    c = {'votes': Vote.objects.filter(cinephile=request.user, film__vu=False, veto=False)}
     return render(request, 'cine/votes.html', c)
 
 
@@ -109,11 +109,24 @@ class FilmListView(ListView):
 
 
 class FilmVuView(SuperuserRequiredMixin, RedirectView):
+    permanent = False
+
     def get_redirect_url(self, *args, **kwargs):
         film = get_object_or_404(Film, slug=kwargs['slug'])
         film.vu = True
+        film.vote_set.update(choix=-1)
         film.save()
         return reverse('cine:films')
+
+
+class VetoView(CinephileRequiredMixin, RedirectView):
+    permanent = False
+
+    def get_redirect_url(self, *args, **kwargs):
+        vote = get_object_or_404(Vote, pk=kwargs['pk'])
+        vote.veto = True
+        vote.save()
+        return reverse('cine:votes')
 
 
 class CinephileListView(CinephileRequiredMixin, ListView):

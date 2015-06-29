@@ -142,6 +142,7 @@ class Vote(Model):
     film = ForeignKey(Film)
     cinephile = ForeignKey(User)
     choix = IntegerField(default=9999)
+    veto = BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         super(Vote, self).save(*args, **kwargs)
@@ -204,12 +205,16 @@ class Soiree(Model):
 
     def score_films(self):
         films = []
-        n = Film.objects.filter(vu=False).count() * User.objects.filter(groups__name='cine').count() + 1
+        n = Film.objects.filter(vu=False).count() * self.dispotowatch_set.filter(dispo='O').count() + 1
         for film in Film.objects.filter(vu=False):
             score = n
             for dispo in self.dispotowatch_set.filter(dispo='O'):
-                score -= film.vote_set.get(cinephile=dispo.cinephile).choix
-            films.append((score, film, film.respo.dispotowatch_set.get(soiree=self).dispo == 'O'))
+                vote = film.vote_set.get(cinephile=dispo.cinephile)
+                if vote.veto:
+                    break
+                score -= vote.choix
+            else:
+                films.append((score, film, film.respo.dispotowatch_set.get(soiree=self).dispo == 'O'))
         films.sort()
         films.reverse()
         return films
@@ -231,7 +236,7 @@ class Soiree(Model):
         return self.adress_ics().replace(' ', '+')
 
     def __str__(self):
-        return self.date
+        return 'soirée du %s' % self.date
 
     class Meta:
         ordering = ["date"]
