@@ -6,7 +6,7 @@
 <h1>Soirées à venir</h1>
 
 {% for soiree in object_list %}
-    <h2>Le {{ soiree.date }} à {{ soiree.time|date:"H:i" }} chez {{ soiree.hote }} – {{soiree.get_categorie}}</h2>
+    <h2>Le {{ soiree.date }} à {{ soiree.time|date:"H:i" }} chez {{ soiree.hote }}</h2>
 
     <p>{% if soiree.has_adress %}
         {{ soiree.hote.adress.adresse|linebreaks }}<br>

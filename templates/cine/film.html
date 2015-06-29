@@ -7,7 +7,6 @@
     <p>{{ film.description|linebreaks }}</p>
     <dl>
         {% if not request.GET.respo or request.GET.respo = 'tous'%}<dt>Respo</dt><dd><a href="{% films_url request 'respo' film.respo %}">{{ film.respo }}</a></dd>{% endif %}
-        {% if not request.GET.cat or request.GET.cat = 'toutes' %}<dt>Catégorie</dt><dd><a href="{% films_url request 'cat' film.categorie %}">{{ film.get_categorie }}</a></dd>{% endif %}
         {% if not request.GET.vus or request.GET.vus = 'tous' %}<dt>Vu</dt><dd>
             {% if film.vu %}
                 <a href="{% films_url request 'vus' 'vus' %}">Oui</a>

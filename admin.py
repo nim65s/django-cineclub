@@ -7,7 +7,7 @@ from models import Adress, DispoToWatch, Film, Soiree, Vote
 
 
 class SoireeAdmin(ModelAdmin):
-    exclude = ('favoris', 'categorie')
+    exclude = ('favoris',)
 
 site.register(Adress)
 site.register(Film)

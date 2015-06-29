@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import CreateView, ListView, UpdateView
 from django.views.generic.base import RedirectView
 
-from .models import CHOIX_CATEGORIE_DICT, Adress, DispoToWatch, Film, Soiree, Vote, get_verbose_name
+from .models import Adress, DispoToWatch, Film, Soiree, Vote, get_verbose_name
 
 
 class CinephileRequiredMixin(GroupRequiredMixin):
@@ -43,7 +43,7 @@ class ICS(ListView):
 
 class FilmActionMixin(CinephileRequiredMixin):
     model = Film
-    fields = ('titre', 'description', 'categorie', 'annee_sortie', 'titre_vo', 'realisateur', 'imdb', 'allocine', 'duree_min', 'imdb_poster_url')
+    fields = ('titre', 'description', 'annee_sortie', 'titre_vo', 'realisateur', 'imdb', 'allocine', 'duree_min', 'imdb_poster_url')
 
     def form_valid(self, form):
         messages.info(self.request, "Film %s" % self.action)
@@ -85,8 +85,6 @@ class FilmListView(ListView):
             list_titre += " à voir"
         if get('respo') and get('respo') != 'tous':
             list_titre += " proposés par %s" % get('respo')
-        if get('cat') and get('cat') in "CD":
-            list_titre += " dans la catégorie %s" % CHOIX_CATEGORIE_DICT[get('cat')]
         if get_verbose_name(Film, get('tri')):
             list_titre += " triés par %s" % get_verbose_name(Film, get('tri'))
 
@@ -98,8 +96,6 @@ class FilmListView(ListView):
         queryset = super(FilmListView, self).get_queryset()
         get = self.request.GET.get
 
-        if get('cat') and get('cat') in "CD":
-            queryset = queryset.filter(categorie=get('cat'))
         if get('vus') == "vus":
             queryset = queryset.filter(vu=True)
         elif get('vus') == "a_voir":
@@ -127,7 +123,7 @@ class CinephileListView(CinephileRequiredMixin, ListView):
 
 class SoireeCreateView(CinephileRequiredMixin, CreateView):
     model = Soiree
-    fields = ['date', 'time', 'categorie']
+    fields = ['date', 'time']
 
     def form_valid(self, form):
         form.instance.hote = self.request.user

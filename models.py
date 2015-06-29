@@ -22,12 +22,6 @@ from django.utils.encoding import python_2_unicode_compatible
 tzloc = timezone(settings.TIME_ZONE).localize
 
 
-CHOIX_CATEGORIE = (
-        ('D', 'Divertissement'),
-        ('C', 'Culture'),
-        )
-CHOIX_CATEGORIE_DICT = dict(CHOIX_CATEGORIE)
-
 CHOIX_ANNEES = [(annee, annee) for annee in range(datetime.now().year + 2, 1900, -1)]
 
 IMDB_API_URL = 'http://www.omdbapi.com/'
@@ -54,8 +48,6 @@ class Film(Model):
     respo = ForeignKey(User)
     description = TextField()
     slug = SlugField(unique=True, blank=True)
-
-    categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D')
     annee_sortie = IntegerField(choices=CHOIX_ANNEES, blank=True, null=True, verbose_name="Année de sortie")
 
     titre_vo = CharField(max_length=200, blank=True, null=True, verbose_name="Titre en VO")
@@ -110,9 +102,6 @@ class Film(Model):
 
     def get_full_url(self):
         return full_url(self.get_absolute_url())
-
-    def get_categorie(self):
-        return CHOIX_CATEGORIE_DICT[self.categorie]
 
     def get_description(self):
         return self.description.replace('\r\n', '\\n')
@@ -176,7 +165,6 @@ class SoireeAVenirManager(Manager):
 class Soiree(Model):
     date = DateField()
     time = TimeField('heure', default=time(20, 30))
-    categorie = CharField(max_length=1, choices=CHOIX_CATEGORIE, default='D', blank=True)
     hote = ForeignKey(User)
     favoris = ForeignKey(Film, null=True)
 
@@ -190,8 +178,8 @@ class Soiree(Model):
     def nouvelle(self):
         dispos_url = full_url(reverse('cine:home'))
 
-        message = 'Hello :) \n\n%s a proposé une soirée %s %s à %s; tu peux donc aller mettre à jour tes disponibilités (%s) \\o/\n\n@+!'
-        message %= (self.hote, self.get_categorie(), self.date.strftime('%A %d %B'), self.time.strftime('%H:%M'), dispos_url)
+        message = 'Hello :) \n\n%s a proposé une soirée %s à %s; tu peux donc aller mettre à jour tes disponibilités (%s) \\o/\n\n@+!'
+        message %= (self.hote, self.date.strftime('%A %d %B'), self.time.strftime('%H:%M'), dispos_url)
         for cinephile in get_cinephiles():
             if cinephile == self.hote:
                 dtw = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile, dispo='O')
@@ -208,9 +196,6 @@ class Soiree(Model):
     def dtend(self):
         return self.dtstart(time(23, 59))
 
-    def get_categorie(self):
-        return CHOIX_CATEGORIE_DICT[self.categorie]
-
     def presents(self):
         return ", ".join([cinephile.cinephile.username for cinephile in self.dispotowatch_set.filter(dispo='O')])
 
@@ -220,7 +205,7 @@ class Soiree(Model):
     def score_films(self):
         films = []
         n = Film.objects.filter(vu=False).count() * User.objects.filter(groups__name='cine').count() + 1
-        for film in Film.objects.filter(categorie=self.categorie, vu=False):
+        for film in Film.objects.filter(vu=False):
             score = n
             for dispo in self.dispotowatch_set.filter(dispo='O'):
                 score -= film.vote_set.get(cinephile=dispo.cinephile).choix
@@ -246,7 +231,7 @@ class Soiree(Model):
         return self.adress_ics().replace(' ', '+')
 
     def __str__(self):
-        return '%s:%s' % (self.date, self.categorie)
+        return self.date
 
     class Meta:
         ordering = ["date"]
