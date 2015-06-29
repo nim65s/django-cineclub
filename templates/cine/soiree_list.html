@@ -27,6 +27,8 @@
     {% for score, film, dispo in soiree.score_films %}
     <p {% if not dispo %}class="text-muted"{% endif %}>{{ score }} » <a href="{{ film.get_absolute_url }}">{{ film.titre }}</a> – {{ film.respo }}</p>
     {% endfor %}
+{% empty %}
+    <p>Rien de prévu pour l’instant</p>
 {% endfor %}
 
 <hr>
