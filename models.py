@@ -14,7 +14,7 @@ from django.contrib.sites.models import Site
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.core.urlresolvers import reverse
-from django.db.models import (BooleanField, CharField, DateField, ForeignKey, ImageField, IntegerField, Manager, Model, OneToOneField, SlugField, TextField,
+from django.db.models import (BooleanField, CharField, DateField, ForeignKey, ImageField, IntegerField, Model, OneToOneField, SlugField, TextField, QuerySet,
                               TimeField, URLField)
 from django.template.defaultfilters import slugify
 from django.utils.encoding import python_2_unicode_compatible
@@ -157,9 +157,9 @@ class Vote(Model):
         unique_together = ("film", "cinephile")
 
 
-class SoireeAVenirManager(Manager):
-    def get_queryset(self):
-        return super(SoireeAVenirManager, self).get_queryset().filter(date__gte=tzloc(datetime.now() - timedelta(hours=5)))
+class SoireeQuerySet(QuerySet):
+    def a_venir(self):
+        return self.filter(date__gte=tzloc(datetime.now() - timedelta(hours=5)))
 
 
 @python_2_unicode_compatible
@@ -169,8 +169,7 @@ class Soiree(Model):
     hote = ForeignKey(User)
     favoris = ForeignKey(Film, null=True)
 
-    a_venir = SoireeAVenirManager()
-    objects = Manager()
+    objects = SoireeQuerySet.as_manager()
 
     def save(self, *args, **kwargs):
         super(Soiree, self).save(*args, **kwargs)
@@ -243,9 +242,9 @@ class Soiree(Model):
         get_latest_by = 'date'
 
 
-class DisposAVenirManager(Manager):
-    def get_queryset(self):
-        return super(DisposAVenirManager, self).get_queryset().filter(soiree__date__gte=tzloc(datetime.now() - timedelta(hours=5)))
+class DispoQuerySet(QuerySet):
+    def a_venir(self):
+        return self.filter(soiree__date__gte=tzloc(datetime.now() - timedelta(hours=5)))
 
 
 @python_2_unicode_compatible
@@ -253,7 +252,7 @@ class DispoToWatch(Model):
     soiree = ForeignKey(Soiree)
     cinephile = ForeignKey(User)
 
-    objects = DisposAVenirManager()
+    objects = DispoQuerySet.as_manager()
 
     unique_together = ("soiree", "cinephile")
 

@@ -11,5 +11,5 @@ class Command(BaseCommand):
     help = 'Update les favoris des soirées à venir'
 
     def handle(self, *args, **options):
-        for soiree in Soiree.a_venir.all():
+        for soiree in Soiree.objets.a_venir.all():
             soiree.update_favori()
