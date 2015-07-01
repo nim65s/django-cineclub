@@ -137,12 +137,19 @@ class Film(Model):
         return self.titre
 
 
+class VoteQuerySet(QuerySet):
+    def veto(self):
+        return self.filter(veto=True)
+
+
 @python_2_unicode_compatible
 class Vote(Model):
     film = ForeignKey(Film)
     cinephile = ForeignKey(User)
     choix = IntegerField(default=9999)
     veto = BooleanField(default=False)
+
+    objects = VoteQuerySet.as_manager()
 
     def save(self, *args, **kwargs):
         super(Vote, self).save(*args, **kwargs)
