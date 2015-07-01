@@ -6,7 +6,7 @@
     <div>
         <h2>{{ cinephile }}</h2>
         <p>{{ cinephile.get_full_name }}: <a href="mailto:{{ cinephile.email }}">mail</a> − <a href="{% url 'cine:films' %}?respo={{ cinephile }}">films</a></p>
-        {% if cinephile.vote_set.veto.exists %}<p>Vétos: {% for v in cinephile.vote_set.veto %}{{ v.film }} {% endfor %}</p>{% endif %}
+        <p>Vétos: {% for v in cinephile.vote_set.veto %}{{ v.film }} {% empty %}Aucun{% endfor %}</p>
     </div>
 {% endfor %}
 {% endblock %}
