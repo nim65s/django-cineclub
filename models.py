@@ -212,7 +212,7 @@ class Soiree(Model):
                 vote = film.vote_set.get(cinephile=dispo.cinephile)
                 if vote.veto:
                     break
-                score -= vote.choix
+                score -= vote.choix + dispo.cinephile.vote_set.filter(veto=True).count()
             else:
                 films.append((score, film, film.respo.dispotowatch_set.get(soiree=self).dispo == 'O'))
         films.sort()
