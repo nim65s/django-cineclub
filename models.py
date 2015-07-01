@@ -151,11 +151,6 @@ class Vote(Model):
 
     objects = VoteQuerySet.as_manager()
 
-    def save(self, *args, **kwargs):
-        super(Vote, self).save(*args, **kwargs)
-        # for soiree in Soiree.a_venir.all():
-        #     soiree.update_favori()
-
     def __str__(self):
         return '%s \t %i \t %s' % (self.film, self.choix, self.cinephile)
 
@@ -220,7 +215,7 @@ class Soiree(Model):
                     break
                 score -= vote.choix + dispo.cinephile.vote_set.filter(veto=True).count()
             else:
-                films.append((score, film, film.respo.dispotowatch_set.get(soiree=self).dispo == 'O'))
+                films.append((score, film, film.respo.dispotowatch_set.a_venir().get(soiree=self).dispo == 'O'))
         films.sort()
         films.reverse()
         return films
@@ -270,9 +265,6 @@ class DispoToWatch(Model):
             )
 
     dispo = CharField(max_length=1, choices=CHOIX_DISPO, default='N')
-
-    def save(self, *args, **kwargs):
-        super(DispoToWatch, self).save(*args, **kwargs)
 
     def __str__(self):
         return '%s %s %s' % (self.soiree, self.dispo, self.cinephile)

@@ -10,7 +10,7 @@ urlpatterns = patterns('',
     url(r'^votes$', votes, name='votes'),
     url(r'^veto/(?P<pk>\d+)$', VetoView.as_view(), name='veto'),
 
-    url(r'^$', ListView.as_view(model=Soiree), name='home'),
+    url(r'^$', ListView.as_view(queryset=Soiree.objects.a_venir()), name='home'),
     url(r'^soiree/(?P<pk>\d+)/(?P<dispo>[ONP])', DTWUpdateView.as_view(), name='dtw'),
     url(r'^soiree$', SoireeCreateView.as_view(), name='ajout_soiree'),
 
