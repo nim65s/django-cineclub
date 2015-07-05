@@ -2,7 +2,7 @@
 
 from __future__ import unicode_literals
 
-from cine.models import DispoToWatch, Film, Soiree, User, Vote
+from cine.models import DispoToWatch, Film, Soiree, User, Vote, get_cinephiles
 from django.core.management.base import BaseCommand
 
 
@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         n = len(Film.objects.all()) + 1
-        for cinephile in User.objects.filter(groups__name='cine'):
+        for cinephile in get_cinephiles():
             for film in Film.objects.all():
                 try:
                     Vote.objects.get(film=film, cinephile=cinephile)
