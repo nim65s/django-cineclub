@@ -152,7 +152,7 @@ class Vote(Model):
     objects = VoteQuerySet.as_manager()
 
     def __str__(self):
-        return '%s \t %i \t %s' % (self.film, self.choix, self.cinephile)
+        return '%i \t %s \t %s' % (self.choix, self.cinephile, self.film)
 
     class Meta:
         ordering = ['choix', 'film']
