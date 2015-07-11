@@ -14,7 +14,7 @@ from django.contrib.sites.models import Site
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.core.urlresolvers import reverse
-from django.db.models import (BooleanField, CharField, DateField, ForeignKey, ImageField, IntegerField, Model, OneToOneField, SlugField, TextField, QuerySet,
+from django.db.models import (BooleanField, CharField, DateField, ForeignKey, ImageField, IntegerField, Model, OneToOneField, QuerySet, SlugField, TextField,
                               TimeField, URLField)
 from django.template.defaultfilters import slugify
 from django.utils.encoding import python_2_unicode_compatible
@@ -256,8 +256,6 @@ class DispoToWatch(Model):
 
     objects = DispoQuerySet.as_manager()
 
-    unique_together = ("soiree", "cinephile")
-
     CHOIX_DISPO = (
             ('O', 'Dispo'),
             ('P', 'Pas dispo'),
@@ -271,6 +269,7 @@ class DispoToWatch(Model):
 
     class Meta:
         ordering = ['soiree__date']
+        unique_together = ("soiree", "cinephile")
 
 
 @python_2_unicode_compatible
