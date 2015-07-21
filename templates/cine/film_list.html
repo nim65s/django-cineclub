@@ -5,7 +5,6 @@
 <h1>{{ list_titre }}</h1>
 <p>Filtres:<ul>
     <li>Vus: <a href="{% films_url request 'vus' 'tous' %}">Tous</a> - <a href="{% films_url request 'vus' 'vus' %}">Vus</a> - <a href="{% films_url request 'vus' 'a_voir' %}">À voir</a></li>
-    <li>Catégorie: <a href="{% films_url request 'cat' 'toutes' %}">Toutes</a> - <a href="{% films_url request 'cat' 'D' %}">Divertissement</a> - <a href="{% films_url request 'cat' 'C' %}">Culture</a></li>
     <li>Tri: <a href="{% films_url request 'tri' 'defaut' %}">Défaut</a> - <a href="{% films_url request 'tri' 'slug' %}">Slug</a> - <a href="{% films_url request 'tri' 'duree_min' %}">Durée</a> - <a href="{% films_url request 'tri' 'annee_sortie' %}">Année de sortie</a></li>
     <li>Respo: <a href="{% films_url request 'respo' 'tous' %}">Tous</a>{% for respo in respos %} - <a href="{% films_url request 'respo' respo %}">{{ respo }}</a>{% endfor %}</li>
 </ul></p>
