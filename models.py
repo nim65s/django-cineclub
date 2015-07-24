@@ -198,11 +198,17 @@ class Soiree(Model):
     def dtend(self):
         return self.dtstart(time(23, 59))
 
+    def dispos(self, dispo='O'):
+        return [dtw.cinephile for dtw in self.dispotowatch_set.filter(dispo=dispo)]
+
+    def dispos_str(self, dispo):
+        return ", ".join([cinephile.username for cinephile in self.dispos(dispo)])
+
     def presents(self):
-        return ", ".join([cinephile.cinephile.username for cinephile in self.dispotowatch_set.filter(dispo='O')])
+        return self.dispos_str('O')
 
     def pas_surs(self):
-        return ", ".join([cinephile.cinephile.username for cinephile in self.dispotowatch_set.filter(dispo='N')])
+        return self.dispos_str('N')
 
     def score_films(self):
         films = []
