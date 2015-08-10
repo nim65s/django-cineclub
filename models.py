@@ -183,11 +183,10 @@ class Soiree(Model):
         message = 'Hello :) \n\n%s a proposé une soirée %s à %s; tu peux donc aller mettre à jour tes disponibilités (%s) \\o/\n\n@+!'
         message %= (self.hote, self.date.strftime('%A %d %B'), self.time.strftime('%H:%M'), dispos_url)
         for cinephile in get_cinephiles():
+            dtw, created = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile)
             if cinephile == self.hote:
-                dtw = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile, dispo='O')
-            else:
-                dtw = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile)
-            if not settings.DEBUG and not settings.INTEGRATION and dtw[1]:
+                dtw.dispo='O'
+            if not settings.DEBUG and not settings.INTEGRATION and created:
                 cinephile.email_user('[CinéNim] Soirée Ajoutée !', message)
 
     def dtstart(self, time=None):
