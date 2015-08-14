@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-
 import re
 from datetime import datetime, time, timedelta
 
@@ -17,7 +13,6 @@ from django.core.urlresolvers import reverse
 from django.db.models import (BooleanField, CharField, DateField, ForeignKey, ImageField, IntegerField, Model, OneToOneField, QuerySet, SlugField, TextField,
                               TimeField, URLField)
 from django.template.defaultfilters import slugify
-from django.utils.encoding import python_2_unicode_compatible
 
 tzloc = timezone(settings.TIME_ZONE).localize
 
@@ -42,7 +37,6 @@ def get_verbose_name(model, name):
         return None
 
 
-@python_2_unicode_compatible
 class Film(Model):
     titre = CharField(max_length=200, unique=True)
     respo = ForeignKey(User)
@@ -142,7 +136,6 @@ class VoteQuerySet(QuerySet):
         return self.filter(veto=True)
 
 
-@python_2_unicode_compatible
 class Vote(Model):
     film = ForeignKey(Film)
     cinephile = ForeignKey(User)
@@ -164,7 +157,6 @@ class SoireeQuerySet(QuerySet):
         return self.filter(date__gte=tzloc(datetime.now() - timedelta(hours=5)))
 
 
-@python_2_unicode_compatible
 class Soiree(Model):
     date = DateField()
     time = TimeField('heure', default=time(20, 30))
@@ -257,7 +249,6 @@ class DispoQuerySet(QuerySet):
         return self.filter(soiree__date__gte=tzloc(datetime.now() - timedelta(hours=5)))
 
 
-@python_2_unicode_compatible
 class DispoToWatch(Model):
     soiree = ForeignKey(Soiree)
     cinephile = ForeignKey(User)
@@ -280,7 +271,6 @@ class DispoToWatch(Model):
         unique_together = ("soiree", "cinephile")
 
 
-@python_2_unicode_compatible
 class Adress(Model):
     user = OneToOneField(User)
     adresse = TextField()

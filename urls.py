@@ -1,10 +1,9 @@
-from __future__ import unicode_literals
-
 from django.conf.urls import patterns, url
 from django.views.generic import DetailView, ListView, RedirectView
 
 from .models import Film, Soiree
-from .views import ICS, AdressUpdateView, CinephileListView, DTWUpdateView, FilmCreateView, FilmListView, FilmUpdateView, FilmVuView, SoireeCreateView, votes, VetoView
+from .views import (ICS, AdressUpdateView, CinephileListView, DTWUpdateView, FilmCreateView, FilmListView, FilmUpdateView, FilmVuView, SoireeCreateView,
+                    VetoView, votes)
 
 urlpatterns = patterns('',
     url(r'^votes$', votes, name='votes'),

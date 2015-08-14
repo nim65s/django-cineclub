@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-
 from braces.views import GroupRequiredMixin, SuperuserRequiredMixin
 
 from django.contrib import messages

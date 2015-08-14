@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-
 from cine.models import Soiree
 from django.core.management.base import BaseCommand
 

@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-
-from cine.models import DispoToWatch, Film, Soiree, User, Vote, get_cinephiles
+from cine.models import DispoToWatch, Film, Soiree, Vote, get_cinephiles
 from django.core.management.base import BaseCommand
 
 

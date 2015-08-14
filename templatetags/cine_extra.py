@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-
 from cine.models import DispoToWatch
 from django import template
 from django.core.mail import mail_admins
