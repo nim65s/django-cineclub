@@ -185,14 +185,17 @@ class Soiree(Model):
         for cinephile in get_cinephiles():
             dtw, created = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile)
             if cinephile == self.hote:
-                dtw.dispo='O'
+                dtw.dispo = 'O'
             if not settings.DEBUG and not settings.INTEGRATION and created:
                 cinephile.email_user('[CinéNim] Soirée Ajoutée !', message)
 
-    def dtstart(self, time=None):
+    def datetime(self, time=None):
         if time is None:
             time = self.time
-        return tzloc(datetime(self.date.year, self.date.month, self.date.day, time.hour, time.minute)).astimezone(timezone('utc')).strftime('%Y%m%dT%H%M%SZ')
+        return datetime.combine(self.date, time)
+
+    def dtstart(self, time=None):
+        return tzloc(self.datetime(time)).astimezone(timezone('utc')).strftime('%Y%m%dT%H%M%SZ')
 
     def dtend(self):
         return self.dtstart(time(23, 59))
