@@ -1,15 +1,8 @@
-{% extends "zinnia/skeleton.html" %}
+{% extends "base.html" %}
 
 {% block title %}CinéNim{% endblock %}
 
-{% block nav %}
-  <ul class="nav navbar-nav">
-    <li><a href="{% url 'cine:home' %}">Soirées</a></li>
-    <li><a href="{% url 'cine:films' %}">Films</a></li>
-    <li><a href="{% url 'cine:votes' %}">Votes</a></li>
-    <li><a href="{% url 'cine:cinephiles' %}">Cinéphiles</a></li>
-    <li><a href="{% url 'cine:adress' %}">Mon adresse</a></li>
-  </ul>
+{% block navbar-right %}
   <form class="navbar-form inline-form pull-right" role="form" method="get" action="{% url 'cine:ajout_film' %}">
     <div class="form-group">
       <input type="text" class="form-control" placeholder="ID IMDB" name="imdb_id" />
