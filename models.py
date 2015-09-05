@@ -166,8 +166,10 @@ class Soiree(Model):
     objects = SoireeQuerySet.as_manager()
 
     def save(self, *args, **kwargs):
+        nouvelle = self.pk is None
         super(Soiree, self).save(*args, **kwargs)
-        self.nouvelle()
+        if nouvelle:
+            self.nouvelle()
 
     def nouvelle(self):
         dispos_url = full_url(reverse('cine:home'))
