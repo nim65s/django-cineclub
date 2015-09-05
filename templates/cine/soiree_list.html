@@ -24,6 +24,8 @@
         <p>{{ soiree.presents }}</p>
         <h3>Pas sûrs</h3>
         <p>{{ soiree.pas_surs }}</p>
+    {% else %}
+        <p><a href="/?next={{ request.path }}">Authentifiez-vous</a> pour plus d’options</p>
     {% endif %}
     <h3>Films</h3>
     {% for score, film, dispo in soiree.score_films %}
