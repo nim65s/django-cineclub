@@ -150,7 +150,7 @@ class DTWUpdateView(CinephileRequiredMixin, UpdateView):
     def get(self, request, *args, **kwargs):
         dtw = get_object_or_404(DispoToWatch, soiree__pk=kwargs['pk'], cinephile=request.user)
         if request.user == dtw.soiree.hote and kwargs['dispo'] != 'O':
-            messages.error(request, "Oui, mais non. Si tu crée une soirée, tu y vas.")
+            messages.error(request, "Oui, mais non. Si tu crées une soirée, tu y vas.")
             return redirect('cine:home')
         dtw.dispo = kwargs['dispo']
         dtw.save()
