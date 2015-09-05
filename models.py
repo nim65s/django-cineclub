@@ -180,6 +180,7 @@ class Soiree(Model):
             dtw, created = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile)
             if cinephile == self.hote:
                 dtw.dispo = 'O'
+                dtw.save()
             if not settings.DEBUG and not settings.INTEGRATION and created:
                 cinephile.email_user('[CinéNim] Soirée Ajoutée !', message)
 
