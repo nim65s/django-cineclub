@@ -118,11 +118,12 @@ class Film(Model):
                     'annee_sortie': imdb_infos['Year'],
                     'titre': imdb_infos['Title'],
                     'titre_vo': imdb_infos['Title'],
-                    'duree_min': timedelta(**dict([
+                    'duree_min': int(timedelta(**dict([
                         (key, int(value) if value else 0) for key, value in
                         re.search(r'((?P<hours>\d+) h )?(?P<minutes>\d+) min', imdb_infos['Runtime']).groupdict().items()
-                        ])).seconds / 60,  # TGCM
+                        ])).seconds / 60),  # TGCM
                     'imdb_id': imdb_id,
+                    'imdb': 'http://www.imdb.com/title/%s/' % imdb_id,
                     }
         except:
             return {}
