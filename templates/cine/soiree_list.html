@@ -8,21 +8,23 @@
 {% for soiree in object_list %}
     <h2>Le {{ soiree.date }} à {{ soiree.time|date:"H:i" }} chez {{ soiree.hote }}</h2>
 
-    <p>{% if soiree.has_adress %}
-        {{ soiree.hote.adress.adresse|linebreaks }}<br>
-        <a href="https://maps.google.fr/?q={{ soiree.adress_query }}">Google Maps</a> –
-        <a href="https://nominatim.openstreetmap.org/?q={{ soiree.adress_query }}">Open Stree Maps</a>
-    {% else %}
-        {{ soiree.hote }} n’a pas encore renseigné son adresse…
-    {% endif %}</p>
+    {% if request.user.is_authenticated %}
+        <p>{% if soiree.has_adress %}
+            {{ soiree.hote.adress.adresse|linebreaks }}<br>
+            <a href="https://maps.google.fr/?q={{ soiree.adress_query }}">Google Maps</a> –
+            <a href="https://nominatim.openstreetmap.org/?q={{ soiree.adress_query }}">Open Stree Maps</a>
+        {% else %}
+            {{ soiree.hote }} n’a pas encore renseigné son adresse…
+        {% endif %}</p>
 
-    <a href="{% url 'cine:dtw' soiree.pk 'O' %}" class="btn btn-success">Je serai là !</a> –
-    <a href="{% url 'cine:dtw' soiree.pk 'P' %}" class="btn btn-warning">Je ne serai pas là…</a>
+        <a href="{% url 'cine:dtw' soiree.pk 'O' %}" class="btn btn-success">Je serai là !</a> –
+        <a href="{% url 'cine:dtw' soiree.pk 'P' %}" class="btn btn-warning">Je ne serai pas là…</a>
 
-    <h3>Présents</h3>
-    <p>{{ soiree.presents }}</p>
-    <h3>Pas sûrs</h3>
-    <p>{{ soiree.pas_surs }}</p>
+        <h3>Présents</h3>
+        <p>{{ soiree.presents }}</p>
+        <h3>Pas sûrs</h3>
+        <p>{{ soiree.pas_surs }}</p>
+    {% endif %}
     <h3>Films</h3>
     {% for score, film, dispo in soiree.score_films %}
     <p {% if not dispo %}class="text-muted"{% endif %}>{{ score }} » <a href="{{ film.get_absolute_url }}">{{ film.titre }}</a> – {{ film.respo }}</p>
