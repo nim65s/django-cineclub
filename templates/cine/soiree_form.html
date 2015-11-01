@@ -7,7 +7,7 @@
 <form method="post" action="" class="form-horizontal" role="form">
     {% csrf_token %}
     {% bootstrap_form form layout="horizontal" %}
-    {% buttons %}
+    {% buttons layout="horizontal" %}
         <button type="submit" class="btn">C’est bon \o/</button>
     {% endbuttons %}
 </form>
