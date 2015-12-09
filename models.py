@@ -281,3 +281,6 @@ class Adress(Model):
 
     def __str__(self):
         return 'Adresse de %s' % self.user
+
+    class Meta:
+        verbose_name_plural = 'Adresses'
