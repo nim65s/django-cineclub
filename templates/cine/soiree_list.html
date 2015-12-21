@@ -17,8 +17,8 @@
             {{ soiree.hote }} n’a pas encore renseigné son adresse…
         {% endif %}</p>
 
-        <a href="{% url 'cine:dtw' soiree.pk 'O' %}" class="btn btn-success">Je serai là !</a> –
-        <a href="{% url 'cine:dtw' soiree.pk 'P' %}" class="btn btn-warning">Je ne serai pas là…</a>
+        <a href="{% url 'cinenim:dtw' soiree.pk 'O' %}" class="btn btn-success">Je serai là !</a> –
+        <a href="{% url 'cinenim:dtw' soiree.pk 'P' %}" class="btn btn-warning">Je ne serai pas là…</a>
 
         <h3>Présents</h3>
         <p>{{ soiree.presents }}</p>
@@ -37,9 +37,9 @@
 
 <hr>
 
-<p><a href="{% url 'cine:ajout_soiree' %}">Proposez-en une chez vous !</a></p>
+<p><a href="{% url 'cinenim:ajout_soiree' %}">Proposez-en une chez vous !</a></p>
 
-<p><a href="https://saurel.me{% url 'cine:ics' %}">Téléchargez</a> le calendrier CinéNim !</p>
+<p><a href="https://saurel.me{% url 'cinenim:ics' %}">Téléchargez</a> le calendrier CinéNim !</p>
 
 <p><a href="https://github.com/nim65s/django-cine/issues">Signalez les bugs, ou proposez de nouvelles fonctionnalités</a></p>
 

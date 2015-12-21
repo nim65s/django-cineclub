@@ -9,7 +9,7 @@ register = template.Library()
 
 @register.simple_tag
 def films_url(request, key, value):
-    return "%s%s" % (reverse('cine:films'), url_get(request, key, value))
+    return "%s%s" % (reverse('cinenim:films'), url_get(request, key, value))
 
 
 @register.simple_tag
