@@ -1,7 +1,7 @@
 {% load cine_extra %}<div id="{{ film.slug }}">
     <h2>
         <a href="{{ film.get_absolute_url }}">{{ film.titre }}</a>
-        {% if film.respo == request.user or request.user.is_superuser %}(<a href="{% url 'cinenim:maj_film' slug=film.slug %}">edit</a>){% endif %}
+        {% if film.respo == request.user or request.user.is_superuser %}(<a href="{% url 'cine:maj_film' slug=film.slug %}">edit</a>){% endif %}
     </h2>
     {% if film.imdb_poster %}<img src="{{ film.imdb_poster.url }}" alt="poster pour {{ film }}" class="pull-right" />{% endif %}
     <p>{{ film.description|linebreaks }}</p>
@@ -12,7 +12,7 @@
                 <a href="{% films_url request 'vus' 'vus' %}">Oui</a>
             {% else %}
                 <a href="{% films_url request 'vus' 'a_voir' %}">Non</a>
-                {% if request.user.is_superuser %} <a href="{% url 'cinenim:film_vu' slug=film.slug %}">Ça y est \o/</a>{% endif %}
+                {% if request.user.is_superuser %} <a href="{% url 'cine:film_vu' slug=film.slug %}">Ça y est \o/</a>{% endif %}
             {% endif %}</dd>
         {% endif %}
         {% if film.annee_sortie %}<dt>Année de sortie</dt><dd>{{ film.annee_sortie }}</dd>{% endif %}

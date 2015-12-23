@@ -12,7 +12,7 @@
 
     <ul id="sortable">
         {% for vote in votes %}
-        <li class="ui-state-default" {% if vote.choix == 9999 %}style="background: red;"{% endif %} data-slug="{{ vote.film.slug }}"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>{{ vote.film.titre }} (<a style="color: #08c;" href="{{ vote.film.get_absolute_url }}">lien</a>) - <a style="color: #08c;" href="{% url 'cinenim:veto' pk=vote.pk %}">veto</a></li>
+        <li class="ui-state-default" {% if vote.choix == 9999 %}style="background: red;"{% endif %} data-slug="{{ vote.film.slug }}"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>{{ vote.film.titre }} (<a style="color: #08c;" href="{{ vote.film.get_absolute_url }}">lien</a>) - <a style="color: #08c;" href="{% url 'cine:veto' pk=vote.pk %}">veto</a></li>
         {% endfor %}
     </ul>
 {% endblock %}

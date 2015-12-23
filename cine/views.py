@@ -64,7 +64,7 @@ class FilmUpdateView(FilmActionMixin, UpdateView):
         if form.instance.respo == self.request.user or self.request.user.is_superuser:
             return super(FilmUpdateView, self).form_valid(form)
         messages.error(self.request, 'Vous n’avez pas le droit de modifier ce film')
-        return redirect('cinenim:films')
+        return redirect('cine:films')
 
 
 class FilmListView(ListView):
@@ -112,7 +112,7 @@ class FilmVuView(SuperuserRequiredMixin, RedirectView):
         film.vu = True
         film.vote_set.update(choix=-1, veto=False)
         film.save()
-        return reverse('cinenim:films')
+        return reverse('cine:films')
 
 
 class VetoView(CinephileRequiredMixin, RedirectView):
@@ -123,7 +123,7 @@ class VetoView(CinephileRequiredMixin, RedirectView):
         vote.veto = True
         vote.choix = -1
         vote.save()
-        return reverse('cinenim:votes')
+        return reverse('cine:votes')
 
 
 class CinephileListView(CinephileRequiredMixin, ListView):
@@ -142,8 +142,8 @@ class SoireeCreateView(CinephileRequiredMixin, CreateView):
 
     def get_success_url(self):
         if self.object.has_adress():
-            return reverse('cinenim:home')
-        return reverse('cinenim:adress')
+            return reverse('cine:home')
+        return reverse('cine:adress')
 
 
 class DTWUpdateView(CinephileRequiredMixin, UpdateView):
@@ -151,16 +151,16 @@ class DTWUpdateView(CinephileRequiredMixin, UpdateView):
         dtw = get_object_or_404(DispoToWatch, soiree__pk=kwargs['pk'], cinephile=request.user)
         if request.user == dtw.soiree.hote and kwargs['dispo'] != 'O':
             messages.error(request, "Oui, mais non. Si tu crées une soirée, tu y vas.")
-            return redirect('cinenim:home')
+            return redirect('cine:home')
         dtw.dispo = kwargs['dispo']
         dtw.save()
         messages.info(request, "Disponibilité mise à jour !")
-        return redirect('cinenim:home')
+        return redirect('cine:home')
 
 
 class AdressUpdateView(CinephileRequiredMixin, UpdateView):
     fields = ['adresse']
-    success_url = reverse_lazy('cinenim:home')
+    success_url = reverse_lazy('cine:home')
 
     def get_object(self, queryset=None):
         return Adress.objects.get_or_create(user=self.request.user)[0]

@@ -81,7 +81,7 @@ class Film(Model):
     def nouveau(self):
         # Création des votes & envoi des mails de notif
         film_url = self.get_full_url()
-        vote_url = full_url(reverse('cinenim:votes'))
+        vote_url = full_url(reverse('cine:votes'))
 
         message = "Hello :)\n\n%s a proposé un nouveau film : %s (%s)' ; " % (self.respo, self.titre, film_url)
         message += "tu peux donc aller actualiser ton classement (%s) \\o/ \n\n @+!" % vote_url
@@ -92,7 +92,7 @@ class Film(Model):
                 cinephile.email_user('[CinéNim] Film ajouté !', message)
 
     def get_absolute_url(self):
-        return reverse('cinenim:film', kwargs={'slug': self.slug})
+        return reverse('cine:film', kwargs={'slug': self.slug})
 
     def get_full_url(self):
         return full_url(self.get_absolute_url())
@@ -173,7 +173,7 @@ class Soiree(Model):
             self.nouvelle()
 
     def nouvelle(self):
-        dispos_url = full_url(reverse('cinenim:home'))
+        dispos_url = full_url(reverse('cine:home'))
 
         message = 'Hello :) \n\n%s a proposé une soirée %s à %s; tu peux donc aller mettre à jour tes disponibilités (%s) \\o/\n\n@+!'
         message %= (self.hote, self.date.strftime('%A %d %B'), self.time.strftime('%H:%M'), dispos_url)

@@ -5,7 +5,7 @@ from .models import Film, Soiree
 from .views import (ICS, AdressUpdateView, CinephileListView, DTWUpdateView, FilmCreateView, FilmListView, FilmUpdateView, FilmVuView, SoireeCreateView,
                     VetoView, votes)
 
-app_name = 'cinenim'
+app_name = 'cine'
 urlpatterns = [
         url(r'^votes$', votes, name='votes'),
         url(r'^veto/(?P<pk>\d+)$', VetoView.as_view(), name='veto'),
