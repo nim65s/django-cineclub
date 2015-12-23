@@ -1,7 +1,7 @@
 include LICENSE
 include README.md
-recursive-include cineclub/management *
-recursive-include cineclub/migrations *
-recursive-include cineclub/templates *
-recursive-include cineclub/templatetags *
+recursive-include cine/management *
+recursive-include cine/migrations *
+recursive-include cine/templates *
+recursive-include cine/templatetags *
 recursive-include docs *
