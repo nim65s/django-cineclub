@@ -16,6 +16,7 @@ setup(
             'django-bootstrap3',
             'requests',
             'pytz',
+            'Pillow',
             ],
         include_package_data=True,
         license='GPL License',
