@@ -1,7 +1,6 @@
-from braces.views import GroupRequiredMixin, SuperuserRequiredMixin
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.shortcuts import get_object_or_404, redirect, render
@@ -11,8 +10,11 @@ from django.views.generic.base import RedirectView
 from .models import Adress, DispoToWatch, Film, Soiree, Vote, get_verbose_name
 
 
-class CinephileRequiredMixin(GroupRequiredMixin):
-    group_required = 'cine'
+class CinephileRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        if self.request.user.is_superuser:
+            return True
+        return self.request.user.groups.filter(name='cine').exists()
 
 
 @login_required
@@ -104,8 +106,11 @@ class FilmListView(ListView):
         return queryset
 
 
-class FilmVuView(SuperuserRequiredMixin, RedirectView):
+class FilmVuView(UserPassesTestMixin, RedirectView):
     permanent = False
+
+    def test_func(self):
+        return self.request.user.is_superuser
 
     def get_redirect_url(self, *args, **kwargs):
         film = get_object_or_404(Film, slug=kwargs['slug'])
