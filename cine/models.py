@@ -111,6 +111,13 @@ class Film(Model):
         try:
             imdb_id = re.search(r'tt\d+', imdb_id).group()
             imdb_infos = requests.get(IMDB_API_URL, params={'i': imdb_id}).json()
+            try:
+                duree = int(timedelta(**dict([
+                            (key, int(value) if value else 0) for key, value in
+                            re.search(r'((?P<hours>\d+) h )?(?P<minutes>\d+) min', imdb_infos['Runtime']).groupdict().items()
+                            ])).seconds / 60)  # TGCM
+            except:
+                duree = 0
             return {
                     'realisateur': imdb_infos['Director'],
                     'description': imdb_infos['Plot'],
@@ -118,10 +125,7 @@ class Film(Model):
                     'annee_sortie': imdb_infos['Year'],
                     'titre': imdb_infos['Title'],
                     'titre_vo': imdb_infos['Title'],
-                    'duree_min': int(timedelta(**dict([
-                        (key, int(value) if value else 0) for key, value in
-                        re.search(r'((?P<hours>\d+) h )?(?P<minutes>\d+) min', imdb_infos['Runtime']).groupdict().items()
-                        ])).seconds / 60),  # TGCM
+                    'duree_min': duree,
                     'imdb_id': imdb_id,
                     'imdb': 'http://www.imdb.com/title/%s/' % imdb_id,
                     }

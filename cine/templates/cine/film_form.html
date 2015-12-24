@@ -1,29 +1,33 @@
 {% extends "cine/cine.html" %}
-{% load widget_tweaks %}
+{% load bootstrap3 %}
 
 {% block content %}
 
-<h1>{% if form.instance.id %}Modifier{% else %}Ajouter{% endif %} un film</h1>
-<form method="post" action="" class="form-horizontal" role="form">
-    {% csrf_token %}
-    {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
-    {% for field in form.visible_fields %}<div class="form-group{% if field.errors %} has-error{% endif %}">
-        <label for="{{ field.id_for_label }}" class="col-sm-2 control-label">{{ field.label }}</label>
-        <div class="col-sm-10">
-            {% if field.errors %}<span class="help-block">{{ field.errors}}</span>{% endif %}
-            {% if field|field_type == "integerfield" %}
-                {{ field|add_class:"form-control"|attr:"type:number" }}
-            {% elif field|field_type == "urlfield" %}
-                {{ field|add_class:"form-control"|attr:"type:url" }}
-            {% else %}
-                {{ field|add_class:"form-control" }}
-            {% endif %}
-            {% if field.help_text %}<span class="help-block">{{ field.help_text}}</span>{% endif %}
+{% if not form.instance.id %}
+<h1>Ajouter un film par son ID IMDB</h1>
+
+<form class="form-horizontal" method="get" action="{% url 'cine:ajout_film' %}">
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="id_imdb_id_only">ID IMDB</label>
+        <div class="col-md-6">
+            <input class="form-control" id="id_imdb_id_only" maxlength="10" name="imdb_id" placeholder="ID IMDB" required="required" title="" type="text" />
         </div>
-    </div>{% endfor %}
-    <div class="form-group"><div class="col-sm-offset-2 col-sm-10">
-        <button type="submit" class="btn">C’est bon \o/</button>
-    </div></div>
+    </div>
+
+    {% buttons layout="horizontal" %}
+    <button type="submit" class="btn btn-primary">Ok !</button>
+    {% endbuttons %}
+</form>
+{% endif %}
+
+<h1>{% if form.instance.id %}Modifier{% else %}Ajouter{% endif %} un film</h1>
+
+<form action="" method="post" class="form-horizontal">
+    {% csrf_token %}
+    {% bootstrap_form form layout="horizontal" %}
+    {% buttons layout="horizontal" %}
+    <button type="submit" class="btn btn-primary">Ok !</button>
+    {% endbuttons %}
 </form>
 
 {% endblock %}

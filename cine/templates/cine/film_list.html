@@ -8,5 +8,6 @@
     <li>Tri: <a href="{% films_url request 'tri' 'defaut' %}">Défaut</a> - <a href="{% films_url request 'tri' 'slug' %}">Slug</a> - <a href="{% films_url request 'tri' 'duree_min' %}">Durée</a> - <a href="{% films_url request 'tri' 'annee_sortie' %}">Année de sortie</a></li>
     <li>Respo: <a href="{% films_url request 'respo' 'tous' %}">Tous</a>{% for respo in respos %} - <a href="{% films_url request 'respo' respo %}">{{ respo }}</a>{% endfor %}</li>
 </ul></p>
+<p><a href="{% url 'cine:ajout_film' %}">Ajouter un film</a></p>
 {% for film in object_list %}{% include 'cine/film.html' %}{% endfor %}
 {% endblock %}
