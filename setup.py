@@ -15,6 +15,7 @@ setup(
             'Django',
             'django-bootstrap3',
             'requests',
+            'pytz',
             ],
         include_package_data=True,
         license='GPL License',
