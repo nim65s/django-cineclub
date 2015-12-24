@@ -14,6 +14,7 @@ setup(
         install_requires=[
             'Django',
             'django-bootstrap3',
+            'requests',
             ],
         include_package_data=True,
         license='GPL License',
