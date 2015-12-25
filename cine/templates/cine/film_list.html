@@ -1,9 +1,8 @@
 {% extends "cine/cine.html" %}
 
 {% block content %}
-<h1>{{ list_titre }}</h1>
 {% for film in object_list %}
-{% ifchanged film.vu %}<hr>{% endifchanged %}
+{% ifchanged film.vu %}<h1>Films {% if film.vu %}déjà{% else %}pas encore{% endif %} vus</h1>{% endifchanged %}
 {% include 'cine/film.html' %}
 {% endfor %}
 {% endblock %}
