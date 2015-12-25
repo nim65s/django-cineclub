@@ -88,7 +88,7 @@ class Film(Model):
 
         for cinephile in get_cinephiles():
             vote = Vote.objects.get_or_create(film=self, cinephile=cinephile)
-            if vote[1] and settings.PROD:
+            if vote[1] and not settings.DEBUG:
                 cinephile.email_user('[CinéNim] Film ajouté !', message)
 
     def get_absolute_url(self):
