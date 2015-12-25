@@ -48,7 +48,7 @@ class Film(Model):
     imdb = URLField(blank=True, null=True, verbose_name="IMDB")
     allocine = URLField(blank=True, null=True, verbose_name="Allociné")
     realisateur = CharField(max_length=200, null=True, blank=True, verbose_name="Réalisateur")
-    duree_min = IntegerField("Durée en minutes", null=True)
+    duree = IntegerField("Durée en minutes", null=True)
 
     vu = BooleanField(default=False)
 
@@ -116,7 +116,7 @@ class Film(Model):
                             re.search(r'((?P<hours>\d+) h )?(?P<minutes>\d+) min', imdb_infos['Runtime']).groupdict().items()
                             ])).seconds / 60)  # TGCM
             except:
-                duree = 0
+                duree = None
             return {
                     'realisateur': imdb_infos['Director'],
                     'description': imdb_infos['Plot'],
@@ -124,7 +124,7 @@ class Film(Model):
                     'annee_sortie': imdb_infos['Year'],
                     'titre': imdb_infos['Title'],
                     'titre_vo': imdb_infos['Title'],
-                    'duree_min': duree,
+                    'duree': duree,
                     'imdb_id': imdb_id,
                     'imdb': 'http://www.imdb.com/title/%s/' % imdb_id,
                     }

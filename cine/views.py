@@ -41,7 +41,7 @@ class ICS(ListView):
 
 class FilmActionMixin(CinephileRequiredMixin):
     model = Film
-    fields = ('titre', 'description', 'annee_sortie', 'titre_vo', 'realisateur', 'imdb', 'allocine', 'duree_min', 'imdb_poster_url', 'imdb_id')
+    fields = ('titre', 'description', 'annee_sortie', 'titre_vo', 'realisateur', 'imdb', 'allocine', 'duree', 'imdb_poster_url', 'imdb_id')
 
     def form_valid(self, form):
         messages.info(self.request, "Film %s" % self.action)
