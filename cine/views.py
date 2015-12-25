@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse, reverse_lazy
@@ -7,7 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import CreateView, ListView, UpdateView
 from django.views.generic.base import RedirectView
 
-from .models import Adress, DispoToWatch, Film, Soiree, Vote, get_verbose_name
+from .models import Adress, DispoToWatch, Film, Soiree, Vote
 
 
 class CinephileRequiredMixin(UserPassesTestMixin):
@@ -17,9 +16,8 @@ class CinephileRequiredMixin(UserPassesTestMixin):
         return self.request.user.groups.filter(name='cine').exists()
 
 
-@login_required
-def votes(request):
-    if request.method == 'POST':
+class VotesView(CinephileRequiredMixin, UpdateView):
+    def post(self, request, *args, **kwargs):
         ordre = request.POST['ordre'].split(',')[:-1]
         if ordre:
             i = 1
@@ -29,8 +27,11 @@ def votes(request):
                 v.choix = i
                 v.save()
                 i += 1
-    c = {'votes': Vote.objects.filter(cinephile=request.user, film__vu=False, veto=False)}
-    return render(request, 'cine/votes.html', c)
+        return self.get(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        c = {'votes': Vote.objects.filter(cinephile=request.user, film__vu=False, veto=False)}
+        return render(request, 'cine/votes.html', c)
 
 
 class ICS(ListView):
@@ -72,43 +73,8 @@ class FilmUpdateView(FilmActionMixin, UpdateView):
 class FilmListView(ListView):
     model = Film
 
-    def get_context_data(self, **kwargs):
-        context = super(FilmListView, self).get_context_data(**kwargs)
-        list_titre = "Films"
-        get = self.request.GET.get
-
-        if get('vus') == "vus":
-            list_titre += " vus"
-        elif get('vus') == "a_voir":
-            list_titre += " à voir"
-        if get('respo') and get('respo') != 'tous':
-            list_titre += " proposés par %s" % get('respo')
-        if get_verbose_name(Film, get('tri')):
-            list_titre += " triés par %s" % get_verbose_name(Film, get('tri'))
-
-        context['list_titre'] = list_titre
-        context['respos'] = User.objects.filter(pk__in=Film.objects.values('respo').distinct())
-        return context
-
-    def get_queryset(self):
-        queryset = super(FilmListView, self).get_queryset()
-        get = self.request.GET.get
-
-        if get('vus') == "vus":
-            queryset = queryset.filter(vu=True)
-        elif get('vus') == "a_voir":
-            queryset = queryset.filter(vu=False)
-        if get('respo') and get('respo') != 'tous':
-            queryset = queryset.filter(respo__username=get('respo'))
-        if get_verbose_name(Film, get('tri')):
-            queryset = queryset.order_by(get('tri'))
-
-        return queryset
-
 
 class FilmVuView(UserPassesTestMixin, RedirectView):
-    permanent = False
-
     def test_func(self):
         return self.request.user.is_superuser
 
@@ -121,8 +87,6 @@ class FilmVuView(UserPassesTestMixin, RedirectView):
 
 
 class VetoView(CinephileRequiredMixin, RedirectView):
-    permanent = False
-
     def get_redirect_url(self, *args, **kwargs):
         vote = get_object_or_404(Vote, pk=kwargs['pk'])
         vote.veto = True
