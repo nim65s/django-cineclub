@@ -231,14 +231,10 @@ class Soiree(Model):
                 films.append((score, film, film.respo.dispotowatch_set.a_venir().get(soiree=self).dispo == 'O'))
         films.sort(key=lambda x: x[0])
         films.reverse()
+        if films and self.favoris != films[0][1]:
+            self.favoris = films[0][1]
+            self.save()
         return films
-
-    def update_favori(self):
-        if self.dispotowatch_set.filter(dispo='O').exists():
-            scores = self.score_films()
-            if scores:
-                self.favoris = scores[0][1]
-                self.save()
 
     def has_adress(self):
         return Adress.objects.filter(user=self.hote).exists()
