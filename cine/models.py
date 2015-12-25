@@ -235,7 +235,7 @@ class Soiree(Model):
                     break
                 score -= vote.choix + dispo.cinephile.vote_set.filter(veto=True).count()
             else:
-                films.append((score, film, film.respo.dispotowatch_set.a_venir().get(soiree=self).dispo == 'O'))
+                films.append((score, film))
         films.sort(key=lambda x: x[0])
         films.reverse()
         if films and self.favoris != films[0][1]:

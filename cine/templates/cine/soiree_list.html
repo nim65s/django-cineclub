@@ -22,14 +22,12 @@
 
         <h3>Présents</h3>
         <p>{{ soiree.presents }}</p>
-        <h3>Pas sûrs</h3>
-        <p>{{ soiree.pas_surs }}</p>
     {% else %}
-        <p><a href="/?next={{ request.path }}">Authentifiez-vous</a> pour plus d’options</p>
+        <p><a href="{% url 'login' %}?next={{ request.path }}">Authentifiez-vous</a> pour plus d’options</p>
     {% endif %}
     <h3>Films</h3>
-    {% for score, film, dispo in soiree.score_films %}
-    <p {% if not dispo %}class="text-muted"{% endif %}>{{ score }} » <a href="{{ film.get_absolute_url }}">{{ film.titre }}</a> – {{ film.respo }}</p>
+    {% for score, film in soiree.score_films %}
+    <p>{{ score }} » <a href="{{ film.get_absolute_url }}">{{ film.titre }}</a></p>
     {% endfor %}
 {% empty %}
     <p>Rien de prévu pour l’instant</p>

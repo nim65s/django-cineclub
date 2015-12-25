@@ -6,15 +6,8 @@
     {% if film.imdb_poster %}<img src="{{ film.imdb_poster.url }}" alt="poster pour {{ film }}" class="pull-right" />{% endif %}
     <p>{{ film.description|linebreaks }}</p>
     <dl>
-        {% if not request.GET.respo or request.GET.respo = 'tous'%}<dt>Respo</dt><dd>{{ film.respo }}</dd>{% endif %}
-        {% if not request.GET.vus or request.GET.vus = 'tous' %}<dt>Vu</dt><dd>
-            {% if film.vu %}
-                Oui
-            {% else %}
-                Non
-                {% if request.user.is_superuser %} <a href="{% url 'cine:film_vu' slug=film.slug %}">Ça y est \o/</a>{% endif %}
-            {% endif %}</dd>
-        {% endif %}
+        <dt>Respo</dt><dd>{{ film.respo }}</dd>
+        <dt>Vu</dt><dd>{{ film.vu|yesno }}{% if request.user.is_superuser %} <a href="{% url 'cine:film_vu' slug=film.slug %}">Ça y est \o/</a>{% endif %}</dd>
         {% if film.annee_sortie %}<dt>Année de sortie</dt><dd>{{ film.annee_sortie }}</dd>{% endif %}
         {% if film.realisateur %}<dt>Réalisateur</dt><dd>{{ film.realisateur }}</dd>{% endif %}
         {% if film.duree %}<dt>Durée</dt><dd>{{ film.duree }} minutes</dd>{% endif %}
