@@ -23,10 +23,12 @@ Quick start with the example project
 ------------
 
 1. Clone this repo in your working directory
+
     ```bash
     git clone git@github.com:nim65s/django-cineclub.git
     cd django-cineclub
     ```
+
 2. Create a virtualenv
     * Using virtualfish: `vf new mycineclub`
     * Using virtualenvwrapper: `mkvirtualenv mycineclub`
@@ -36,10 +38,12 @@ Quick start with the example project
     * Built it yoursefl: `python setup.py sdist; pip install -U dist/*.tar.gz`
 4. Go to the example dir: `cd mycineclub_example`
 6. Update and populate your database, and launch the server
+
     ```python
     ./manage.py migrate
     ./manage.py createsuperuser
     ./manage.py runserver
     ```
-7. Add yourself to the Group 'cine' on http://localhost:8000/admin/auth/user/1/change/
+
+7. Add yourself to the Group 'cine' on [http://localhost:8000/admin/auth/user/1/change/]
 8. Create the presence objects: `./manage.py create_missing_v_d`
