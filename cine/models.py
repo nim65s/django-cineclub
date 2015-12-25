@@ -7,6 +7,7 @@ from pytz import timezone
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.core.cache import cache
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.core.urlresolvers import reverse
@@ -57,6 +58,12 @@ class Film(Model):
     imdb_poster_url = URLField(blank=True, null=True, verbose_name="URL du poster")
     imdb_poster = ImageField(upload_to='cine/posters', blank=True, null=True)
 
+    def __str__(self):
+        return self.titre
+
+    class Meta:
+        ordering = ['vu', 'titre']
+
     def save(self, *args, **kwargs):
         update = self.pk is None
         if not update:
@@ -86,8 +93,8 @@ class Film(Model):
         message += "tu peux donc aller actualiser ton classement (%s) \\o/ \n\n @+!" % vote_url
 
         for cinephile in get_cinephiles():
-            vote = Vote.objects.get_or_create(film=self, cinephile=cinephile)
-            if vote[1] and not settings.DEBUG:
+            vote, created = Vote.objects.get_or_create(film=self, cinephile=cinephile)
+            if created and not settings.DEBUG:
                 cinephile.email_user('[CinéNim] Film ajouté !', message)
 
     def get_absolute_url(self):
@@ -98,12 +105,6 @@ class Film(Model):
 
     def get_description(self):
         return self.description.replace('\r\n', '\\n')
-
-    def score_absolu(self):
-        score = 0
-        for vote in self.vote_set.all():
-            score -= vote.choix
-        return score
 
     @staticmethod
     def get_imdb_dict(imdb_id):
@@ -130,9 +131,6 @@ class Film(Model):
                     }
         except:
             return {}
-
-    def __str__(self):
-        return self.titre
 
 
 class VoteQuerySet(QuerySet):
@@ -189,9 +187,7 @@ class Soiree(Model):
                 cinephile.email_user('[CinéNim] Soirée Ajoutée !', message)
 
     def datetime(self, time=None):
-        if time is None:
-            time = self.time
-        return datetime.combine(self.date, time)
+        return datetime.combine(self.date, self.time if time is None else time)
 
     def dtstart(self, time=None):
         return tzloc(self.datetime(time)).astimezone(timezone('utc')).strftime('%Y%m%dT%H%M%SZ')
@@ -211,7 +207,17 @@ class Soiree(Model):
     def pas_surs(self):
         return self.dispos_str('N')
 
+    def cache_name(self):
+        return 'soiree_%i' % self.pk
+
     def score_films(self):
+        films = cache.get(self.cache_name())
+        if films is None:
+            films = self.compute_score_films()
+        cache.set(self.cache_name(), films, 3600 * 24 * 30)
+        return films
+
+    def compute_score_films(self):
         films = []
         n = Film.objects.filter(vu=False).count() * self.dispotowatch_set.filter(dispo='O').count() + 1
         for film in Film.objects.filter(vu=False):
