@@ -1,3 +1,16 @@
 {% extends "base.html" %}
 
 {% block title %}CinéNim{% endblock %}
+
+{% block cinenav %}
+<ul>
+    <li><a href="{% url 'cine:votes' %}">Votes</a></li>
+    <li><a href="{% url 'cine:home' %}">List Soirées</a></li>
+    <li><a href="{% url 'cine:ajout_soiree' %}">Add a Soirée</a></li>
+    <li><a href="{% url 'cine:films' %}">List Films</a></li>
+    <li><a href="{% url 'cine:ajout_film' %}">Add a Film</a></li>
+    <li><a href="{% url 'cine:cinephiles' %}">List Cinéphiles</a></li>
+    <li><a href="{% url 'cine:adress' %}">Update my Adress</a></li>
+    <li><a href="{% url 'cine:ics' %}">Get ICS file</a></li>
+</ul>
+{% endblock %}

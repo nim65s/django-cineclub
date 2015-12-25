@@ -1,4 +1,4 @@
-{% load cine_extra %}<div id="{{ film.slug }}">
+<div id="{{ film.slug }}">
     <h2>
         <a href="{{ film.get_absolute_url }}">{{ film.titre }}</a>
         {% if film.respo == request.user or request.user.is_superuser %}(<a href="{% url 'cine:maj_film' slug=film.slug %}">edit</a>){% endif %}
@@ -6,12 +6,12 @@
     {% if film.imdb_poster %}<img src="{{ film.imdb_poster.url }}" alt="poster pour {{ film }}" class="pull-right" />{% endif %}
     <p>{{ film.description|linebreaks }}</p>
     <dl>
-        {% if not request.GET.respo or request.GET.respo = 'tous'%}<dt>Respo</dt><dd><a href="{% films_url request 'respo' film.respo %}">{{ film.respo }}</a></dd>{% endif %}
+        {% if not request.GET.respo or request.GET.respo = 'tous'%}<dt>Respo</dt><dd>{{ film.respo }}</dd>{% endif %}
         {% if not request.GET.vus or request.GET.vus = 'tous' %}<dt>Vu</dt><dd>
             {% if film.vu %}
-                <a href="{% films_url request 'vus' 'vus' %}">Oui</a>
+                Oui
             {% else %}
-                <a href="{% films_url request 'vus' 'a_voir' %}">Non</a>
+                Non
                 {% if request.user.is_superuser %} <a href="{% url 'cine:film_vu' slug=film.slug %}">Ça y est \o/</a>{% endif %}
             {% endif %}</dd>
         {% endif %}
