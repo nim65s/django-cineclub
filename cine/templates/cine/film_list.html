@@ -2,6 +2,8 @@
 
 {% block content %}
 <h1>{{ list_titre }}</h1>
-<p>Filtres:<ul>
-{% for film in object_list %}{% include 'cine/film.html' %}{% endfor %}
+{% for film in object_list %}
+{% ifchanged film.vu %}<hr>{% endifchanged %}
+{% include 'cine/film.html' %}
+{% endfor %}
 {% endblock %}
