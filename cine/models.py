@@ -167,6 +167,13 @@ class Soiree(Model):
 
     objects = SoireeQuerySet.as_manager()
 
+    def __str__(self):
+        return 'soirée du %s' % self.date
+
+    class Meta:
+        ordering = ["date"]
+        get_latest_by = 'date'
+
     def save(self, *args, **kwargs):
         nouvelle = self.pk is None
         super(Soiree, self).save(*args, **kwargs)
@@ -244,13 +251,6 @@ class Soiree(Model):
 
     def adress_query(self):
         return self.adress_ics().replace(' ', '+')
-
-    def __str__(self):
-        return 'soirée du %s' % self.date
-
-    class Meta:
-        ordering = ["date"]
-        get_latest_by = 'date'
 
 
 class DispoQuerySet(QuerySet):
