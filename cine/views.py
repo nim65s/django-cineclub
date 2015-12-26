@@ -16,19 +16,20 @@ class CinephileRequiredMixin(UserPassesTestMixin):
 
 class VotesView(CinephileRequiredMixin, UpdateView):  # TODO: this is a PoC… clean it.
     def post(self, request, *args, **kwargs):
-        ordre = request.POST['ordre'].split(',')[:-1]
-        print(ordre)
+        ordre = request.POST['ordre'].split(',')
         if ordre:
             request.user.cinephile.votes.clear()
-            films = [get_object_or_404(Film, slug=slug, vu=False) for slug in ordre]
+            films = [get_object_or_404(Film, slug=slug, vu=False) for slug in ordre if slug]
             for film in films:
                 request.user.cinephile.votes.add(film)
             request.user.cinephile.save()
         return self.get(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        c = {'films': request.user.cinephile.votes.all()}
-        return render(request, 'cine/votes.html', c)
+        return render(request, 'cine/votes.html', {
+            'films': request.user.cinephile.votes.all(),
+            'films_pas_classes': request.user.cinephile.pas_classes(),
+            })
 
 
 class ICS(ListView):

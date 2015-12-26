@@ -301,3 +301,6 @@ class Cinephile(Model):
 
     def __str__(self):
         return '%s' % self.user
+
+    def pas_classes(self):
+        return Film.objects.filter(vu=False).exclude(pk__in=self.votes.all())

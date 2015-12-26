@@ -4,7 +4,7 @@
     <h1>Votes !</h1>
     <form action="" method="POST" class="text-center">
         {% csrf_token %}
-        <input name="ordre" value="" type="hidden"/>
+        <input name="ordre" value="{% for film in films %}{{ film.slug}},{% endfor %},{% for film in films_pas_classes %}{{ film.slug }},{% endfor %}" type="hidden"/>
         <button type="submit" class="btn">Voter !</button>
     </form>
 
@@ -13,6 +13,9 @@
     <ul id="sortable">
         {% for film in films %}
         <li class="ui-state-default" data-slug="{{ film.slug }}"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>{{ film.titre }} (<a style="color: #08c;" href="{{ film.get_absolute_url }}">lien</a>) - <a style="color: #08c;" href="{% url 'cine:veto' pk=film.pk %}">veto</a></li>
+        {% endfor %}
+        {% for film in films_pas_classes %}
+        <li class="ui-state-default" style="background: red;"  data-slug="{{ film.slug }}"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>{{ film.titre }} (<a style="color: #08c;" href="{{ film.get_absolute_url }}">lien</a>) - <a style="color: #08c;" href="{% url 'cine:veto' pk=film.pk %}">veto</a></li>
         {% endfor %}
     </ul>
 {% endblock %}
