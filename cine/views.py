@@ -6,31 +6,28 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import CreateView, ListView, UpdateView
 from django.views.generic.base import RedirectView
 
-from .models import Adress, DispoToWatch, Film, Soiree, Vote
+from .models import Adress, Cinephile, DispoToWatch, Film, Soiree, Vote
 
 
 class CinephileRequiredMixin(UserPassesTestMixin):
     def test_func(self):
-        if self.request.user.is_superuser:
-            return True
-        return self.request.user.groups.filter(name='cine').exists()
+        return Cinephile.objects.filter(user=self.request.user).exists()
 
 
-class VotesView(CinephileRequiredMixin, UpdateView):
+class VotesView(CinephileRequiredMixin, UpdateView):  # TODO: this is a PoC… clean it.
     def post(self, request, *args, **kwargs):
         ordre = request.POST['ordre'].split(',')[:-1]
+        print(ordre)
         if ordre:
-            i = 1
-            for vote in ordre:
-                film = Film.objects.get(slug=vote)
-                v = Vote.objects.get(film=film, cinephile=request.user)
-                v.choix = i
-                v.save()
-                i += 1
-        return self.get(*args, **kwargs)
+            request.user.cinephile.votes.clear()
+            films = [get_object_or_404(Film, slug=slug, vu=False) for slug in ordre]
+            for film in films:
+                request.user.cinephile.votes.add(film)
+            request.user.cinephile.save()
+        return self.get(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        c = {'votes': Vote.objects.filter(cinephile=request.user, film__vu=False, veto=False)}
+        c = {'films': request.user.cinephile.votes.all()}
         return render(request, 'cine/votes.html', c)
 
 

@@ -13,13 +13,16 @@ def update_cinephile_data(apps, schema_editor):
         adress, created = Adress.objects.get_or_create(user=user)
         adress = 'Bag End, Bagshot Row, Hobbiton' if created else adress.adresse
         cinephile = Cinephile(user=user, adresse=adress)
+        cinephile.save()
         for vote in user.vote_set.all():
-            if vote.veto:
-                cinephile.vetos.add(vote.film)
-            else:
-                cinephile.votes.add(vote.film)
+            if not vote.film.vu:
+                if vote.veto:
+                    cinephile.vetos.add(vote.film)
+                else:
+                    cinephile.votes.add(vote.film)
         for dtw in user.dispotowatch_set.filter(dispo='O'):
             cinephile.soirees.add(dtw.soiree)
+        cinephile.save()
 
 
 class Migration(migrations.Migration):
