@@ -15,9 +15,10 @@ setup(
         install_requires=[
             'Django',
             'django-bootstrap3',
-            'requests',
-            'pytz',
+            'django-sortedm2m',
             'Pillow',
+            'pytz',
+            'requests',
             ],
         include_package_data=True,
         license='GPL License',

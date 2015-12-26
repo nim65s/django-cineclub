@@ -3,6 +3,7 @@ from datetime import datetime, time, timedelta
 
 import requests
 from pytz import timezone
+from sortedm2m.fields import SortedManyToManyField
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -11,8 +12,8 @@ from django.core.cache import cache
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.core.urlresolvers import reverse
-from django.db.models import (BooleanField, CharField, DateField, ForeignKey, ImageField, IntegerField, Model, OneToOneField, QuerySet, SlugField, TextField,
-                              TimeField, URLField)
+from django.db.models import (BooleanField, CharField, DateField, ForeignKey, ImageField, IntegerField, ManyToManyField, Model, OneToOneField, QuerySet,
+                              SlugField, TextField, TimeField, URLField)
 from django.template.defaultfilters import slugify
 
 tzloc = timezone(settings.TIME_ZONE).localize
@@ -289,3 +290,14 @@ class Adress(Model):
 
     class Meta:
         verbose_name_plural = 'Adresses'
+
+
+class Cinephile(Model):
+    user = OneToOneField(User)
+    adresse = TextField()
+    votes = SortedManyToManyField(Film)
+    vetos = ManyToManyField(Film, related_name='vetos')
+    soirees = ManyToManyField(Soiree)
+
+    def __str__(self):
+        return '%s' % self.user
