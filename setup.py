@@ -10,16 +10,16 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
         name='django-cineclub',
-        version='1.0.0',
+        version='2.0.0',
         packages=['cine'],
         install_requires=[
             'Django',
-            'django-bootstrap3',
             'django-sortedm2m',
             'Pillow',
             'pytz',
             'requests',
             ],
+        extras_require={'example': ['django-bootstrap3']},
         include_package_data=True,
         license='GPL License',
         description='A Django app to manage a cineclub.',

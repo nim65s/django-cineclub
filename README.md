@@ -45,5 +45,4 @@ Quick start with the example project
     ./manage.py runserver
     ```
 
-7. Add yourself to the Group 'cine' on [your browser](http://localhost:8000/admin/auth/user/1/change/)
-8. Create the presence objects: `./manage.py create_missing_v_d`
+7. Add some cinephile on [your browser](http://localhost:8000/admin/cine/cinephile/add/)
