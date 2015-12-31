@@ -36,8 +36,14 @@ Quick start with the example project
 3. Install the package:
     * Directly from the repo: `pip install -e git://github.com/Nim65s/django-cineclub.git#egg=cine`
     * Built it yoursefl: `python setup.py sdist; pip install -U dist/*.tar.gz`
-4. Go to the example dir: `cd mycineclub_example`
-6. Update and populate your database, and launch the server
+5. Go to the example dir: `cd mycineclub_example`
+6. Optionnaly install django-bootstrap3 if you want to use the provided templates
+
+    ```bash
+    pip install django-bootstrap3
+    ```
+
+7. Update and populate your database, and launch the server
 
     ```python
     ./manage.py migrate
