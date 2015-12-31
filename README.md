@@ -14,7 +14,7 @@ Ils renseignent également leurs disponibilités, et boum paf, la présente appl
 Requirements
 ------------
 
-* Django
+* [Django](https://www.djangoproject.com/)
 * [django-bootstrap3](https://github.com/dyve/django-bootstrap3/) (only if you use the provided templates)
 * [django-sortedm2m](https://github.com/dyve/django-bootstrap3/)
 * pytz
