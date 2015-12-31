@@ -1,6 +1,5 @@
 include LICENSE
 include README.md
-recursive-include cine/management *
 recursive-include cine/migrations *
 recursive-include cine/templates *
 recursive-include docs *

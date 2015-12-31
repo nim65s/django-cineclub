@@ -11,10 +11,14 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
+from django.core.mail import EmailMultiAlternatives
 from django.core.urlresolvers import reverse
-from django.db.models import (BooleanField, CharField, DateField, ForeignKey, ImageField, IntegerField, ManyToManyField, Model, OneToOneField, QuerySet,
+from django.db.models import (Q, BooleanField, CharField, DateField, ForeignKey, ImageField,
+                              IntegerField, ManyToManyField, Model, OneToOneField, QuerySet,
                               SlugField, TextField, TimeField, URLField)
 from django.template.defaultfilters import slugify
+from django.template.loader import get_template
+from django.utils.safestring import mark_safe
 
 tzloc = timezone(settings.TIME_ZONE).localize
 
@@ -40,7 +44,8 @@ class Film(Model):
     respo = ForeignKey(User)
     description = TextField()
     slug = SlugField(unique=True, blank=True)
-    annee_sortie = IntegerField(choices=CHOIX_ANNEES, blank=True, null=True, verbose_name="Année de sortie")
+    annee_sortie = IntegerField(choices=CHOIX_ANNEES, blank=True, null=True,
+            verbose_name="Année de sortie")
 
     titre_vo = CharField(max_length=200, blank=True, null=True, verbose_name="Titre en VO")
     imdb = URLField(blank=True, null=True, verbose_name="IMDB")
@@ -78,9 +83,11 @@ class Film(Model):
                 img_temp.close()
         super(Film, self).save(*args, **kwargs)
 
-
     def get_absolute_url(self):
         return reverse('cine:film', kwargs={'slug': self.slug})
+
+    def get_link(self):
+        return mark_safe('<a href="%s">%s</a>' % (self.get_absolute_url(), self.titre))
 
     def get_full_url(self):
         return full_url(self.get_absolute_url())
@@ -94,9 +101,10 @@ class Film(Model):
             imdb_id = re.search(r'tt\d+', imdb_id).group()
             imdb_infos = requests.get(IMDB_API_URL, params={'i': imdb_id}).json()
             try:
+                REGEX = r'((?P<hours>\d+) h )?(?P<minutes>\d+) min'
                 duree = int(timedelta(**dict([
                             (key, int(value) if value else 0) for key, value in
-                            re.search(r'((?P<hours>\d+) h )?(?P<minutes>\d+) min', imdb_infos['Runtime']).groupdict().items()
+                            re.search(REGEX, imdb_infos['Runtime']).groupdict().items()
                             ])).seconds / 60)  # TGCM
             except:
                 duree = None
@@ -113,27 +121,6 @@ class Film(Model):
                     }
         except:
             return {}
-
-
-class VoteQuerySet(QuerySet):
-    def veto(self):
-        return self.filter(veto=True)
-
-
-class Vote(Model):
-    film = ForeignKey(Film)
-    cinephile = ForeignKey(User)
-    choix = IntegerField(default=9999)
-    veto = BooleanField(default=False)
-
-    objects = VoteQuerySet.as_manager()
-
-    def __str__(self):
-        return '%i \t %s \t %s' % (self.choix, self.cinephile, self.film)
-
-    class Meta:
-        ordering = ['choix', 'film']
-        unique_together = ("film", "cinephile")
 
 
 class SoireeQuerySet(QuerySet):
@@ -159,15 +146,16 @@ class Soiree(Model):
     def save(self, *args, **kwargs):
         nouvelle = self.pk is None
         super(Soiree, self).save(*args, **kwargs)
+        self.hote.cinephile.soirees.add(self)
         if nouvelle:
-            dispos_url = full_url(reverse('cine:home'))
-            message = 'Hello :) \n\n%s a proposé une soirée %s à %s; tu peux donc aller mettre à jour tes disponibilités (%s) \\o/\n\n@+!'
-            message %= (self.hote, self.date.strftime('%A %d %B'), self.time.strftime('%H:%M'), dispos_url)
-            for cinephile in Cinephile.objects.all():
-                if cinephile.user == self.hote:
-                    cinephile.soirees.add(self)
+            ctx = {'hote': self.hote, 'date': self.date, 'time': self.time,
+                'lien': full_url(reverse('cine:dtw', args=(self.pk, 1)))}
+            text, html = (get_template('cine/mail.%s' % alt).render(ctx) for alt in ['txt', 'html'])
+            msg = EmailMultiAlternatives('Soirée Ajoutée !', text, settings.DEFAULT_FROM_EMAIL,
+                    [cinephile.user.email for cinephile in self.cinephile_set.all()])
+            msg.attach_alternative(html, 'text/html')
             if not settings.DEBUG:
-                cinephile.user.email_user('[CinéNim] Soirée Ajoutée !', message)
+                msg.send()
 
     def datetime(self, time=None):
         return datetime.combine(self.date, self.time if time is None else time)
@@ -184,8 +172,8 @@ class Soiree(Model):
     def cache_name(self):
         return 'soiree_%i' % self.pk
 
-    def score_films(self):
-        films = cache.get(self.cache_name())
+    def score_films(self, update=False):
+        films = None if update else cache.get(self.cache_name())
         if films is None:
             films = self.compute_score_films()
         cache.set(self.cache_name(), films, 3600 * 24 * 30)
@@ -193,84 +181,47 @@ class Soiree(Model):
 
     def compute_score_films(self):
         films = Film.objects.filter(vu=False).exclude(vetos__soirees=self)
-        scores = {f.pk: 0, for f in films}
+        n = len(films) * self.cinephile_set.count()
+        scores = {film: n for film in films}
         for cinephile in self.cinephile_set.all():
-            for s, f in enumerate(cinephile.votes.all()):
-                ...
-        n = len(films)) * self.cinephile_set.count() + 1
-        for film in f:
-            score = n
-            for dispo in self.dispotowatch_set.filter(dispo='O'):
-                vote = film.vote_set.get(cinephile=dispo.cinephile)
-                if vote.veto:
-                    break
-                score -= vote.choix + dispo.cinephile.vote_set.filter(veto=True).count()
-            else:
-                films.append((score, film))
-        films.sort(key=lambda x: x[0])
-        films.reverse()
+            for score, film in enumerate(cinephile.votes.all()):
+                if film in scores:
+                    scores[film] -= score
+            for film in cinephile.pas_classes():
+                if film in scores:
+                    scores[film] -= n
+        films = sorted([(score, film) for film, score in scores.items()], key=lambda x: -x[0])
         if films and self.favoris != films[0][1]:
             self.favoris = films[0][1]
             self.save()
         return films
 
     def has_adress(self):
-        return Adress.objects.filter(user=self.hote).exists()
+        return bool(self.hote.cinephile.adresse)
+
+    @staticmethod
+    def update_scores(cinephile=None):
+        soirees = Soiree.objects if cinephile is None else cinephile.soirees
+        for soiree in soirees.a_venir():
+            soiree.score_films(update=True)
 
     def adress_ics(self):
-        return self.hote.adress.adresse.replace('\n', ' ').replace('\r', '')
+        return self.hote.cinephile.adresse.replace('\n', ' ').replace('\r', '')
 
     def adress_query(self):
         return self.adress_ics().replace(' ', '+')
 
 
-class DispoQuerySet(QuerySet):
-    def a_venir(self):
-        return self.filter(soiree__date__gte=tzloc(datetime.now() - timedelta(hours=5)))
-
-
-class DispoToWatch(Model):
-    soiree = ForeignKey(Soiree)
-    cinephile = ForeignKey(User)
-
-    objects = DispoQuerySet.as_manager()
-
-    CHOIX_DISPO = (
-            ('O', 'Dispo'),
-            ('P', 'Pas dispo'),
-            ('N', 'Ne sais pas'),
-            )
-
-    dispo = CharField(max_length=1, choices=CHOIX_DISPO, default='N')
-
-    def __str__(self):
-        return '%s %s %s' % (self.soiree, self.dispo, self.cinephile)
-
-    class Meta:
-        ordering = ['soiree__date']
-        unique_together = ("soiree", "cinephile")
-
-
-class Adress(Model):
-    user = OneToOneField(User)
-    adresse = TextField()
-
-    def __str__(self):
-        return 'Adresse de %s' % self.user
-
-    class Meta:
-        verbose_name_plural = 'Adresses'
-
-
 class Cinephile(Model):
     user = OneToOneField(User)
-    adresse = TextField()
-    votes = SortedManyToManyField(Film)
-    vetos = ManyToManyField(Film, related_name='vetos')
-    soirees = ManyToManyField(Soiree)
+    adresse = TextField(blank=True)
+    votes = SortedManyToManyField(Film, blank=True)
+    vetos = ManyToManyField(Film, blank=True, related_name='vetos')
+    soirees = ManyToManyField(Soiree, blank=True)
 
     def __str__(self):
         return '%s' % self.user
 
     def pas_classes(self):
-        return Film.objects.filter(vu=False).exclude(pk__in=self.votes.all())
+        query = Q(vu=True) | Q(pk__in=self.votes.all()) | Q(pk__in=self.vetos.all())
+        return Film.objects.exclude(query)

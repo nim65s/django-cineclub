@@ -1,0 +1,10 @@
+Hello :)
+
+{{ hote }} a proposé une soirée CinéNim le *{{ date|date:"l j F" }} à {{ time|time:"H:i" }}*.
+Si tu veux venir, ouvre ce lien: {{ lien }} :)
+
+@+ !
+
+
+--
+  Cet email a été envoyé automatiquement. Il est inutile d’y répondre.

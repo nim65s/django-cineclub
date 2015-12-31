@@ -1,12 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import CreateView, ListView, UpdateView
 from django.views.generic.base import RedirectView
 
-from .models import Adress, Cinephile, DispoToWatch, Film, Soiree, Vote
+from .models import Cinephile, Film, Soiree
 
 
 class CinephileRequiredMixin(UserPassesTestMixin):
@@ -23,24 +22,27 @@ class VotesView(CinephileRequiredMixin, UpdateView):  # TODO: this is a PoC… c
             for film in films:
                 request.user.cinephile.votes.add(film)
             request.user.cinephile.save()
+            Soiree.update_scores(request.user.cinephile)
         return self.get(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         return render(request, 'cine/votes.html', {
             'films': request.user.cinephile.votes.all(),
-            'films_pas_classes': request.user.cinephile.pas_classes(),
+            'pas_classes': request.user.cinephile.pas_classes(),
+            'vetos': request.user.cinephile.vetos.all(),
             })
 
 
 class ICS(ListView):
     template_name = 'cine/cinenim.ics'
     content_type = "text/calendar; charset=UTF-8"
-    model = Soiree
+    queryset = Soiree.objects.a_venir()
 
 
 class FilmActionMixin(CinephileRequiredMixin):
     model = Film
-    fields = ('titre', 'description', 'annee_sortie', 'titre_vo', 'realisateur', 'imdb', 'allocine', 'duree', 'imdb_poster_url', 'imdb_id')
+    fields = ('titre', 'description', 'annee_sortie', 'titre_vo', 'realisateur', 'imdb', 'allocine',
+            'duree', 'imdb_poster_url', 'imdb_id')
 
     def form_valid(self, form):
         messages.info(self.request, "Film %s" % self.action)
@@ -52,6 +54,7 @@ class FilmCreateView(FilmActionMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.respo = self.request.user
+        Soiree.update_scores()
         return super(FilmCreateView, self).form_valid(form)
 
     def get_initial(self):
@@ -83,14 +86,15 @@ class FilmVuView(UserPassesTestMixin, RedirectView):
         for cinephile in Cinephile.objects.all():
             cinephile.votes.remove(film)
             cinephile.vetos.remove(film)
+        Soiree.update_scores()
         return reverse('cine:films')
 
 
 class VetoView(CinephileRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         film = get_object_or_404(Film, pk=kwargs['pk'])
-        request.user.cinephile.votes.remove(film)
-        request.user.cinephile.vetos.add(film)
+        self.request.user.cinephile.votes.remove(film)
+        self.request.user.cinephile.vetos.add(film)
         return reverse('cine:votes')
 
 
@@ -115,12 +119,15 @@ class SoireeCreateView(CinephileRequiredMixin, CreateView):
 
 class DTWUpdateView(CinephileRequiredMixin, UpdateView):
     def get(self, request, *args, **kwargs):
-        dtw = get_object_or_404(DispoToWatch, soiree__pk=kwargs['pk'], cinephile=request.user)
-        if request.user == dtw.soiree.hote and kwargs['dispo'] != 'O':
-            messages.error(request, "Oui, mais non. Si tu crées une soirée, tu y vas.")
-            return redirect('cine:home')
-        dtw.dispo = kwargs['dispo']
-        dtw.save()
+        soiree = get_object_or_404(Soiree, pk=kwargs['pk'])
+        if int(kwargs['dispo']):
+            request.user.cinephile.soirees.add(soiree)
+        else:
+            if soiree.hote == request.user:
+                messages.error(request, "Oui, mais non. Si tu hébèrges une soirée, tu y vas.")
+                return redirect('cine:home')
+            request.user.cinephile.soirees.remove(soiree)
+        soiree.score_films(update=True)
         messages.info(request, "Disponibilité mise à jour !")
         return redirect('cine:home')
 
@@ -130,7 +137,7 @@ class AdressUpdateView(CinephileRequiredMixin, UpdateView):
     success_url = reverse_lazy('cine:home')
 
     def get_object(self, queryset=None):
-        return Adress.objects.get_or_create(user=self.request.user)[0]
+        return self.request.user.cinephile
 
     def form_valid(self, form):
         messages.info(self.request, "Adresse mise à jour")

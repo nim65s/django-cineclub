@@ -2,16 +2,16 @@ from django.conf.urls import url
 from django.views.generic import DetailView, ListView
 
 from .models import Film, Soiree
-from .views import (ICS, AdressUpdateView, CinephileListView, DTWUpdateView, FilmCreateView, FilmListView, FilmUpdateView, FilmVuView, SoireeCreateView,
-                    VetoView, VotesView)
+from .views import (ICS, AdressUpdateView, CinephileListView, DTWUpdateView, FilmCreateView,
+                    FilmListView, FilmUpdateView, FilmVuView, SoireeCreateView, VetoView, VotesView)
 
 app_name = 'cine'
 urlpatterns = [
         url(r'^votes$', VotesView.as_view(), name='votes'),
         url(r'^veto/(?P<pk>\d+)$', VetoView.as_view(), name='veto'),
 
-        url(r'^$', ListView.as_view(template_name='cine/soiree_list.html', queryset=Soiree.objects.a_venir), name='home'),
-        url(r'^soiree/(?P<pk>\d+)/(?P<dispo>[ONP])', DTWUpdateView.as_view(), name='dtw'),
+        url(r'^$', ListView.as_view(queryset=Soiree.objects.a_venir()), name='home'),
+        url(r'^soiree/(?P<pk>\d+)/(?P<dispo>[01])', DTWUpdateView.as_view(), name='dtw'),
         url(r'^soiree$', SoireeCreateView.as_view(), name='ajout_soiree'),
 
         url(r'^films$', FilmListView.as_view(), name='films'),
