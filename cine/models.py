@@ -24,10 +24,6 @@ CHOIX_ANNEES = [(annee, annee) for annee in range(datetime.now().year + 2, 1900,
 IMDB_API_URL = 'http://www.omdbapi.com/'
 
 
-def get_cinephiles():
-    return User.objects.filter(groups__name='cine')
-
-
 def full_url(path):
     return 'https://%s%s' % (Site.objects.get_current().domain, path)
 
@@ -82,21 +78,6 @@ class Film(Model):
                 img_temp.close()
         super(Film, self).save(*args, **kwargs)
 
-        if update:
-            self.nouveau()
-
-    def nouveau(self):
-        # Création des votes & envoi des mails de notif
-        film_url = self.get_full_url()
-        vote_url = full_url(reverse('cine:votes'))
-
-        message = "Hello :)\n\n%s a proposé un nouveau film : %s (%s)' ; " % (self.respo, self.titre, film_url)
-        message += "tu peux donc aller actualiser ton classement (%s) \\o/ \n\n @+!" % vote_url
-
-        for cinephile in get_cinephiles():
-            vote, created = Vote.objects.get_or_create(film=self, cinephile=cinephile)
-            if created and not settings.DEBUG:
-                cinephile.email_user('[CinéNim] Film ajouté !', message)
 
     def get_absolute_url(self):
         return reverse('cine:film', kwargs={'slug': self.slug})
@@ -179,20 +160,14 @@ class Soiree(Model):
         nouvelle = self.pk is None
         super(Soiree, self).save(*args, **kwargs)
         if nouvelle:
-            self.nouvelle()
-
-    def nouvelle(self):
-        dispos_url = full_url(reverse('cine:home'))
-
-        message = 'Hello :) \n\n%s a proposé une soirée %s à %s; tu peux donc aller mettre à jour tes disponibilités (%s) \\o/\n\n@+!'
-        message %= (self.hote, self.date.strftime('%A %d %B'), self.time.strftime('%H:%M'), dispos_url)
-        for cinephile in get_cinephiles():
-            dtw, created = DispoToWatch.objects.get_or_create(soiree=self, cinephile=cinephile)
-            if cinephile == self.hote:
-                dtw.dispo = 'O'
-                dtw.save()
-            if not settings.DEBUG and not settings.INTEGRATION and created:
-                cinephile.email_user('[CinéNim] Soirée Ajoutée !', message)
+            dispos_url = full_url(reverse('cine:home'))
+            message = 'Hello :) \n\n%s a proposé une soirée %s à %s; tu peux donc aller mettre à jour tes disponibilités (%s) \\o/\n\n@+!'
+            message %= (self.hote, self.date.strftime('%A %d %B'), self.time.strftime('%H:%M'), dispos_url)
+            for cinephile in Cinephile.objects.all():
+                if cinephile.user == self.hote:
+                    cinephile.soirees.add(self)
+            if not settings.DEBUG:
+                cinephile.user.email_user('[CinéNim] Soirée Ajoutée !', message)
 
     def datetime(self, time=None):
         return datetime.combine(self.date, self.time if time is None else time)
@@ -203,17 +178,8 @@ class Soiree(Model):
     def dtend(self):
         return self.dtstart(time(23, 59))
 
-    def dispos(self, dispo='O'):
-        return [dtw.cinephile for dtw in self.dispotowatch_set.filter(dispo=dispo)]
-
-    def dispos_str(self, dispo):
-        return ", ".join([cinephile.username for cinephile in self.dispos(dispo)])
-
     def presents(self):
-        return self.dispos_str('O')
-
-    def pas_surs(self):
-        return self.dispos_str('N')
+        return ", ".join([cinephile.user.username for cinephile in self.cinephile_set.all()])
 
     def cache_name(self):
         return 'soiree_%i' % self.pk
@@ -226,9 +192,13 @@ class Soiree(Model):
         return films
 
     def compute_score_films(self):
-        films = []
-        n = Film.objects.filter(vu=False).count() * self.dispotowatch_set.filter(dispo='O').count() + 1
-        for film in Film.objects.filter(vu=False):
+        films = Film.objects.filter(vu=False).exclude(vetos__soirees=self)
+        scores = {f.pk: 0, for f in films}
+        for cinephile in self.cinephile_set.all():
+            for s, f in enumerate(cinephile.votes.all()):
+                ...
+        n = len(films)) * self.cinephile_set.count() + 1
+        for film in f:
             score = n
             for dispo in self.dispotowatch_set.filter(dispo='O'):
                 vote = film.vote_set.get(cinephile=dispo.cinephile)

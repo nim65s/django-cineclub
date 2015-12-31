@@ -79,23 +79,23 @@ class FilmVuView(UserPassesTestMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         film = get_object_or_404(Film, slug=kwargs['slug'])
         film.vu = True
-        film.vote_set.update(choix=-1, veto=False)
         film.save()
+        for cinephile in Cinephile.objects.all():
+            cinephile.votes.remove(film)
+            cinephile.vetos.remove(film)
         return reverse('cine:films')
 
 
 class VetoView(CinephileRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
-        vote = get_object_or_404(Vote, pk=kwargs['pk'])
-        vote.veto = True
-        vote.choix = -1
-        vote.save()
+        film = get_object_or_404(Film, pk=kwargs['pk'])
+        request.user.cinephile.votes.remove(film)
+        request.user.cinephile.vetos.add(film)
         return reverse('cine:votes')
 
 
 class CinephileListView(CinephileRequiredMixin, ListView):
-    queryset = User.objects.filter(groups__name='cine')
-    template_name = 'cine/cinephile_list.html'
+    model = Cinephile
 
 
 class SoireeCreateView(CinephileRequiredMixin, CreateView):
