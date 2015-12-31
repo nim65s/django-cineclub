@@ -1,7 +1,7 @@
 {% extends "cine/cine.html" %}
 
 {% block content %}
-    <h1>Votes !</h1>
+    <h1>Classement</h1>
     <form action="" method="POST" class="text-center">
         {% csrf_token %}
         <input name="ordre" value="{% for film in films %}{{ film.slug}},{% endfor %},{% for film in pas_classes %}{{ film.slug }},{% endfor %}" type="hidden"/>
