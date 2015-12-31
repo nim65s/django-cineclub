@@ -15,7 +15,8 @@ Requirements
 ------------
 
 * Django
-* django-bootstrap3 (only if you use the provided templates)
+* [django-bootstrap3](https://github.com/dyve/django-bootstrap3/) (only if you use the provided templates)
+* [django-sortedm2m](https://github.com/dyve/django-bootstrap3/)
 * pytz
 * Pillow
 
