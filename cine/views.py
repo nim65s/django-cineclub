@@ -10,6 +10,8 @@ from .models import Cinephile, Film, Soiree
 
 class CinephileRequiredMixin(UserPassesTestMixin):
     def test_func(self):
+        if not self.request.user.is_authenticated():
+            return False
         return Cinephile.objects.filter(user=self.request.user).exists()
 
 
