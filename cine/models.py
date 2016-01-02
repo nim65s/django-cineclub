@@ -222,6 +222,9 @@ class Cinephile(Model):
     def __str__(self):
         return '%s' % self.user
 
+    class Meta:
+        ordering = ["user"]
+
     def pas_classes(self):
         query = Q(vu=True) | Q(pk__in=self.votes.all()) | Q(pk__in=self.vetos.all())
         return Film.objects.exclude(query)
