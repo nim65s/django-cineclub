@@ -1,4 +1,4 @@
-<h2>Le {{ soiree.date }} à {{ soiree.time|date:"H:i" }} chez {{ soiree.hote }}</h2>
+<h2><a href="{{ soiree.get_absolute_url }}">Le {{ soiree.date }} à {{ soiree.time|date:"H:i" }} chez {{ soiree.hote }}</a></h2>
 
 {% if request.user.is_authenticated %}
     <p>{% if soiree.has_adress %}
@@ -18,6 +18,6 @@
     <p><a href="{% url 'login' %}?next={{ request.path }}">Authentifiez-vous</a> pour plus d’options</p>
 {% endif %}
 <h3>Films</h3>
-{% for score, film in soiree.score_films %}
+{% for score, film in score_films %}
 <p>{{ score }} » <a href="{{ film.get_absolute_url }}">{{ film.titre }}</a></p>
 {% endfor %}

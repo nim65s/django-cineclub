@@ -175,6 +175,9 @@ class Soiree(Model):
     def cache_name(self):
         return 'soiree_%i' % self.pk
 
+    def score_films_short(self):
+        return self.score_films()[:5]
+
     def score_films(self, update=False):
         films = None if update else cache.get(self.cache_name())
         if films is None:

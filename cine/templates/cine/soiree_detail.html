@@ -2,6 +2,8 @@
 
 {% block content %}
 
-{% include 'cine/soiree.html' %}
+{% with score_films=soiree.score_films %}
+    {% include 'cine/soiree.html' %}
+{% endwith %}
 
 {% endblock %}
