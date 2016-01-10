@@ -10,7 +10,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
         name='django-cineclub',
-        version='2.0.1',
+        version='2.1.0',
         packages=['cine'],
         install_requires=[
             'Django',
