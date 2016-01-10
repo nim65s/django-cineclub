@@ -2,6 +2,9 @@
 
 {% block content %}
 <h1>Cinéphiles</h1>
+
+<a href="{% url 'cine:rajquit' %}" class="btn btn-danger btn-lg">Raj Quit</a>
+
 {% for cinephile in object_list %}
     <div>
         <h2>{{ cinephile }}</h2>

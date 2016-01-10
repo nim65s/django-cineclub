@@ -3,7 +3,8 @@ from django.views.generic import DetailView, ListView
 
 from .models import Film, Soiree
 from .views import (ICS, AdressUpdateView, CinephileListView, DTWUpdateView, FilmCreateView,
-                    FilmListView, FilmUpdateView, FilmVuView, SoireeCreateView, VetoView, VotesView)
+                    FilmListView, FilmUpdateView, FilmVuView, RajQuitView, SoireeCreateView,
+                    VetoView, VotesView)
 
 app_name = 'cine'
 urlpatterns = [
@@ -21,6 +22,7 @@ urlpatterns = [
         url(r'^film/(?P<slug>[^/]+)$', DetailView.as_view(model=Film), name='film'),
 
         url(r'^cinephiles$', CinephileListView.as_view(), name='cinephiles'),
+        url(r'^rajquit$', RajQuitView.as_view(), name='rajquit'),
         url(r'^adress$', AdressUpdateView.as_view(), name='adress'),
 
         url(r'^cinenim.ics$', ICS.as_view(), name='ics'),

@@ -12,7 +12,10 @@ class CinephileRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         if not self.request.user.is_authenticated():
             return False
-        return Cinephile.objects.filter(user=self.request.user, actif=True).exists()
+        ok = Cinephile.objects.filter(user=self.request.user, actif=True).exists()
+        if ok:
+            return True
+        messages.error(self.request, 'Vous ne faites pas partie du cinéclub :(')
 
 
 class VotesView(CinephileRequiredMixin, UpdateView):  # TODO: this is a PoC… clean it.
@@ -102,6 +105,14 @@ class VetoView(CinephileRequiredMixin, RedirectView):
 
 class CinephileListView(CinephileRequiredMixin, ListView):
     queryset = Cinephile.objects.filter(actif=True)
+
+
+class RajQuitView(CinephileRequiredMixin, RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        self.request.user.cinephile.actif = False
+        self.request.user.cinephile.save()
+        messages.error(self.request, 'Vous ne faites plus partie du Ciné Club.')
+        return reverse('cine:home')
 
 
 class SoireeCreateView(CinephileRequiredMixin, CreateView):
