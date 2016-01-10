@@ -6,29 +6,7 @@
 <h1>Soirées à venir</h1>
 
 {% for soiree in object_list %}
-    <h2>Le {{ soiree.date }} à {{ soiree.time|date:"H:i" }} chez {{ soiree.hote }}</h2>
-
-    {% if request.user.is_authenticated %}
-        <p>{% if soiree.has_adress %}
-            {{ soiree.hote.adress.adresse|linebreaks }}<br>
-            <a href="https://maps.google.fr/?q={{ soiree.adress_query }}">Google Maps</a> –
-            <a href="https://nominatim.openstreetmap.org/?q={{ soiree.adress_query }}">Open Stree Maps</a>
-        {% else %}
-            {{ soiree.hote }} n’a pas encore renseigné son adresse…
-        {% endif %}</p>
-
-        <a href="{% url 'cine:dtw' soiree.pk 1 %}" class="btn btn-success{% if soiree in request.user.cinephile.soirees.all %} active disabled{% endif %}">Je serai là !</a> –
-        <a href="{% url 'cine:dtw' soiree.pk 0 %}" class="btn btn-danger{% if soiree not in request.user.cinephile.soirees.all %} active disabled{% endif %}">Je ne serai pas là…</a>
-
-        <h3>Présents</h3>
-        <p>{{ soiree.presents }}</p>
-    {% else %}
-        <p><a href="{% url 'login' %}?next={{ request.path }}">Authentifiez-vous</a> pour plus d’options</p>
-    {% endif %}
-    <h3>Films</h3>
-    {% for score, film in soiree.score_films %}
-    <p>{{ score }} » <a href="{{ film.get_absolute_url }}">{{ film.titre }}</a></p>
-    {% endfor %}
+    {% include 'cine/soiree.html' %}
 {% empty %}
     <p>Rien de prévu pour l’instant</p>
 {% endfor %}

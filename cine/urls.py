@@ -6,13 +6,16 @@ from .views import (ICS, AdressUpdateView, CinephileListView, DTWUpdateView, Fil
                     FilmListView, FilmUpdateView, FilmVuView, RajQuitView, SoireeCreateView,
                     VetoView, VotesView)
 
+A_VENIR = Soiree.objects.a_venir()
+
 app_name = 'cine'
 urlpatterns = [
         url(r'^votes$', VotesView.as_view(), name='votes'),
         url(r'^veto/(?P<pk>\d+)$', VetoView.as_view(), name='veto'),
 
-        url(r'^$', ListView.as_view(queryset=Soiree.objects.a_venir()), name='home'),
-        url(r'^soiree/(?P<pk>\d+)/(?P<dispo>[01])', DTWUpdateView.as_view(), name='dtw'),
+        url(r'^$', ListView.as_view(queryset=A_VENIR), name='home'),
+        url(r'^soiree/(?P<pk>\d+)$', DetailView.as_view(queryset=A_VENIR), name='soiree'),
+        url(r'^soiree/(?P<pk>\d+)/(?P<dispo>[01])$', DTWUpdateView.as_view(), name='dtw'),
         url(r'^soiree$', SoireeCreateView.as_view(), name='ajout_soiree'),
 
         url(r'^films$', FilmListView.as_view(), name='films'),

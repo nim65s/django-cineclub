@@ -142,7 +142,7 @@ class DTWUpdateView(CinephileRequiredMixin, UpdateView):
             request.user.cinephile.soirees.remove(soiree)
         soiree.score_films(update=True)
         messages.info(request, "Disponibilité mise à jour !")
-        return redirect('cine:home')
+        return redirect(soiree)
 
 
 class AdressUpdateView(CinephileRequiredMixin, UpdateView):

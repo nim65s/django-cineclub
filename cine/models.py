@@ -143,6 +143,9 @@ class Soiree(Model):
         ordering = ["date"]
         get_latest_by = 'date'
 
+    def get_absolute_url(self):
+        return reverse('cine:soiree', kwargs={'pk': self.pk})
+
     def save(self, *args, **kwargs):
         nouvelle = self.pk is None
         super(Soiree, self).save(*args, **kwargs)
