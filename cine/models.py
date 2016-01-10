@@ -152,7 +152,7 @@ class Soiree(Model):
                 'lien': full_url(reverse('cine:dtw', args=(self.pk, 1)))}
             text, html = (get_template('cine/mail.%s' % alt).render(ctx) for alt in ['txt', 'html'])
             msg = EmailMultiAlternatives('Soirée Ajoutée !', text, settings.DEFAULT_FROM_EMAIL,
-                    [cinephile.user.email for cinephile in Cinephile.objects.all()])
+                    [cinephile.user.email for cinephile in Cinephile.objects.filter(actif=True)])
             msg.attach_alternative(html, 'text/html')
             if not settings.DEBUG:
                 msg.send()
@@ -218,6 +218,7 @@ class Cinephile(Model):
     votes = SortedManyToManyField(Film, blank=True)
     vetos = ManyToManyField(Film, blank=True, related_name='vetos')
     soirees = ManyToManyField(Soiree, blank=True)
+    actif = BooleanField(default=True)
 
     def __str__(self):
         return '%s' % self.user

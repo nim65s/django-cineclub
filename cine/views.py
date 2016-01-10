@@ -12,7 +12,7 @@ class CinephileRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         if not self.request.user.is_authenticated():
             return False
-        return Cinephile.objects.filter(user=self.request.user).exists()
+        return Cinephile.objects.filter(user=self.request.user, actif=True).exists()
 
 
 class VotesView(CinephileRequiredMixin, UpdateView):  # TODO: this is a PoC… clean it.
@@ -101,7 +101,7 @@ class VetoView(CinephileRequiredMixin, RedirectView):
 
 
 class CinephileListView(CinephileRequiredMixin, ListView):
-    model = Cinephile
+    queryset = Cinephile.objects.filter(actif=True)
 
 
 class SoireeCreateView(CinephileRequiredMixin, CreateView):
