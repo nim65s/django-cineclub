@@ -152,7 +152,7 @@ class Soiree(Model):
                 'lien': full_url(reverse('cine:dtw', args=(self.pk, 1)))}
             text, html = (get_template('cine/mail.%s' % alt).render(ctx) for alt in ['txt', 'html'])
             msg = EmailMultiAlternatives('Soirée Ajoutée !', text, settings.DEFAULT_FROM_EMAIL,
-                    [cinephile.user.email for cinephile in self.cinephile_set.all()])
+                    [cinephile.user.email for cinephile in Cinephile.objects.all()])
             msg.attach_alternative(html, 'text/html')
             if not settings.DEBUG:
                 msg.send()
