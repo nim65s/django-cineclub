@@ -1,10 +1,6 @@
 import re
 from datetime import datetime, time, timedelta
 
-import requests
-from pytz import timezone
-from sortedm2m.fields import SortedManyToManyField
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -19,6 +15,10 @@ from django.db.models import (Q, BooleanField, CharField, DateField, ForeignKey,
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.utils.safestring import mark_safe
+
+import requests
+from pytz import timezone
+from sortedm2m.fields import SortedManyToManyField
 
 tzloc = timezone(settings.TIME_ZONE).localize
 
@@ -44,8 +44,7 @@ class Film(Model):
     respo = ForeignKey(User)
     description = TextField()
     slug = SlugField(unique=True, blank=True)
-    annee_sortie = IntegerField(choices=CHOIX_ANNEES, blank=True, null=True,
-            verbose_name="Année de sortie")
+    annee_sortie = IntegerField(choices=CHOIX_ANNEES, blank=True, null=True, verbose_name="Année de sortie")
 
     titre_vo = CharField(max_length=200, blank=True, null=True, verbose_name="Titre en VO")
     imdb = URLField(blank=True, null=True, verbose_name="IMDB")
@@ -101,24 +100,23 @@ class Film(Model):
             imdb_id = re.search(r'tt\d+', imdb_id).group()
             imdb_infos = requests.get(IMDB_API_URL, params={'i': imdb_id}).json()
             try:
-                REGEX = r'((?P<hours>\d+) h )?(?P<minutes>\d+) min'
                 duree = int(timedelta(**dict([
-                            (key, int(value) if value else 0) for key, value in
-                            re.search(REGEX, imdb_infos['Runtime']).groupdict().items()
-                            ])).seconds / 60)  # TGCM
+                    (key, int(value) if value else 0) for key, value in
+                    re.search(r'((?P<hours>\d+) h )?(?P<minutes>\d+) min', imdb_infos['Runtime']).groupdict().items()
+                ])).seconds / 60)  # TGCM
             except:
                 duree = None
             return {
-                    'realisateur': imdb_infos['Director'],
-                    'description': imdb_infos['Plot'],
-                    'imdb_poster_url': imdb_infos['Poster'],
-                    'annee_sortie': imdb_infos['Year'],
-                    'titre': imdb_infos['Title'],
-                    'titre_vo': imdb_infos['Title'],
-                    'duree': duree,
-                    'imdb_id': imdb_id,
-                    'imdb': 'http://www.imdb.com/title/%s/' % imdb_id,
-                    }
+                'realisateur': imdb_infos['Director'],
+                'description': imdb_infos['Plot'],
+                'imdb_poster_url': imdb_infos['Poster'],
+                'annee_sortie': imdb_infos['Year'],
+                'titre': imdb_infos['Title'],
+                'titre_vo': imdb_infos['Title'],
+                'duree': duree,
+                'imdb_id': imdb_id,
+                'imdb': 'http://www.imdb.com/title/%s/' % imdb_id,
+            }
         except:
             return {}
 
@@ -152,10 +150,10 @@ class Soiree(Model):
         self.hote.cinephile.soirees.add(self)
         if nouvelle:
             ctx = {'hote': self.hote, 'date': self.date, 'time': self.time,
-                'lien': full_url(reverse('cine:dtw', args=(self.pk, 1)))}
+                   'lien': full_url(reverse('cine:dtw', args=(self.pk, 1)))}
             text, html = (get_template('cine/mail.%s' % alt).render(ctx) for alt in ['txt', 'html'])
-            msg = EmailMultiAlternatives('Soirée Ajoutée !', text, settings.DEFAULT_FROM_EMAIL,
-                    [cinephile.user.email for cinephile in Cinephile.objects.filter(actif=True)])
+            emails = [cinephile.user.email for cinephile in Cinephile.objects.filter(actif=True)]
+            msg = EmailMultiAlternatives('Soirée Ajoutée !', text, settings.DEFAULT_FROM_EMAIL, emails)
             msg.attach_alternative(html, 'text/html')
             if not settings.DEBUG:
                 msg.send()

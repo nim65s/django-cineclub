@@ -12,13 +12,14 @@ class CinephileRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         if not self.request.user.is_authenticated():
             return False
-        ok = Cinephile.objects.filter(user=self.request.user, actif=True).exists()
-        if ok:
+        if Cinephile.objects.filter(user=self.request.user, actif=True).exists():
             return True
         messages.error(self.request, 'Vous ne faites pas partie du cinéclub :(')
+        return False
 
 
-class VotesView(CinephileRequiredMixin, UpdateView):  # TODO: this is a PoC… clean it.
+# TODO: this is a PoC… clean it.
+class VotesView(CinephileRequiredMixin, UpdateView):
     def post(self, request, *args, **kwargs):
         ordre = request.POST['ordre'].split(',')
         if ordre:
@@ -26,16 +27,16 @@ class VotesView(CinephileRequiredMixin, UpdateView):  # TODO: this is a PoC… c
             films = [get_object_or_404(Film, slug=slug, vu=False) for slug in ordre if slug]
             for film in films:
                 request.user.cinephile.votes.add(film)
-            request.user.cinephile.save()
-            Soiree.update_scores(request.user.cinephile)
-        return self.get(request, *args, **kwargs)
+                request.user.cinephile.save()
+                Soiree.update_scores(request.user.cinephile)
+            return self.get(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         return render(request, 'cine/votes.html', {
             'films': request.user.cinephile.votes.all(),
-            'pas_classes': request.user.cinephile.pas_classes(),
             'vetos': request.user.cinephile.vetos.all(),
-            })
+            'pas_classes': request.user.cinephile.pas_classes(),
+        })
 
 
 class ICS(ListView):
@@ -47,7 +48,7 @@ class ICS(ListView):
 class FilmActionMixin(CinephileRequiredMixin):
     model = Film
     fields = ('titre', 'description', 'annee_sortie', 'titre_vo', 'realisateur', 'imdb', 'allocine',
-            'duree', 'imdb_poster_url', 'imdb_id')
+              'duree', 'imdb_poster_url', 'imdb_id')
 
     def form_valid(self, form):
         messages.info(self.request, "Film %s" % self.action)
