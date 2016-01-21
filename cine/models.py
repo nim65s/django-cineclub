@@ -72,7 +72,7 @@ class Film(Model):
             if orig.slug != self.slug or orig.imdb_poster_url != self.imdb_poster_url:
                 update = True
         if update:
-            self.slug = slugify(self.titre)
+            self.slug = slugify(self.titre)[:48]
             img = requests.get(self.imdb_poster_url)
             if img.status_code == requests.codes.ok:
                 img_temp = NamedTemporaryFile(delete=True)
