@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 from django.views.generic.base import RedirectView
 
+from .forms import SoireeForm
 from .models import Cinephile, Film, Soiree
 
 
@@ -118,8 +119,7 @@ class RajQuitView(CinephileRequiredMixin, RedirectView):
 
 
 class SoireeCreateView(CinephileRequiredMixin, CreateView):
-    model = Soiree
-    fields = ['date', 'time']
+    form_class = SoireeForm
 
     def form_valid(self, form):
         form.instance.hote = self.request.user
