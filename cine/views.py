@@ -1,8 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import CreateView, ListView, UpdateView
+from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 from django.views.generic.base import RedirectView
 
 from .models import Cinephile, Film, Soiree
@@ -129,6 +130,16 @@ class SoireeCreateView(CinephileRequiredMixin, CreateView):
         if self.object.has_adress():
             return reverse('cine:home')
         return reverse('cine:adress')
+
+
+class SoireeDeleteView(CinephileRequiredMixin, DeleteView):
+    model = Soiree
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset=None)
+        if not self.request.user.is_superuser and obj.hote != self.request.user:
+            raise PermissionDenied()
+        return obj
 
 
 class DTWUpdateView(CinephileRequiredMixin, UpdateView):

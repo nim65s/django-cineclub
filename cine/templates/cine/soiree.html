@@ -1,6 +1,9 @@
 <h2><a href="{{ soiree.get_absolute_url }}">Le {{ soiree.date }} à {{ soiree.time|date:"H:i" }} chez {{ soiree.hote }}</a></h2>
 
 {% if request.user.is_authenticated %}
+    {% if request.user.is_superuser or soiree.hote == request.user %}
+    <a href="{% url 'cine:delete_soiree' soiree.pk %}">Supprimer cette soirée</a>
+    {% endif %}
     <p>{% if soiree.has_adress %}
         {{ soiree.hote.adress.adresse|linebreaks }}<br>
         <a href="https://maps.google.fr/?q={{ soiree.adress_query }}">Google Maps</a> –
@@ -9,8 +12,10 @@
         {{ soiree.hote }} n’a pas encore renseigné son adresse…
     {% endif %}</p>
 
-    <a href="{% url 'cine:dtw' soiree.pk 1 %}" class="btn btn-success{% if soiree in request.user.cinephile.soirees.all %} active disabled{% endif %}">Je serai là !</a> –
-    <a href="{% url 'cine:dtw' soiree.pk 0 %}" class="btn btn-danger{% if soiree not in request.user.cinephile.soirees.all %} active disabled{% endif %}">Je ne serai pas là…</a>
+    {% with present = soiree in request.user.cinephile.soirees.all %}
+    <a href="{% url 'cine:dtw' soiree.pk 1 %}" class="btn btn-success{% if present %} active disabled{% endif %}">Je serai là !</a> –
+    <a href="{% url 'cine:dtw' soiree.pk 0 %}" class="btn btn-danger{% if not present %} active disabled{% endif %}">Je ne serai pas là…</a>
+    {% endwith %}
 
     <h3>Présents</h3>
     <p>{{ soiree.presents }}</p>
