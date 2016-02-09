@@ -228,7 +228,7 @@ class Cinephile(Model):
         return '%s' % self.user
 
     class Meta:
-        ordering = ["user"]
+        ordering = ["user__username"]
 
     def pas_classes(self):
         query = Q(vu=True) | Q(pk__in=self.votes.all()) | Q(pk__in=self.vetos.all())
