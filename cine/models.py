@@ -148,15 +148,14 @@ class Soiree(Model):
         nouvelle = self.pk is None
         super(Soiree, self).save(*args, **kwargs)
         self.hote.cinephile.soirees.add(self)
-        if nouvelle:
+        if nouvelle and not settings.DEBUG:
             ctx = {'hote': self.hote, 'date': self.date, 'time': self.time,
                    'lien': full_url(reverse('cine:dtw', args=(self.pk, 1)))}
             text, html = (get_template('cine/mail.%s' % alt).render(ctx) for alt in ['txt', 'html'])
             emails = [cinephile.user.email for cinephile in Cinephile.objects.filter(actif=True)]
             msg = EmailMultiAlternatives('Soirée Ajoutée !', text, settings.DEFAULT_FROM_EMAIL, emails)
             msg.attach_alternative(html, 'text/html')
-            if not settings.DEBUG:
-                msg.send()
+            msg.send()
 
     def datetime(self, time=None):
         return datetime.combine(self.date, self.time if time is None else time)
