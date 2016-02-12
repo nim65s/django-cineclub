@@ -119,6 +119,7 @@ class RajQuitView(CinephileRequiredMixin, RedirectView):
 
 
 class SoireeCreateView(CinephileRequiredMixin, CreateView):
+    model = Soiree
     form_class = SoireeForm
 
     def form_valid(self, form):
