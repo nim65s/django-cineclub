@@ -135,6 +135,7 @@ class SoireeCreateView(CinephileRequiredMixin, CreateView):
 
 class SoireeDeleteView(CinephileRequiredMixin, DeleteView):
     model = Soiree
+    success_url = reverse_lazy('cine:home')
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset=None)
