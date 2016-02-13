@@ -47,7 +47,6 @@ class Film(Model):
     annee_sortie = IntegerField(choices=CHOIX_ANNEES, blank=True, null=True, verbose_name="Année de sortie")
 
     titre_vo = CharField(max_length=200, blank=True, null=True, verbose_name="Titre en VO")
-    imdb = URLField(blank=True, null=True, verbose_name="IMDB")
     allocine = URLField(blank=True, null=True, verbose_name="Allociné")
     realisateur = CharField(max_length=200, null=True, blank=True, verbose_name="Réalisateur")
     duree = IntegerField("Durée en minutes", null=True)
@@ -115,7 +114,6 @@ class Film(Model):
                 'titre_vo': imdb_infos['Title'],
                 'duree': duree,
                 'imdb_id': imdb_id,
-                'imdb': 'http://www.imdb.com/title/%s/' % imdb_id,
             }
         except:
             return {}
