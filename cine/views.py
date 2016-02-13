@@ -100,6 +100,7 @@ class VetoView(CinephileRequiredMixin, RedirectView):
         film = get_object_or_404(Film, pk=kwargs['pk'])
         self.request.user.cinephile.votes.remove(film)
         self.request.user.cinephile.vetos.add(film)
+        messages.warning(self.request, 'Vous avez posé un véto sur «%s»' % film)
         return reverse('cine:votes')
 
 
