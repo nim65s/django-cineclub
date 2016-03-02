@@ -14,6 +14,7 @@ from django.db.models import (Q, BooleanField, CharField, DateField, ForeignKey,
                               SlugField, TextField, TimeField, URLField)
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
+from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
 import requests
@@ -165,7 +166,10 @@ class Soiree(Model):
         return self.dtstart(time(23, 59))
 
     def presents(self):
-        return ", ".join([cinephile.user.username for cinephile in self.cinephile_set.all()])
+        presents = ", ".join([cinephile.user.username for cinephile in self.cinephile_set.all()])
+        mails = ','.join([cinephile.user.email for cinephile in self.cinephile_set.all()])
+        url = 'mailto:%s?subject=%s' % (mails, urlencode('%s chez %s' % (self, self.hote)))
+        return mark_safe('%s – <a href="%s">Leur envoyer un mail</a>' % (presents, url))
 
     def cache_name(self):
         return 'soiree_%i' % self.pk
