@@ -169,7 +169,7 @@ class Soiree(Model):
         presents = ", ".join([cinephile.user.username for cinephile in self.cinephile_set.all()])
         mails = ','.join([cinephile.user.email for cinephile in self.cinephile_set.all()])
 
-        subject = urlquote('%s %s chez %s' % (settings.EMAIL_SUBJECT_PREFIX, self, self.hote))
+        subject = urlquote('[CinéNim] %s chez %s' % (self, self.hote))
         return mark_safe('%s – <a href="mailto:%s?subject=%s">Leur envoyer un mail</a>' % (presents, mails, subject))
 
     def cache_name(self):
