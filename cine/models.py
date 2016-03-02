@@ -134,7 +134,7 @@ class Soiree(Model):
     objects = SoireeQuerySet.as_manager()
 
     def __str__(self):
-        return 'soirée du %s' % self.date
+        return 'Soirée du %s' % self.date
 
     class Meta:
         ordering = ["date"]
