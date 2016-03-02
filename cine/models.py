@@ -1,6 +1,7 @@
 import re
-from datetime import datetime, time, timedelta
+from datetime import date, datetime, time, timedelta
 
+import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -14,11 +15,10 @@ from django.db.models import (Q, BooleanField, CharField, DateField, ForeignKey,
                               SlugField, TextField, TimeField, URLField)
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
-from django.utils.http import urlencode
+from django.utils.http import urlquote
 from django.utils.safestring import mark_safe
-
-import requests
 from pytz import timezone
+
 from sortedm2m.fields import SortedManyToManyField
 
 tzloc = timezone(settings.TIME_ZONE).localize
@@ -122,7 +122,7 @@ class Film(Model):
 
 class SoireeQuerySet(QuerySet):
     def a_venir(self):
-        return self.filter(date__gte=tzloc(datetime.now() - timedelta(hours=5)))
+        return self.filter(date__gte=date.today())
 
 
 class Soiree(Model):
@@ -168,7 +168,7 @@ class Soiree(Model):
     def presents(self):
         presents = ", ".join([cinephile.user.username for cinephile in self.cinephile_set.all()])
         mails = ','.join([cinephile.user.email for cinephile in self.cinephile_set.all()])
-        url = 'mailto:%s?subject=%s' % (mails, urlencode('%s chez %s' % (self, self.hote)))
+        url = 'mailto:%s?subject=%s' % (mails, urlquote('%s chez %s' % (self, self.hote)))
         return mark_safe('%s – <a href="%s">Leur envoyer un mail</a>' % (presents, url))
 
     def cache_name(self):
