@@ -41,7 +41,7 @@ class VotesView(CinephileRequiredMixin, UpdateView):
 class ICS(ListView):
     template_name = 'cine/cinenim.ics'
     content_type = "text/calendar; charset=UTF-8"
-    queryset = Soiree.objects.a_venir()
+    queryset = Soiree.objects.all()
 
 
 class FilmActionMixin(CinephileRequiredMixin):
