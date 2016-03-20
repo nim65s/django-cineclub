@@ -12,10 +12,13 @@
         {{ soiree.hote }} n’a pas encore renseigné son adresse…
     {% endif %}</p>
 
-    {% with present=request.user.cinephile.soirees.all %}
-    <a href="{% url 'cine:dtw' soiree.pk 1 %}" class="btn btn-success{% if soiree in present %} active disabled{% endif %}">Je serai là !</a> –
-    <a href="{% url 'cine:dtw' soiree.pk 0 %}" class="btn btn-danger{% if soiree not in present %} active disabled{% endif %}">Je ne serai pas là…</a>
-    {% endwith %}
+    {% if soiree in request.user.cinephile.soirees.all %}
+    <a href="{% url 'cine:dtw' soiree.pk 1 %}" class="btn btn-success active disabled">Je serai là !</a> –
+    <a href="{% url 'cine:dtw' soiree.pk 0 %}" class="btn btn-danger">Non, en fait, je serai pas là :(</a>
+    {% else %}
+    <a href="{% url 'cine:dtw' soiree.pk 1 %}" class="btn btn-success">Si, en fait, je serai là :D</a> –
+    <a href="{% url 'cine:dtw' soiree.pk 0 %}" class="btn btn-danger active disabled">Je ne serai pas là…</a>
+    {% endif %}
 
     <h3>Présents</h3>
     <p>{{ soiree.presents }}</p>
