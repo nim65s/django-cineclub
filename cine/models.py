@@ -66,6 +66,7 @@ class Film(Model):
         ordering = ['vu', 'titre']
 
     def save(self, *args, **kwargs):
+        # Check if we need to update the slug
         update = self.pk is None
         if not update:
             orig = Film.objects.get(pk=self.pk)
