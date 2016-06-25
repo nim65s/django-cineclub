@@ -167,3 +167,8 @@ class AdressUpdateView(CinephileRequiredMixin, UpdateView):
     def form_valid(self, form):
         messages.info(self.request, "Adresse mise à jour")
         return super(AdressUpdateView, self).form_valid(form)
+
+
+class SoireeListView(ListView):
+    def get_queryset(self):
+        return Soiree.objects.a_venir()

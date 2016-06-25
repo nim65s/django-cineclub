@@ -1,16 +1,17 @@
 from django.conf.urls import url
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView
 
 from .models import Film, Soiree
-from .views import (ICS, AdressUpdateView, CinephileListView, DTWUpdateView, FilmCreateView, FilmListView,
-                    FilmUpdateView, FilmVuView, RajQuitView, SoireeCreateView, SoireeDeleteView, VetoView, VotesView)
+from .views import (ICS, AdressUpdateView, CinephileListView, DTWUpdateView, FilmCreateView,
+                    FilmListView, FilmUpdateView, FilmVuView, RajQuitView, SoireeCreateView,
+                    SoireeDeleteView, SoireeListView, VetoView, VotesView)
 
 app_name = 'cine'
 urlpatterns = [
     url(r'^votes$', VotesView.as_view(), name='votes'),
     url(r'^veto/(?P<pk>\d+)$', VetoView.as_view(), name='veto'),
 
-    url(r'^$', ListView.as_view(queryset=Soiree.objects.a_venir()), name='home'),
+    url(r'^$', SoireeListView.as_view(), name='home'),
     url(r'^soiree/(?P<pk>\d+)$', DetailView.as_view(queryset=Soiree.objects.a_venir()), name='soiree'),
     url(r'^soiree/(?P<pk>\d+)/delete$', SoireeDeleteView.as_view(), name='delete_soiree'),
     url(r'^soiree/(?P<pk>\d+)/(?P<dispo>[01])$', DTWUpdateView.as_view(), name='dtw'),
