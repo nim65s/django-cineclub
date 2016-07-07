@@ -123,7 +123,7 @@ class Film(Model):
 
 class SoireeQuerySet(QuerySet):
     def a_venir(self):
-        return self.filter(date__gte=date.today() + timedelta(days=1))
+        return self.filter(date__gte=date.today() - timedelta(days=1))
 
 
 class Soiree(Model):
