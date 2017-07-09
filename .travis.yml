@@ -1,0 +1,11 @@
+language: python
+python:
+    - 3.6
+install:
+    - pip install -r requirements-dev.txt flake8 python-coveralls
+script:
+    - ./mycineclub_example/manage.py migrate
+    - coverage run mycineclub_example/manage.py test
+    - flake8 .
+after_success:
+    - coveralls
