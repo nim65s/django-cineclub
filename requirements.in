@@ -1,0 +1,5 @@
+django
+django-sortedm2m
+pillow
+pytz
+requests
