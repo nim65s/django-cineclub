@@ -3,3 +3,4 @@ django-sortedm2m
 pillow
 pytz
 requests
+-e git://github.com/Nim65s/ndh.git#egg=ndh

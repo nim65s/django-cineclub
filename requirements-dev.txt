@@ -4,14 +4,15 @@
 #
 #    pip-compile --output-file requirements-dev.txt requirements-dev.in
 #
-certifi==2017.4.17        # via requests
+-e git+git://github.com/Nim65s/ndh.git#egg=ndh
+certifi==2017.7.27.1      # via requests
 chardet==3.0.4            # via requests
-django-bootstrap3==8.2.3
-django-sortedm2m==1.4.0
-django==1.11.3
-idna==2.5                 # via requests
+django-bootstrap3==9.0.0
+django-sortedm2m==1.5.0
+django==1.11.5
+idna==2.6                 # via requests
 olefile==0.44             # via pillow
 pillow==4.2.1
 pytz==2017.2
-requests==2.18.1
-urllib3==1.21.1           # via requests
+requests==2.18.4
+urllib3==1.22             # via requests

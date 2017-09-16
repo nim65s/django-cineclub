@@ -1,24 +1,25 @@
 import re
 from datetime import date, datetime, time, timedelta
 
-import requests
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.core.mail import EmailMultiAlternatives
 from django.core.urlresolvers import reverse
-from django.db.models import (Q, BooleanField, CharField, DateField, ForeignKey, ImageField,
-                              IntegerField, ManyToManyField, Model, OneToOneField, QuerySet,
-                              SlugField, TextField, TimeField, URLField)
+from django.db.models import (BooleanField, CharField, DateField, ForeignKey, ImageField,
+                              IntegerField, ManyToManyField, Model, OneToOneField, Q,
+                              QuerySet, SlugField, TextField, TimeField, URLField)
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.utils.http import urlquote
 from django.utils.safestring import mark_safe
-from pytz import timezone
 
+import requests
+from ndh.models import Links
+from ndh.utils import full_url
+from pytz import timezone
 from sortedm2m.fields import SortedManyToManyField
 
 tzloc = timezone(settings.TIME_ZONE).localize
@@ -29,10 +30,6 @@ CHOIX_ANNEES = [(annee, annee) for annee in range(datetime.now().year + 2, 1900,
 IMDB_API_URL = 'http://www.omdbapi.com/'
 
 
-def full_url(path):
-    return 'https://%s%s' % (Site.objects.get_current().domain, path)
-
-
 def get_verbose_name(model, name):
     try:
         return model._meta.get_field(name).verbose_name
@@ -40,7 +37,7 @@ def get_verbose_name(model, name):
         return None
 
 
-class Film(Model):
+class Film(Links, Model):
     titre = CharField(max_length=200, unique=True)
     respo = ForeignKey(User)
     description = TextField()
@@ -88,9 +85,6 @@ class Film(Model):
 
     def get_link(self):
         return mark_safe('<a href="%s">%s</a>' % (self.get_absolute_url(), self.titre))
-
-    def get_full_url(self):
-        return full_url(self.get_absolute_url())
 
     def get_description(self):
         return self.description.replace('\r\n', '\\n')
