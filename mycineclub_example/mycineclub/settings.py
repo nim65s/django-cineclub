@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'bootstrap3',
     'sortedm2m',
     'cine',
+    'ndh',
 ]
 
 MIDDLEWARE_CLASSES = [
