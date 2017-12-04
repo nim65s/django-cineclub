@@ -2,10 +2,10 @@ language: python
 python:
     - 3.6
 install:
-    - pip install -r requirements-dev.txt flake8 python-coveralls
+    - pip install -r requirements.txt flake8 python-coveralls
 script:
-    - ./mycineclub_example/manage.py migrate
-    - coverage run mycineclub_example/manage.py test
+    - ./manage.py migrate
+    - coverage run manage.py test
     - flake8 .
 after_success:
     - coveralls

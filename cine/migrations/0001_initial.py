@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('dispo', models.CharField(default='N', max_length=1, choices=[('O', 'Dispo'), ('P', 'Pas dispo'), ('N', 'Ne sais pas')])),
-                ('cinephile', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('cinephile', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ['soiree__date'],
@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
                 ('imdb_id', models.CharField(max_length=10, null=True, verbose_name='id IMDB', blank=True)),
                 ('imdb_poster_url', models.URLField(null=True, verbose_name='URL du poster', blank=True)),
                 ('imdb_poster', models.ImageField(null=True, upload_to='cine/posters', blank=True)),
-                ('respo', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('respo', models.ForeignKey(to=settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)),
             ],
             options={
             },
@@ -52,8 +52,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('date', models.DateTimeField()),
                 ('categorie', models.CharField(default='D', max_length=1, blank=True, choices=[('D', 'Divertissement'), ('C', 'Culture')])),
-                ('favoris', models.ForeignKey(to='cine.Film', null=True)),
-                ('hote', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('favoris', models.ForeignKey(to='cine.Film', null=True, on_delete=models.SET_NULL)),
+                ('hote', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ['date'],
@@ -66,8 +66,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('choix', models.IntegerField(default=9999)),
-                ('cinephile', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
-                ('film', models.ForeignKey(to='cine.Film')),
+                ('cinephile', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('film', models.ForeignKey(to='cine.Film', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ['choix', 'film'],
@@ -81,7 +81,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='dispotowatch',
             name='soiree',
-            field=models.ForeignKey(to='cine.Soiree'),
+            field=models.ForeignKey(to='cine.Soiree', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

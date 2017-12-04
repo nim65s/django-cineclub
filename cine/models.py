@@ -7,12 +7,13 @@ from django.core.cache import cache
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.core.mail import EmailMultiAlternatives
-from django.core.urlresolvers import reverse
+from django.db import models
 from django.db.models import (BooleanField, CharField, DateField, ForeignKey, ImageField,
                               IntegerField, ManyToManyField, Model, OneToOneField, Q,
                               QuerySet, SlugField, TextField, TimeField, URLField)
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
+from django.urls import reverse
 from django.utils.http import urlquote
 from django.utils.safestring import mark_safe
 
@@ -39,7 +40,7 @@ def get_verbose_name(model, name):
 
 class Film(Links, Model):
     titre = CharField(max_length=200, unique=True)
-    respo = ForeignKey(User)
+    respo = ForeignKey(User, on_delete=models.SET_NULL, null=True)
     description = TextField()
     slug = SlugField(unique=True, blank=True)
     annee_sortie = IntegerField(choices=CHOIX_ANNEES, blank=True, null=True, verbose_name="Année de sortie")
@@ -123,8 +124,8 @@ class SoireeQuerySet(QuerySet):
 class Soiree(Model):
     date = DateField()
     time = TimeField('heure', default=time(20, 30))
-    hote = ForeignKey(User)
-    favoris = ForeignKey(Film, null=True)
+    hote = ForeignKey(User, on_delete=models.CASCADE)
+    favoris = ForeignKey(Film, null=True, on_delete=models.SET_NULL)
 
     objects = SoireeQuerySet.as_manager()
 
@@ -214,7 +215,7 @@ class Soiree(Model):
 
 
 class Cinephile(Model):
-    user = OneToOneField(User)
+    user = OneToOneField(User, on_delete=models.CASCADE)
     adresse = TextField(blank=True)
     votes = SortedManyToManyField(Film, blank=True)
     vetos = ManyToManyField(Film, blank=True, related_name='vetos')

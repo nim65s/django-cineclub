@@ -1,8 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse, reverse_lazy
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 from django.views.generic.base import RedirectView
 

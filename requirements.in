@@ -1,6 +1,8 @@
 django
+django-bootstrap3
 django-sortedm2m
 pillow
 pytz
 requests
--e git://github.com/Nim65s/ndh.git#egg=ndh
+git+https://github.com/nim65s/ndh.git#egg=ndh
+git+https://github.com/nim65s/django-autoslug.git#egg=django-autoslug
