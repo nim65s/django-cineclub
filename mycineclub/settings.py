@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'sortedm2m',
     'cine',
     'ndh',
+    'mycineclub',
 ]
 
 MIDDLEWARE_CLASSES = [
