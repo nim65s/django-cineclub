@@ -94,7 +94,7 @@ class Film(Links, Model):
     def get_imdb_dict(imdb_id):
         try:
             imdb_id = re.search(r'tt\d+', imdb_id).group()
-            imdb_infos = requests.get(IMDB_API_URL, params={'i': imdb_id}).json()
+            imdb_infos = requests.get(IMDB_API_URL, params={'i': imdb_id, 'apikey': settings.OMDB_API_KEY}).json()
             try:
                 duree = int(timedelta(**dict([
                     (key, int(value) if value else 0) for key, value in
