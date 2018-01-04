@@ -1,31 +1,24 @@
-from django.conf.urls import url
+from django.urls import path
 from django.views.generic import DetailView
 
+from . import views
 from .models import Film, Soiree
-from .views import (ICS, AdressUpdateView, CinephileListView, DTWUpdateView, FilmCreateView,
-                    FilmListView, FilmUpdateView, FilmVuView, RajQuitView, SoireeCreateView,
-                    SoireeDeleteView, SoireeListView, VetoView, VotesView)
 
 app_name = 'cine'
 urlpatterns = [
-    url(r'^votes$', VotesView.as_view(), name='votes'),
-    url(r'^veto/(?P<pk>\d+)$', VetoView.as_view(), name='veto'),
+    path(r'', views.SoireeListView.as_view(), name='home'),
+    path(r'soiree/<int:pk>', DetailView.as_view(queryset=Soiree.objects.a_venir()), name='soiree'),
+    path(r'soiree/<int:pk>/delete', views.SoireeDeleteView.as_view(), name='delete_soiree'),
+    path(r'soiree/<int:pk>/<int:dispo>', views.DTWUpdateView.as_view(), name='dtw'),
+    path(r'soiree', views.SoireeCreateView.as_view(), name='ajout_soiree'),
 
-    url(r'^$', SoireeListView.as_view(), name='home'),
-    url(r'^soiree/(?P<pk>\d+)$', DetailView.as_view(queryset=Soiree.objects.a_venir()), name='soiree'),
-    url(r'^soiree/(?P<pk>\d+)/delete$', SoireeDeleteView.as_view(), name='delete_soiree'),
-    url(r'^soiree/(?P<pk>\d+)/(?P<dispo>[01])$', DTWUpdateView.as_view(), name='dtw'),
-    url(r'^soiree$', SoireeCreateView.as_view(), name='ajout_soiree'),
+    path(r'films', views.FilmListView.as_view(), name='films'),
+    path(r'film/ajout', views.FilmCreateView.as_view(), name='ajout_film'),
+    path(r'film/maj/<str:slug>', views.FilmUpdateView.as_view(), name='maj_film'),
+    path(r'film/vu/<str:slug>', views.FilmVuView.as_view(), name='film_vu'),
+    path(r'film/<str:slug>', DetailView.as_view(model=Film), name='film'),
 
-    url(r'^films$', FilmListView.as_view(), name='films'),
-    url(r'^film/ajout$', FilmCreateView.as_view(), name='ajout_film'),
-    url(r'^film/maj/(?P<slug>[^/]+)$', FilmUpdateView.as_view(), name='maj_film'),
-    url(r'^film/vu/(?P<slug>[^/]+)$', FilmVuView.as_view(), name='film_vu'),
-    url(r'^film/(?P<slug>[^/]+)$', DetailView.as_view(model=Film), name='film'),
-
-    url(r'^cinephiles$', CinephileListView.as_view(), name='cinephiles'),
-    url(r'^rajquit$', RajQuitView.as_view(), name='rajquit'),
-    url(r'^adress$', AdressUpdateView.as_view(), name='adress'),
-
-    url(r'^cinenim.ics$', ICS.as_view(), name='ics'),
+    path(r'cinephiles', views.CinephileListView.as_view(), name='cinephiles'),
+    path(r'rajquit', views.RajQuitView.as_view(), name='rajquit'),
+    path(r'adress', views.AdressUpdateView.as_view(), name='adress'),
 ]

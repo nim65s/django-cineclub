@@ -1,6 +1,6 @@
-Hello :)
+{% load humanize %}Hello :)
 
-{{ hote }} a proposé une soirée CinéNim le *{{ date|date:"l j F" }} à {{ time|time:"H:i" }}*.
+{{ hote }} a proposé une soirée CinéNim le *{{ moment|naturaltime }}*.
 Si tu veux venir, ouvre ce lien: {{ lien }} :)
 
 @+ !

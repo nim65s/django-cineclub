@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 from django.views.generic.base import RedirectView
@@ -16,64 +16,44 @@ class CinephileRequiredMixin(UserPassesTestMixin):
             return False
         if Cinephile.objects.filter(user=self.request.user, actif=True).exists():
             return True
-        messages.error(self.request, 'Vous ne faites pas partie du cinéclub :(')
+        messages.error(self.request, 'Vous ne faites pas partie du cinéclub… Parlez-en à Nim :)')
         return False
-
-
-class VotesView(CinephileRequiredMixin, UpdateView):
-    def post(self, request, *args, **kwargs):
-        ordre = request.POST['ordre'].split(',')
-        if ordre:
-            request.user.cinephile.votes.clear()
-            films = [get_object_or_404(Film, slug=slug, vu=False) for slug in ordre if slug]
-            request.user.cinephile.votes.add(*films)
-            Soiree.update_scores(request.user.cinephile)
-        return self.get(request, *args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        return render(request, 'cine/votes.html', {
-            'films': request.user.cinephile.votes.all(),
-            'vetos': request.user.cinephile.vetos.all(),
-            'pas_classes': request.user.cinephile.pas_classes(),
-        })
 
 
 class ICS(ListView):
     template_name = 'cine/cinenim.ics'
-    content_type = "text/calendar; charset=UTF-8"
+    content_type = 'text/calendar; charset=UTF-8'
     queryset = Soiree.objects.all()
 
 
 class FilmActionMixin(CinephileRequiredMixin):
     model = Film
-    fields = ('titre', 'description', 'annee_sortie', 'titre_vo', 'realisateur', 'allocine',
+    fields = ('name', 'description', 'annee_sortie', 'titre_vo', 'realisateur', 'allocine',
               'duree', 'imdb_poster_url', 'imdb_id')
 
     def form_valid(self, form):
-        messages.info(self.request, "Film %s" % self.action)
+        messages.info(self.request, f'Film {self.action}')
         return super(FilmActionMixin, self).form_valid(form)
 
 
 class FilmCreateView(FilmActionMixin, CreateView):
-    action = "créé"
+    action = 'créé'
 
     def form_valid(self, form):
         form.instance.respo = self.request.user
-        Soiree.update_scores()
-        return super(FilmCreateView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_initial(self):
         return Film.get_imdb_dict(self.request.GET.get('imdb_id'))
 
 
 class FilmUpdateView(FilmActionMixin, UpdateView):
-    action = "modifié"
+    action = 'modifié'
 
     def form_valid(self, form):
         if form.instance.respo == self.request.user or self.request.user.is_superuser:
-            return super(FilmUpdateView, self).form_valid(form)
-        messages.error(self.request, 'Vous n’avez pas le droit de modifier ce film')
-        return redirect('cine:films')
+            return super().form_valid(form)
+        raise PermissionDenied
 
 
 class FilmListView(ListView):
@@ -88,20 +68,8 @@ class FilmVuView(UserPassesTestMixin, RedirectView):
         film = get_object_or_404(Film, slug=kwargs['slug'])
         film.vu = True
         film.save()
-        for cinephile in Cinephile.objects.all():
-            cinephile.votes.remove(film)
-            cinephile.vetos.remove(film)
-        Soiree.update_scores()
+        messages.success(self.request, 'Film vu !')
         return reverse('cine:films')
-
-
-class VetoView(CinephileRequiredMixin, RedirectView):
-    def get_redirect_url(self, *args, **kwargs):
-        film = get_object_or_404(Film, pk=kwargs['pk'])
-        self.request.user.cinephile.votes.remove(film)
-        self.request.user.cinephile.vetos.add(film)
-        messages.warning(self.request, 'Vous avez posé un véto sur «%s»' % film)
-        return reverse('cine:votes')
 
 
 class CinephileListView(CinephileRequiredMixin, ListView):
@@ -122,8 +90,8 @@ class SoireeCreateView(CinephileRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.hote = self.request.user
-        messages.info(self.request, "Soirée Créée")
-        return super(SoireeCreateView, self).form_valid(form)
+        messages.info(self.request, 'Soirée Créée')
+        return super().form_valid(form)
 
     def get_success_url(self):
         if self.object.has_adress():
@@ -138,7 +106,7 @@ class SoireeDeleteView(CinephileRequiredMixin, DeleteView):
     def get_object(self, queryset=None):
         obj = super().get_object(queryset=None)
         if not self.request.user.is_superuser and obj.hote != self.request.user:
-            raise PermissionDenied()
+            raise PermissionDenied
         return obj
 
 
@@ -149,11 +117,10 @@ class DTWUpdateView(CinephileRequiredMixin, UpdateView):
             request.user.cinephile.soirees.add(soiree)
         else:
             if soiree.hote == request.user:
-                messages.error(request, "Oui, mais non. Si tu hébèrges une soirée, tu y vas.")
+                messages.error(request, 'Si tu hébèrges une soirée, tu y vas… Supprime la soirée, ou contacte Nim.')
                 return redirect('cine:home')
             request.user.cinephile.soirees.remove(soiree)
-        soiree.score_films(update=True)
-        messages.info(request, "Disponibilité mise à jour !")
+        messages.info(request, 'Disponibilité mise à jour !')
         return redirect(soiree)
 
 
@@ -165,10 +132,9 @@ class AdressUpdateView(CinephileRequiredMixin, UpdateView):
         return self.request.user.cinephile
 
     def form_valid(self, form):
-        messages.info(self.request, "Adresse mise à jour")
-        return super(AdressUpdateView, self).form_valid(form)
+        messages.info(self.request, 'Adresse mise à jour')
+        return super().form_valid(form)
 
 
 class SoireeListView(ListView):
-    def get_queryset(self):
-        return Soiree.objects.a_venir()
+    queryset = Soiree.objects.a_venir

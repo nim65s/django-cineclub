@@ -10,7 +10,6 @@
     <div>
         <h2>{{ cinephile }}</h2>
         <p>{{ cinephile.user.get_full_name }}: {{ cinephile.user.email|email:request }}</p>
-        {% with veto=cinephile.vetos.all %}{% if veto %}<p>Vétos: {% for v in veto %}{{ v.get_link }} {% endfor %}</p>{% endif %}{% endwith %}
     </div>
 {% endfor %}
 {% endblock %}

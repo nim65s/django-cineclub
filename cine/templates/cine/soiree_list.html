@@ -2,15 +2,12 @@
 
 {% block content %}
 
-
 <h1>Soirées à venir</h1>
 
 {% for soiree in object_list %}
-    {% with score_films=soiree.score_films_short %}
-        {% include 'cine/soiree.html' %}
-    {% endwith %}
+  {% include 'cine/soiree.html' %}
 {% empty %}
-    <p>Rien de prévu pour l’instant</p>
+  <p>Rien de prévu pour l’instant</p>
 {% endfor %}
 
 <hr>

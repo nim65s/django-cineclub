@@ -40,13 +40,13 @@ class TestFilm(TestCase):
         film = Film.objects.first()
         self.assertEqual(str(film), 'My Neighbor Totoro')
 
-        form['titre'] = 'となりのトトロ'
+        form['name'] = 'となりのトトロ'
         r = self.client.post(reverse('cine:maj_film', kwargs={'slug': film.slug}), form)
         film = Film.objects.first()
         self.assertEqual(str(film), 'となりのトトロ')
 
         self.client.login(username='b', password='b')
-        form['titre'] = 'rototo'
+        form['name'] = 'rototo'
         r = self.client.post(reverse('cine:maj_film', kwargs={'slug': film.slug}), form)
         film = Film.objects.first()
         self.assertEqual(str(film), 'となりのトトロ')

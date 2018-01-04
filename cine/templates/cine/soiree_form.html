@@ -1,22 +1,6 @@
 {% extends "cine/cine.html" %}
-{% load bootstrap3 %}
 
 {% block content %}
-
 <h1>Proposer une soiree</h1>
-<form method="post" action="" class="form-horizontal" role="form">
-    {% csrf_token %}
-    {% bootstrap_form form layout="horizontal" %}
-    {% buttons layout="horizontal" %}
-        <button type="submit" class="btn">C’est bon \o/</button>
-    {% endbuttons %}
-</form>
-
-{% endblock %}
-
-{% block js %}
-<script>
-    $('#id_date').attr({type: 'date'});
-    $('#id_time').attr({type: 'time'});
-</script>
+{% include 'ndh/form.html' %}
 {% endblock %}

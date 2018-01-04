@@ -1,6 +1,6 @@
 <div id="{{ film.slug }}">
     <h2>
-        <a href="{{ film.get_absolute_url }}">{{ film.titre }}</a>
+        {{ film.get_link }}
         {% if film.respo == request.user or request.user.is_superuser %}(<a href="{% url 'cine:maj_film' slug=film.slug %}">edit</a>){% endif %}
     </h2>
     {% if film.imdb_poster %}<img src="{{ film.imdb_poster.url }}" alt="poster pour {{ film }}" class="pull-right" />{% endif %}

@@ -1,77 +1,50 @@
 import re
-from datetime import date, datetime, time, timedelta
+from datetime import date, timedelta
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.cache import cache
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.core.mail import EmailMultiAlternatives
 from django.db import models
-from django.db.models import (BooleanField, CharField, DateField, ForeignKey, ImageField,
-                              IntegerField, ManyToManyField, Model, OneToOneField, Q,
-                              QuerySet, SlugField, TextField, TimeField, URLField)
-from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.http import urlquote
 from django.utils.safestring import mark_safe
 
 import requests
-from ndh.models import Links
+
+from ndh.models import Links, NamedModel
 from ndh.utils import full_url
-from pytz import timezone
-from sortedm2m.fields import SortedManyToManyField
 
-tzloc = timezone(settings.TIME_ZONE).localize
-
-
-CHOIX_ANNEES = [(annee, annee) for annee in range(datetime.now().year + 2, 1900, -1)]
+CHOIX_ANNEES = [(annee, annee) for annee in range(date.today().year + 2, 1900, -1)]
 
 IMDB_API_URL = 'http://www.omdbapi.com/'
 
 
-def get_verbose_name(model, name):
-    try:
-        return model._meta.get_field(name).verbose_name
-    except:
-        return None
+class Film(Links, NamedModel):
+    respo = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    description = models.TextField()
+    annee_sortie = models.IntegerField(choices=CHOIX_ANNEES, blank=True, null=True, verbose_name='Année de sortie')
 
+    titre_vo = models.CharField(max_length=200, blank=True, null=True, verbose_name='Titre en VO')
+    allocine = models.URLField(blank=True, null=True, verbose_name='Allociné')
+    realisateur = models.CharField(max_length=200, null=True, blank=True, verbose_name='Réalisateur')
+    duree = models.IntegerField('Durée en minutes', null=True)
 
-class Film(Links, Model):
-    titre = CharField(max_length=200, unique=True)
-    respo = ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    description = TextField()
-    slug = SlugField(unique=True, blank=True)
-    annee_sortie = IntegerField(choices=CHOIX_ANNEES, blank=True, null=True, verbose_name="Année de sortie")
+    vu = models.BooleanField(default=False)
 
-    titre_vo = CharField(max_length=200, blank=True, null=True, verbose_name="Titre en VO")
-    allocine = URLField(blank=True, null=True, verbose_name="Allociné")
-    realisateur = CharField(max_length=200, null=True, blank=True, verbose_name="Réalisateur")
-    duree = IntegerField("Durée en minutes", null=True)
+    imdb_id = models.CharField(max_length=10, verbose_name='id IMDB', null=True, blank=True)
 
-    vu = BooleanField(default=False)
-
-    imdb_id = CharField(max_length=10, verbose_name="id IMDB", null=True, blank=True)
-
-    imdb_poster_url = URLField(blank=True, null=True, verbose_name="URL du poster")
-    imdb_poster = ImageField(upload_to='cine/posters', blank=True, null=True)
-
-    def __str__(self):
-        return self.titre
+    imdb_poster_url = models.URLField(blank=True, null=True, verbose_name='URL du poster')
+    imdb_poster = models.ImageField(upload_to='cine/posters', blank=True, null=True)
 
     class Meta:
-        ordering = ['vu', 'titre']
+        ordering = ['vu', 'name']
 
     def save(self, *args, **kwargs):
-        # Check if we need to update the slug
-        update = self.pk is None
-        if not update:
-            orig = Film.objects.get(pk=self.pk)
-            if orig.slug != self.slug or orig.imdb_poster_url != self.imdb_poster_url:
-                update = True
-        if update:
-            self.slug = slugify(self.titre)[:48]
+        if self.pk is None or Film.objects.get(pk=self.pk).imdb_poster_url != self.imdb_poster_url:
             img = requests.get(self.imdb_poster_url)
             if img.status_code == requests.codes.ok:
                 img_temp = NamedTemporaryFile(delete=True)
@@ -79,16 +52,10 @@ class Film(Links, Model):
                 img_temp.flush()
                 self.imdb_poster.save(self.slug, File(img_temp), save=False)
                 img_temp.close()
-        super(Film, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('cine:film', kwargs={'slug': self.slug})
-
-    def get_link(self):
-        return mark_safe('<a href="%s">%s</a>' % (self.get_absolute_url(), self.titre))
-
-    def get_description(self):
-        return self.description.replace('\r\n', '\\n')
 
     @staticmethod
     def get_imdb_dict(imdb_id):
@@ -107,7 +74,7 @@ class Film(Links, Model):
                 'description': imdb_infos['Plot'],
                 'imdb_poster_url': imdb_infos['Poster'],
                 'annee_sortie': imdb_infos['Year'],
-                'titre': imdb_infos['Title'],
+                'name': imdb_infos['Title'],
                 'titre_vo': imdb_infos['Title'],
                 'duree': duree,
                 'imdb_id': imdb_id,
@@ -116,28 +83,24 @@ class Film(Links, Model):
             return {}
 
 
-class SoireeQuerySet(QuerySet):
+class SoireeQuerySet(models.QuerySet):
     def a_venir(self):
-        return self.filter(date__gte=date.today() - timedelta(days=1))
+        return self.filter(moment__gte=timezone.now() - timedelta(days=1))
 
 
-class Soiree(Model):
-    date = DateField()
-    time = TimeField('heure', default=time(20, 30))
-    hote = ForeignKey(User, on_delete=models.CASCADE)
-    favoris = ForeignKey(Film, null=True, on_delete=models.SET_NULL)
+class Soiree(models.Model):
+    moment = models.DateTimeField()
+    hote = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    favoris = models.ForeignKey(Film, null=True, on_delete=models.SET_NULL)
 
     objects = SoireeQuerySet.as_manager()
 
-    def __str__(self):
-        return 'Soirée du %s' % self.date
-
     class Meta:
-        ordering = ["date"]
-        get_latest_by = 'date'
+        ordering = ['moment']
+        get_latest_by = 'moment'
 
-    def get_absolute_url(self):
-        return reverse('cine:soiree', kwargs={'pk': self.pk})
+    def __str__(self):
+        return f'Soirée du {self.moment:%c}'
 
     def save(self, *args, **kwargs):
         nouvelle = self.pk is None
@@ -146,66 +109,27 @@ class Soiree(Model):
         if nouvelle and not settings.DEBUG:
             ctx = {'hote': self.hote, 'date': self.date, 'time': self.time,
                    'lien': full_url(reverse('cine:dtw', args=(self.pk, 1)))}
-            text, html = (get_template('cine/mail.%s' % alt).render(ctx) for alt in ['txt', 'html'])
+            text, html = (get_template(f'cine/mail.{alt}').render(ctx) for alt in ['txt', 'html'])
             emails = [cinephile.user.email for cinephile in Cinephile.objects.filter(actif=True)]
             msg = EmailMultiAlternatives('Soirée Ajoutée !', text, settings.DEFAULT_FROM_EMAIL, emails)
             msg.attach_alternative(html, 'text/html')
             msg.send()
 
-    def datetime(self, time=None):
-        return datetime.combine(self.date, self.time if time is None else time)
-
-    def dtstart(self, time=None):
-        return tzloc(self.datetime(time)).astimezone(timezone('utc')).strftime('%Y%m%dT%H%M%SZ')
-
-    def dtend(self):
-        return self.dtstart(time(23, 59))
+    def get_absolute_url(self):
+        return reverse('cine:soiree', kwargs={'pk': self.pk})
 
     def presents(self):
-        presents = ", ".join([cinephile.user.username for cinephile in self.cinephile_set.all()])
+        presents = ', '.join([cinephile.user.username for cinephile in self.cinephile_set.all()])
         mails = ','.join([cinephile.user.email for cinephile in self.cinephile_set.all()])
 
-        subject = urlquote('[CinéNim] %s chez %s' % (self, self.hote))
-        return mark_safe('%s – <a href="mailto:%s?subject=%s">Leur envoyer un mail</a>' % (presents, mails, subject))
+        subject = urlquote(f'[CinéNim] {self} chez {self.hote}')
+        return mark_safe(f'{presents} – <a href="mailto:{mails}?subject={subject}">Leur envoyer un mail</a>')
 
     def cache_name(self):
-        return 'soiree_%i' % self.pk
-
-    def score_films_short(self):
-        return self.score_films()[:5]
-
-    def score_films(self, update=False):
-        films = None if update else cache.get(self.cache_name())
-        if films is None:
-            films = self.compute_score_films()
-        cache.set(self.cache_name(), films, 3600 * 24 * 30)
-        return films
-
-    def compute_score_films(self):
-        films = Film.objects.filter(vu=False).exclude(vetos__soirees=self)
-        n = len(films) * self.cinephile_set.count()
-        scores = {film: n for film in films}
-        for cinephile in self.cinephile_set.all():
-            for score, film in enumerate(cinephile.votes.all()):
-                if film in scores:
-                    scores[film] -= score
-            for film in cinephile.pas_classes():
-                if film in scores:
-                    scores[film] -= n
-        films = sorted([(score, film) for film, score in scores.items()], key=lambda x: -x[0])
-        if films and self.favoris != films[0][1]:
-            self.favoris = films[0][1]
-            self.save()
-        return films
+        return f'soiree_{self.pk}'
 
     def has_adress(self):
         return bool(self.hote.cinephile.adresse)
-
-    @staticmethod
-    def update_scores(cinephile=None):
-        soirees = Soiree.objects if cinephile is None else cinephile.soirees
-        for soiree in soirees.a_venir():
-            soiree.score_films(update=True)
 
     def adress_ics(self):
         return self.hote.cinephile.adresse.replace('\n', ' ').replace('\r', '')
@@ -214,20 +138,15 @@ class Soiree(Model):
         return self.adress_ics().replace(' ', '+')
 
 
-class Cinephile(Model):
-    user = OneToOneField(User, on_delete=models.CASCADE)
-    adresse = TextField(blank=True)
-    votes = SortedManyToManyField(Film, blank=True)
-    vetos = ManyToManyField(Film, blank=True, related_name='vetos')
-    soirees = ManyToManyField(Soiree, blank=True)
-    actif = BooleanField(default=True)
-
-    def __str__(self):
-        return '%s' % self.user
+class Cinephile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    adresse = models.TextField(blank=True)
+    soirees = models.ManyToManyField(Soiree, blank=True)
+    actif = models.BooleanField(default=True)
+    should_vote = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ["user__username"]
+        ordering = ['user__username']
 
-    def pas_classes(self):
-        query = Q(vu=True) | Q(pk__in=self.votes.all()) | Q(pk__in=self.vetos.all())
-        return Film.objects.exclude(query)
+    def __str__(self):
+        return str(self.user)

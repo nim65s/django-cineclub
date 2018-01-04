@@ -1,9 +1,9 @@
-<html>
+{% load humanize %}<html>
     <head></head>
     <body>
         <p>Hello :)</p>
 
-        <p>{{ hote }} a proposé une soirée CinéNim le <em>{{ date|date:"l j F" }} à {{ time|time:"H:i" }}</em>.<br>
+        <p>{{ hote }} a proposé une soirée CinéNim le <em>{{ moment|naturaltime }}</em>.<br>
         Si tu veux venir, ouvre ce <a href="{{ lien }}">lien</a> :)</p>
         <p>@+ !</p>
         <footer>Cet email a été envoyé automatiquement. Il est inutile d’y répondre.</footer>

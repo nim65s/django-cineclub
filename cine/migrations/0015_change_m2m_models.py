@@ -6,7 +6,7 @@ from django.db import migrations
 
 
 def update_cinephile_data(apps, schema_editor):
-    Cinephile, Adress, Film, Vote, Soiree, DispoToWatch = (apps.get_model("cine", x) for x in [
+    Cinephile, Adress, Film, Vote, Soiree, DispoToWatch = (apps.get_model('cine', x) for x in [
             'Cinephile', 'Adress', 'Film', 'Vote', 'Soiree', 'DispoToWatch'])
     User = apps.get_model('auth', 'User')
     for user in User.objects.filter(groups__name='cine'):
