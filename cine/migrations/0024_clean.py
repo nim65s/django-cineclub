@@ -10,7 +10,7 @@ from django.utils import timezone
 def update_moment(apps, schema_editor):
     Soiree = apps.get_model('cine', 'Soiree')
     for soiree in Soiree.objects.all():
-        soiree.moment = datetime.combine(soiree.date, soiree.time, tzinfo=timezone.tzinfo())
+        soiree.moment = datetime.combine(soiree.date, soiree.time)
         soiree.save()
 
 
