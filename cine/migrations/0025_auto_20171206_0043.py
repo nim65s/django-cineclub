@@ -8,7 +8,7 @@ import autoslug.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cine', '0024_clean'),
+        ('cine', '0024_clean_2'),
     ]
 
     operations = [
