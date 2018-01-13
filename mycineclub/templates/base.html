@@ -1,20 +1,12 @@
-{% load bootstrap3 %}
-<html>
-    <head>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-        {% block link %}
-        {% endblock %}
-        <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-    </head>
-    <body>
-        {% block cinenav %}
-        {% endblock %}
-        <hr>
-        {% bootstrap_messages %}
-        {% block content %}
-        {% endblock %}
-        {% block js %}
-        {% endblock %}
-    </body>
-</html>
+{% extends 'ndh.html' %}
+
+
+{% block pagetitle %}CinéNim Test Site{% endblock %}
+{% block sitetitle %}CinéNim{% endblock %}
+{% block navbarleft %}
+<li><a href="{% url 'cine:home' %}">Home</a></li>
+<li><a href="{% url 'cine:films' %}">Films</a></li>
+<li><a href="{% url 'cine:ajout_film' %}">Ajouter un Film</a></li>
+<li><a href="{% url 'cine:cinephiles' %}">Cinephiles</a></li>
+<li><a href="{% url 'cine:adress' %}">Mon adresse</a></li>
+{% endblock %}

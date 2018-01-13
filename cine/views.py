@@ -138,3 +138,4 @@ class AdressUpdateView(CinephileRequiredMixin, UpdateView):
 
 class SoireeListView(ListView):
     queryset = Soiree.objects.a_venir
+    template_name = 'cine/soiree_list.html'  # TODO ?

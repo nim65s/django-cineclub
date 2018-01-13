@@ -14,7 +14,6 @@ from django.utils.http import urlquote
 from django.utils.safestring import mark_safe
 
 import requests
-
 from ndh.models import Links, NamedModel
 from ndh.utils import full_url
 
