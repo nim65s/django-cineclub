@@ -14,7 +14,7 @@ from django.utils.http import urlquote
 from django.utils.safestring import mark_safe
 
 import requests
-from ndh.models import Links, NamedModel
+from ndh.models import Links, NamedModel, TimeStampedModel
 from ndh.utils import full_url
 
 CHOIX_ANNEES = [(annee, annee) for annee in range(date.today().year + 2, 1900, -1)]
@@ -87,7 +87,7 @@ class SoireeQuerySet(models.QuerySet):
         return self.filter(moment__gte=timezone.now() - timedelta(days=1))
 
 
-class Soiree(models.Model):
+class Soiree(TimeStampedModel):
     moment = models.DateTimeField()
     hote = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     favoris = models.ForeignKey(Film, null=True, on_delete=models.SET_NULL)
@@ -106,7 +106,7 @@ class Soiree(models.Model):
         super(Soiree, self).save(*args, **kwargs)
         self.hote.cinephile.soirees.add(self)
         if nouvelle and not settings.DEBUG:
-            ctx = {'hote': self.hote, 'date': self.date, 'time': self.time,
+            ctx = {'hote': self.hote, 'moment': self.moment,
                    'lien': full_url(reverse('cine:dtw', args=(self.pk, 1)))}
             text, html = (get_template(f'cine/mail.{alt}').render(ctx) for alt in ['txt', 'html'])
             emails = [cinephile.user.email for cinephile in Cinephile.objects.filter(actif=True)]
@@ -124,17 +124,11 @@ class Soiree(models.Model):
         subject = urlquote(f'[CinéNim] {self} chez {self.hote}')
         return mark_safe(f'{presents} – <a href="mailto:{mails}?subject={subject}">Leur envoyer un mail</a>')
 
-    def cache_name(self):
-        return f'soiree_{self.pk}'
-
     def has_adress(self):
         return bool(self.hote.cinephile.adresse)
 
-    def adress_ics(self):
-        return self.hote.cinephile.adresse.replace('\n', ' ').replace('\r', '')
-
     def adress_query(self):
-        return self.adress_ics().replace(' ', '+')
+        return self.hote.cinephile.adresse.replace('\n', '+').replace('\r', '')
 
 
 class Cinephile(models.Model):

@@ -1,10 +1,17 @@
+from datetime import timedelta
+
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 from django.views.generic.base import RedirectView
+
+from icalendar import Calendar, Event
 
 from .forms import SoireeForm
 from .models import Cinephile, Film, Soiree
@@ -20,10 +27,35 @@ class CinephileRequiredMixin(UserPassesTestMixin):
         return False
 
 
-class ICS(ListView):
-    template_name = 'cine/cinenim.ics'
-    content_type = 'text/calendar; charset=UTF-8'
-    queryset = Soiree.objects.all()
+def ics(request):
+    cal = Calendar()
+    domain = get_current_site(request).domain
+    cal.add('prodid', '-//cinenim//saurel.me//')
+    cal.add('version', '2.0')
+    cal.add('summary', 'CinéNim')
+    cal.add('x-wr-calname', f'CinéNim {domain}')
+    cal.add('x-wr-timezone', settings.TIME_ZONE)
+    cal.add('calscale', 'GREGORIAN')
+
+    for soiree in Soiree.objects.all():
+        event = Event()
+        event.add('uid', f'cinenim{soiree.id}@{domain}')
+        event.add('dtstart', soiree.moment)
+        event.add('dtend', soiree.moment + timedelta(hours=2))
+        event.add('dtstamp', soiree.updated)
+        if soiree.favoris:
+            event.add('summary', soiree.favoris)
+            event.add('description', soiree.favoris.description)
+        else:
+            event.add('summary', 'CinéNim')
+        if soiree.hote is not None:
+            event.add('organizer', f'CN={soiree.hote}:mailto:{soiree.hote.email}')
+            event.add('location', soiree.hote.cinephile.adresse)
+        cal.add_component(event)
+
+    response = HttpResponse(cal.to_ical(), content_type='text/calendar')
+    response['Content-Disposition'] = 'attachement; filename=cinenim.ics'
+    return response
 
 
 class FilmActionMixin(CinephileRequiredMixin):
@@ -138,4 +170,4 @@ class AdressUpdateView(CinephileRequiredMixin, UpdateView):
 
 class SoireeListView(ListView):
     queryset = Soiree.objects.a_venir
-    template_name = 'cine/soiree_list.html'  # TODO ?
+    template_name = 'cine/soiree_list.html'

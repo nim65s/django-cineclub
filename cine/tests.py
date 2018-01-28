@@ -1,8 +1,11 @@
+from datetime import timedelta
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.timezone import now
 
-from .models import Cinephile, Film
+from .models import Cinephile, Film, Soiree
 
 FILM = 'tt0096283'
 
@@ -15,9 +18,6 @@ class TestFilm(TestCase):
             Cinephile.objects.create(user=user, actif=name != 'i')
 
     def test_film(self):
-        r = self.client.get(reverse('cine:films'))
-        self.assertEqual(r.status_code, 200)
-
         r = self.client.get(reverse('cine:ajout_film'))
         self.assertEqual(r.status_code, 302)
 
@@ -50,3 +50,26 @@ class TestFilm(TestCase):
         r = self.client.post(reverse('cine:maj_film', kwargs={'slug': film.slug}), form)
         film = Film.objects.first()
         self.assertEqual(str(film), 'となりのトトロ')
+
+    def test_urls(self):
+        public = ('home', 'films', 'ics')
+        private = ('cinephiles', 'adress')
+
+        for url in public:
+            r = self.client.get(reverse(f'cine:{url}'))
+            self.assertEqual(r.status_code, 200)
+
+        for url in private:
+            r = self.client.get(reverse(f'cine:{url}'))
+            self.assertEqual(r.status_code, 302)
+
+        self.client.login(username='a', password='a')
+
+        for url in private:
+            r = self.client.get(reverse(f'cine:{url}'))
+            self.assertEqual(r.status_code, 200)
+
+    def test_ics(self):
+        Soiree.objects.create(moment=now() + timedelta(days=3), hote=User.objects.first())
+        r = self.client.get(reverse('cine:ics'))
+        self.assertEqual(r.status_code, 200)

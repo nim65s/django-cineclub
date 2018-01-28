@@ -21,4 +21,6 @@ urlpatterns = [
     path('cinephiles', views.CinephileListView.as_view(), name='cinephiles'),
     path('rajquit', views.RajQuitView.as_view(), name='rajquit'),
     path('adress', views.AdressUpdateView.as_view(), name='adress'),
+
+    path('cinenim.ics', views.ics, name='ics'),
 ]
