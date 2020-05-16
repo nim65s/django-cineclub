@@ -4,18 +4,22 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
+beautifulsoup4==4.9.0     # via django-bootstrap4
 certifi==2017.11.5        # via requests
 chardet==3.0.4            # via requests
-git+https://github.com/nim65s/django-autoslug.git#egg=django-autoslug
-django-bootstrap3==9.1.0
-django-sortedm2m==1.5.0
-django==2.0.1
-icalendar==4.0.0
+git+https://github.com/nim65s/django-autoslug.git#egg=django-autoslug  # via -r requirements.in, ndh
+django-bootstrap3==9.1.0  # via -r requirements.in
+django-bootstrap4==1.1.1  # via ndh
+django-sortedm2m==1.5.0   # via -r requirements.in
+django==2.2.10            # via -r requirements.in, ndh
+icalendar==4.0.0          # via -r requirements.in
 idna==2.6                 # via requests
-git+https://github.com/nim65s/ndh.git#egg=ndh
-pillow==5.0.0
+git+https://github.com/nim65s/ndh.git#egg=ndh  # via -r requirements.in
+pillow==5.0.0             # via -r requirements.in
 python-dateutil==2.6.1    # via icalendar
-pytz==2017.3
-requests==2.18.4
+pytz==2017.3              # via -r requirements.in, django, icalendar
+requests==2.18.4          # via -r requirements.in
 six==1.11.0               # via python-dateutil
+soupsieve==2.0            # via beautifulsoup4
+sqlparse==0.3.1           # via django
 urllib3==1.22             # via requests
