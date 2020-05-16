@@ -17,8 +17,8 @@ Requirements
 ------------
 
 * [Django](https://www.djangoproject.com/)
-* [django-bootstrap3](https://github.com/dyve/django-bootstrap3/) (only if you use the provided templates)
-* [django-sortedm2m](https://github.com/dyve/django-bootstrap3/)
+* [django-bootstrap4](https://github.com/zostera/django-bootstrap4) (only if you use the provided templates)
+* [django-sortedm2m](https://github.com/jazzband/django-sortedm2m)
 * pytz
 * Pillow
 

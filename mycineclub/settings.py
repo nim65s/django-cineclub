@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django.contrib.humanize',
-    'bootstrap3',
+    'bootstrap4',
     'sortedm2m',
     'cine',
     'ndh',
