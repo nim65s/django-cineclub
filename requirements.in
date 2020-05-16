@@ -5,5 +5,5 @@ icalendar
 pillow
 pytz
 requests
-git+https://github.com/nim65s/ndh.git#egg=ndh
-git+https://github.com/nim65s/django-autoslug.git#egg=django-autoslug
+ndh
+django-auto-slug
