@@ -10,7 +10,6 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 from django.views.generic.base import RedirectView
-
 from icalendar import Calendar, Event
 
 from .forms import SoireeForm
@@ -73,6 +72,7 @@ class FilmCreateView(FilmActionMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.respo = self.request.user
+        Cinephile.objects.filter(actif=True).update(should_vote=True)
         return super().form_valid(form)
 
     def get_initial(self):
