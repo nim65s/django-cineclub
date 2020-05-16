@@ -23,7 +23,7 @@ class TestFilm(TestCase):
 
         self.client.login(username='i', password='i')
         r = self.client.get(reverse('cine:ajout_film'))
-        self.assertEqual(r.status_code, 302)
+        self.assertEqual(r.status_code, 403)
 
         self.client.login(username='a', password='a')
         r = self.client.get(reverse('cine:ajout_film'))
