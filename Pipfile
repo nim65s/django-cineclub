@@ -9,6 +9,7 @@ mypy = "*"
 yapf = "*"
 safety = "*"
 django-stubs = "*"
+python-coveralls = "*"
 
 [packages]
 django-sortedm2m = "*"
