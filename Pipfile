@@ -17,8 +17,6 @@ icalendar = "*"
 pytz = "*"
 requests = "*"
 ndh = "*"
-django-autoslug = "*"
-Django = "*"
 Pillow = "*"
 
 [requires]
