@@ -17,6 +17,6 @@ script:
   #- mypy .  TODO
   #- pydocstyle  TODO
   #- safety check  issue about py 1.9.0 on travis
-  - pip install "git+https://github.com/${TRAVIS_REPO_SLUG}.git#egg=cine"
+  #- pip install "git+https://github.com/${TRAVIS_REPO_SLUG}.git#egg=cine"  TODO
 after_success:
   - coveralls
