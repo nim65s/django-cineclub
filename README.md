@@ -31,7 +31,7 @@ Ils renseignent également leurs disponibilités, et boum paf, la présente appl
 2. Install requirements
 
     ```bash
-    pipenv install
+    poetry install
     ```
 
 3. Update and populate your database, and launch the server

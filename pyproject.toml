@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "cineclub"
+version = "2.2.2"
+description = "gestion d’un cinéclub"
+authors = ["Guilhem Saurel <guilhem.saurel@laas.fr>"]
+license = "BSD-2-Clause"
+
+[tool.poetry.dependencies]
+python = "^3.6.1"
+django-sortedm2m = "^3.0.2"
+icalendar = "^4.0.7"
+pytz = "^2021.1"
+requests = "^2.25.1"
+ndh = "^3.10.4"
+Pillow = "^8.2.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

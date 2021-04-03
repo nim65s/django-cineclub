@@ -1,12 +1,22 @@
 language: python
+dist: focal
 python:
-    - 3.6
+  - 3.6
+  - 3.7
+  - 3.8
+  - 3.9
 install:
-    - pip install pipenv
-    - pipenv install --dev
+  - pip install poetry
+  - poetry config virtualenvs.create false --local
+  - poetry install --no-interaction --no-ansi
 script:
-    - ./manage.py migrate
-    - coverage run manage.py test
-    - flake8 .
+  - python -Wa ./manage.py migrate
+  - PYTHONWARNINGS=always coverage run manage.py test
+  - flake8 .
+  - yapf -dr .
+  - mypy .
+  - pydocstyle
+  #- safety check  issue about py 1.9.0 on travis
+  - pip install "git+https://github.com/${TRAVIS_REPO_SLUG}.git#egg=cineclub"
 after_success:
-    - coveralls
+  - coveralls
