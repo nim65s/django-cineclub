@@ -62,10 +62,11 @@ class Film(Links, NamedModel):
             imdb_id = re.search(r'tt\d+', imdb_id).group()
             imdb_infos = requests.get(IMDB_API_URL, params={'i': imdb_id, 'apikey': settings.OMDB_API_KEY}).json()
             try:
-                duree = int(timedelta(**dict([
-                    (key, int(value) if value else 0) for key, value in
-                    re.search(r'((?P<hours>\d+) h )?(?P<minutes>\d+) min', imdb_infos['Runtime']).groupdict().items()
-                ])).seconds / 60)  # TGCM
+                duree = int(
+                    timedelta(**dict([(key, int(value) if value else 0)
+                                      for key, value in re.search(r'((?P<hours>\d+) h )?(?P<minutes>\d+) min',
+                                                                  imdb_infos['Runtime']).groupdict().items()])).seconds
+                    / 60)  # TGCM
             except:
                 duree = None
             return {
@@ -106,8 +107,7 @@ class Soiree(TimeStampedModel):
         super(Soiree, self).save(*args, **kwargs)
         self.hote.cinephile.soirees.add(self)
         if nouvelle and not settings.DEBUG:
-            ctx = {'hote': self.hote, 'moment': self.moment,
-                   'lien': full_url(reverse('cine:dtw', args=(self.pk, 1)))}
+            ctx = {'hote': self.hote, 'moment': self.moment, 'lien': full_url(reverse('cine:dtw', args=(self.pk, 1)))}
             text, html = (get_template(f'cine/mail.{alt}').render(ctx) for alt in ['txt', 'html'])
             emails = [cinephile.user.email for cinephile in Cinephile.objects.filter(actif=True)]
             msg = EmailMultiAlternatives('Soirée Ajoutée !', text, settings.DEFAULT_FROM_EMAIL, emails)

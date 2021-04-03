@@ -17,8 +17,7 @@ class Migration(migrations.Migration):
                 ('adresse', models.TextField()),
                 ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
-            options={
-            },
-            bases=(models.Model,),
+            options={},
+            bases=(models.Model, ),
         ),
     ]

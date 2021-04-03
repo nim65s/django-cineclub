@@ -40,13 +40,7 @@ class Migration(migrations.Migration):
             model_name='vote',
             name='film',
         ),
-        migrations.DeleteModel(
-            name='Adress',
-        ),
-        migrations.DeleteModel(
-            name='DispoToWatch',
-        ),
-        migrations.DeleteModel(
-            name='Vote',
-        ),
+        migrations.DeleteModel(name='Adress', ),
+        migrations.DeleteModel(name='DispoToWatch', ),
+        migrations.DeleteModel(name='Vote', ),
     ]

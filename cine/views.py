@@ -60,8 +60,8 @@ def ics(request):
 
 class FilmActionMixin(CinephileRequiredMixin):
     model = Film
-    fields = ('name', 'description', 'annee_sortie', 'titre_vo', 'realisateur', 'allocine',
-              'duree', 'imdb_poster_url', 'imdb_id')
+    fields = ('name', 'description', 'annee_sortie', 'titre_vo', 'realisateur', 'allocine', 'duree', 'imdb_poster_url',
+              'imdb_id')
 
     def form_valid(self, form):
         messages.info(self.request, f'Film {self.action}')

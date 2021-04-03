@@ -14,7 +14,10 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='soiree',
-            options={'get_latest_by': 'moment', 'ordering': ['moment']},
+            options={
+                'get_latest_by': 'moment',
+                'ordering': ['moment']
+            },
         ),
         migrations.RemoveField(
             model_name='soiree',
@@ -32,6 +35,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='soiree',
             name='hote',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(null=True,
+                                    on_delete=django.db.models.deletion.SET_NULL,
+                                    to=settings.AUTH_USER_MODEL),
         ),
     ]
