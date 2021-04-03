@@ -62,11 +62,9 @@ class Film(Links, NamedModel):
             imdb_id = re.search(r'tt\d+', imdb_id).group()
             imdb_infos = requests.get(IMDB_API_URL, params={'i': imdb_id, 'apikey': settings.OMDB_API_KEY}).json()
             try:
-                duree = int(
-                    timedelta(**dict([(key, int(value) if value else 0)
-                                      for key, value in re.search(r'((?P<hours>\d+) h )?(?P<minutes>\d+) min',
-                                                                  imdb_infos['Runtime']).groupdict().items()])).seconds
-                    / 60)  # TGCM
+                search = re.search(r'((?P<hours>\d+) h )?(?P<minutes>\d+) min', imdb_infos['Runtime'])
+                hours_min = {key: int(value) if value else 0 for key, value in search.groupdict().items()}
+                duree = int(timedelta(**hours_min).seconds / 60)
             except:
                 duree = None
             return {

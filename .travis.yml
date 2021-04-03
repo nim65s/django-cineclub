@@ -14,8 +14,8 @@ script:
   - PYTHONWARNINGS=always coverage run manage.py test
   - flake8 .
   - yapf -dr .
-  - mypy .
-  - pydocstyle
+  #- mypy .  TODO
+  #- pydocstyle  TODO
   #- safety check  issue about py 1.9.0 on travis
   - pip install "git+https://github.com/${TRAVIS_REPO_SLUG}.git#egg=cine"
 after_success:
