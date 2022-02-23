@@ -85,7 +85,7 @@ class Film(Links, NamedModel):
                     for key, value in search.groupdict().items()
                 }
                 duree = int(timedelta(**hours_min).seconds / 60)
-            except:
+            except:  # noqa: E722 TODO
                 duree = None
             return {
                 "realisateur": imdb_infos["Director"],
@@ -97,7 +97,7 @@ class Film(Links, NamedModel):
                 "duree": duree,
                 "imdb_id": imdb_id,
             }
-        except:
+        except:  # noqa: E722 TODO
             return {}
 
 
@@ -155,9 +155,8 @@ class Soiree(TimeStampedModel):
         )
 
         subject = urlquote(f"[CinéNim] {self} chez {self.hote}")
-        return mark_safe(
-            f'{presents} – <a href="mailto:{mails}?subject={subject}">Leur envoyer un mail</a>'
-        )
+        url = f"mailto:{mails}?subject={subject}"
+        return mark_safe(f'{presents} – <a href="{url}">Leur envoyer un mail</a>')
 
     def has_adress(self):
         return bool(self.hote.cinephile.adresse)
