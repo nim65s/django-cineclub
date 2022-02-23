@@ -162,7 +162,8 @@ class DTWUpdateView(CinephileRequiredMixin, UpdateView):
             if soiree.hote == request.user:
                 messages.error(
                     request,
-                    "Si tu hébèrges une soirée, tu y vas… Supprime la soirée, ou contacte Nim.",
+                    "Si tu hébèrges une soirée, tu y vas… "
+                    "Supprime la soirée, ou contacte Nim.",
                 )
                 return redirect("cine:home")
             request.user.cinephile.soirees.remove(soiree)
