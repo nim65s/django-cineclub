@@ -6,15 +6,15 @@ from django.db import migrations
 
 
 def create_group(apps, schema_editor):
-    group = apps.get_model('auth', 'Group')
-    group.objects.get_or_create(name='cine')
+    group = apps.get_model("auth", "Group")
+    group.objects.get_or_create(name="cine")
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cine', '0009_adresses'),
-        ('auth', '0001_initial'),
+        ("cine", "0009_adresses"),
+        ("auth", "0001_initial"),
     ]
 
     operations = [

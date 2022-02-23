@@ -8,39 +8,45 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cine', '0015_change_m2m_models'),
+        ("cine", "0015_change_m2m_models"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='adress',
-            name='user',
+            model_name="adress",
+            name="user",
         ),
         migrations.AlterUniqueTogether(
-            name='dispotowatch',
+            name="dispotowatch",
             unique_together=set([]),
         ),
         migrations.RemoveField(
-            model_name='dispotowatch',
-            name='cinephile',
+            model_name="dispotowatch",
+            name="cinephile",
         ),
         migrations.RemoveField(
-            model_name='dispotowatch',
-            name='soiree',
+            model_name="dispotowatch",
+            name="soiree",
         ),
         migrations.AlterUniqueTogether(
-            name='vote',
+            name="vote",
             unique_together=set([]),
         ),
         migrations.RemoveField(
-            model_name='vote',
-            name='cinephile',
+            model_name="vote",
+            name="cinephile",
         ),
         migrations.RemoveField(
-            model_name='vote',
-            name='film',
+            model_name="vote",
+            name="film",
         ),
-        migrations.DeleteModel(name='Adress', ),
-        migrations.DeleteModel(name='DispoToWatch', ),
-        migrations.DeleteModel(name='Vote', ),
+        migrations.DeleteModel(
+            name="Adress",
+        ),
+        migrations.DeleteModel(
+            name="DispoToWatch",
+        ),
+        migrations.DeleteModel(
+            name="Vote",
+        ),
     ]

@@ -12,19 +12,37 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('cine', '0013_film_ordering'),
+        ("cine", "0013_film_ordering"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Cinephile',
+            name="Cinephile",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('adresse', models.TextField()),
-                ('soirees', models.ManyToManyField(to='cine.Soiree')),
-                ('user', models.OneToOneField(on_delete=models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('vetos', models.ManyToManyField(related_name='vetos', to='cine.Film')),
-                ('votes', sortedm2m.fields.SortedManyToManyField(help_text=None, to='cine.Film')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("adresse", models.TextField()),
+                ("soirees", models.ManyToManyField(to="cine.Soiree")),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+                    ),
+                ),
+                ("vetos", models.ManyToManyField(related_name="vetos", to="cine.Film")),
+                (
+                    "votes",
+                    sortedm2m.fields.SortedManyToManyField(
+                        help_text=None, to="cine.Film"
+                    ),
+                ),
             ],
         ),
     ]

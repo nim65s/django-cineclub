@@ -1,6 +1,8 @@
 # CinéNim
+
 [![Build Status](https://travis-ci.org/nim65s/django-cineclub.svg?branch=master)](https://travis-ci.org/nim65s/django-cineclub)
 [![Coverage Status](https://coveralls.io/repos/github/nim65s/django-cineclub/badge.svg?branch=master)](https://coveralls.io/github/nim65s/django-cineclub?branch=master)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## But
 Ceci est une application de gestion d’un cinéclub. Plus ou moins.

@@ -10,28 +10,32 @@ import sortedm2m.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cine', '0016_rm_old_models'),
+        ("cine", "0016_rm_old_models"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='cinephile',
-            name='adresse',
+            model_name="cinephile",
+            name="adresse",
             field=models.TextField(blank=True),
         ),
         migrations.AlterField(
-            model_name='cinephile',
-            name='soirees',
-            field=models.ManyToManyField(blank=True, to='cine.Soiree'),
+            model_name="cinephile",
+            name="soirees",
+            field=models.ManyToManyField(blank=True, to="cine.Soiree"),
         ),
         migrations.AlterField(
-            model_name='cinephile',
-            name='vetos',
-            field=models.ManyToManyField(blank=True, related_name='vetos', to='cine.Film'),
+            model_name="cinephile",
+            name="vetos",
+            field=models.ManyToManyField(
+                blank=True, related_name="vetos", to="cine.Film"
+            ),
         ),
         migrations.AlterField(
-            model_name='cinephile',
-            name='votes',
-            field=sortedm2m.fields.SortedManyToManyField(blank=True, help_text=None, to='cine.Film'),
+            model_name="cinephile",
+            name="votes",
+            field=sortedm2m.fields.SortedManyToManyField(
+                blank=True, help_text=None, to="cine.Film"
+            ),
         ),
     ]

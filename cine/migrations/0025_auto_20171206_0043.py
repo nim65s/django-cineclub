@@ -8,22 +8,24 @@ import autoslug.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cine', '0024_clean_2'),
+        ("cine", "0024_clean_2"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='film',
-            options={'ordering': ['vu', 'name']},
+            name="film",
+            options={"ordering": ["vu", "name"]},
         ),
         migrations.RenameField(
-            model_name='film',
-            old_name='titre',
-            new_name='name',
+            model_name="film",
+            old_name="titre",
+            new_name="name",
         ),
         migrations.AlterField(
-            model_name='film',
-            name='slug',
-            field=autoslug.fields.AutoSlugField(editable=False, populate_from='name', unique=True),
+            model_name="film",
+            name="slug",
+            field=autoslug.fields.AutoSlugField(
+                editable=False, populate_from="name", unique=True
+            ),
         ),
     ]

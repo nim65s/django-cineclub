@@ -7,7 +7,7 @@ from django.utils import timezone
 
 
 def update_moment(apps, schema_editor):
-    Soiree = apps.get_model('cine', 'Soiree')
+    Soiree = apps.get_model("cine", "Soiree")
     for soiree in Soiree.objects.all():
         soiree.moment = datetime.combine(soiree.date, soiree.time)
         soiree.save()
@@ -16,13 +16,13 @@ def update_moment(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cine', '0023_auto_20170709_1509'),
+        ("cine", "0023_auto_20170709_1509"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='soiree',
-            name='moment',
+            model_name="soiree",
+            name="moment",
             field=models.DateTimeField(default=timezone.now),
             preserve_default=False,
         ),

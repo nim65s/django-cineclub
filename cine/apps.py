@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class CineConfig(AppConfig):
-    name = 'cine'
-    verbose_name = 'CinéNim'
+    name = "cine"
+    verbose_name = "CinéNim"

@@ -23,64 +23,75 @@ class CinephileRequiredMixin(UserPassesTestMixin):
             return False
         if Cinephile.objects.filter(user=self.request.user, actif=True).exists():
             return True
-        messages.error(self.request, 'Vous ne faites pas partie du cinéclub… Parlez-en à Nim :)')
+        messages.error(
+            self.request, "Vous ne faites pas partie du cinéclub… Parlez-en à Nim :)"
+        )
         return False
 
 
 def ics(request):
     cal = Calendar()
     domain = get_current_site(request).domain
-    cal.add('prodid', '-//cinenim//saurel.me//')
-    cal.add('version', '2.0')
-    cal.add('summary', 'CinéNim')
-    cal.add('x-wr-calname', f'CinéNim {domain}')
-    cal.add('x-wr-timezone', settings.TIME_ZONE)
-    cal.add('calscale', 'GREGORIAN')
+    cal.add("prodid", "-//cinenim//saurel.me//")
+    cal.add("version", "2.0")
+    cal.add("summary", "CinéNim")
+    cal.add("x-wr-calname", f"CinéNim {domain}")
+    cal.add("x-wr-timezone", settings.TIME_ZONE)
+    cal.add("calscale", "GREGORIAN")
 
     for soiree in Soiree.objects.all():
         event = Event()
-        event.add('uid', f'cinenim{soiree.id}@{domain}')
-        event.add('dtstart', soiree.moment)
-        event.add('dtend', soiree.moment + timedelta(hours=2))
-        event.add('dtstamp', soiree.updated)
+        event.add("uid", f"cinenim{soiree.id}@{domain}")
+        event.add("dtstart", soiree.moment)
+        event.add("dtend", soiree.moment + timedelta(hours=2))
+        event.add("dtstamp", soiree.updated)
         if soiree.favoris:
-            event.add('summary', soiree.favoris)
-            event.add('description', soiree.favoris.description)
+            event.add("summary", soiree.favoris)
+            event.add("description", soiree.favoris.description)
         else:
-            event.add('summary', 'CinéNim')
+            event.add("summary", "CinéNim")
         if soiree.hote is not None:
-            event.add('organizer', f'CN={soiree.hote}:mailto:{soiree.hote.email}')
-            event.add('location', soiree.hote.cinephile.adresse)
+            event.add("organizer", f"CN={soiree.hote}:mailto:{soiree.hote.email}")
+            event.add("location", soiree.hote.cinephile.adresse)
         cal.add_component(event)
 
-    response = HttpResponse(cal.to_ical(), content_type='text/calendar')
-    response['Content-Disposition'] = 'attachement; filename=cinenim.ics'
+    response = HttpResponse(cal.to_ical(), content_type="text/calendar")
+    response["Content-Disposition"] = "attachement; filename=cinenim.ics"
     return response
 
 
 class FilmActionMixin(CinephileRequiredMixin):
     model = Film
-    fields = ('name', 'description', 'annee_sortie', 'titre_vo', 'realisateur', 'allocine', 'duree', 'imdb_poster_url',
-              'imdb_id')
+    fields = (
+        "name",
+        "description",
+        "annee_sortie",
+        "titre_vo",
+        "realisateur",
+        "allocine",
+        "duree",
+        "imdb_poster_url",
+        "imdb_id",
+    )
 
     def form_valid(self, form):
-        messages.info(self.request, f'Film {self.action}')
+        messages.info(self.request, f"Film {self.action}")
         return super(FilmActionMixin, self).form_valid(form)
 
 
 class FilmCreateView(FilmActionMixin, CreateView):
-    action = 'créé'
+    action = "créé"
 
     def form_valid(self, form):
         form.instance.respo = self.request.user
         return super().form_valid(form)
 
     def get_initial(self):
-        return Film.get_imdb_dict(self.request.GET.get('imdb_id'))
+        return Film.get_imdb_dict(self.request.GET.get("imdb_id"))
 
 
 class FilmUpdateView(FilmActionMixin, UpdateView):
-    action = 'modifié'
+    action = "modifié"
 
     def form_valid(self, form):
         if form.instance.respo == self.request.user or self.request.user.is_superuser:
@@ -97,11 +108,11 @@ class FilmVuView(UserPassesTestMixin, RedirectView):
         return self.request.user.is_superuser
 
     def get_redirect_url(self, *args, **kwargs):
-        film = get_object_or_404(Film, slug=kwargs['slug'])
+        film = get_object_or_404(Film, slug=kwargs["slug"])
         film.vu = True
         film.save()
-        messages.success(self.request, 'Film vu !')
-        return reverse('cine:films')
+        messages.success(self.request, "Film vu !")
+        return reverse("cine:films")
 
 
 class CinephileListView(CinephileRequiredMixin, ListView):
@@ -112,8 +123,8 @@ class RajQuitView(CinephileRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         self.request.user.cinephile.actif = False
         self.request.user.cinephile.save()
-        messages.error(self.request, 'Vous ne faites plus partie du Ciné Club.')
-        return reverse('cine:home')
+        messages.error(self.request, "Vous ne faites plus partie du Ciné Club.")
+        return reverse("cine:home")
 
 
 class SoireeCreateView(CinephileRequiredMixin, CreateView):
@@ -122,18 +133,18 @@ class SoireeCreateView(CinephileRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.hote = self.request.user
-        messages.info(self.request, 'Soirée Créée')
+        messages.info(self.request, "Soirée Créée")
         return super().form_valid(form)
 
     def get_success_url(self):
         if self.object.has_adress():
-            return reverse('cine:home')
-        return reverse('cine:adress')
+            return reverse("cine:home")
+        return reverse("cine:adress")
 
 
 class SoireeDeleteView(CinephileRequiredMixin, DeleteView):
     model = Soiree
-    success_url = reverse_lazy('cine:home')
+    success_url = reverse_lazy("cine:home")
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset=None)
@@ -144,30 +155,33 @@ class SoireeDeleteView(CinephileRequiredMixin, DeleteView):
 
 class DTWUpdateView(CinephileRequiredMixin, UpdateView):
     def get(self, request, *args, **kwargs):
-        soiree = get_object_or_404(Soiree, pk=kwargs['pk'])
-        if int(kwargs['dispo']):
+        soiree = get_object_or_404(Soiree, pk=kwargs["pk"])
+        if int(kwargs["dispo"]):
             request.user.cinephile.soirees.add(soiree)
         else:
             if soiree.hote == request.user:
-                messages.error(request, 'Si tu hébèrges une soirée, tu y vas… Supprime la soirée, ou contacte Nim.')
-                return redirect('cine:home')
+                messages.error(
+                    request,
+                    "Si tu hébèrges une soirée, tu y vas… Supprime la soirée, ou contacte Nim.",
+                )
+                return redirect("cine:home")
             request.user.cinephile.soirees.remove(soiree)
-        messages.info(request, 'Disponibilité mise à jour !')
+        messages.info(request, "Disponibilité mise à jour !")
         return redirect(soiree)
 
 
 class AdressUpdateView(CinephileRequiredMixin, UpdateView):
-    fields = ['adresse']
-    success_url = reverse_lazy('cine:home')
+    fields = ["adresse"]
+    success_url = reverse_lazy("cine:home")
 
     def get_object(self, queryset=None):
         return self.request.user.cinephile
 
     def form_valid(self, form):
-        messages.info(self.request, 'Adresse mise à jour')
+        messages.info(self.request, "Adresse mise à jour")
         return super().form_valid(form)
 
 
 class SoireeListView(ListView):
     queryset = Soiree.objects.a_venir
-    template_name = 'cine/soiree_list.html'
+    template_name = "cine/soiree_list.html"
