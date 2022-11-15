@@ -12,7 +12,7 @@ icalendar = "^4.0.7"
 pytz = "^2021.1"
 requests = "^2.25.1"
 ndh = "^3.10.4"
-Pillow = "^9.0.0"
+Pillow = "^9.3.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.9.0"
