@@ -10,7 +10,7 @@ python = "^3.7"
 django-sortedm2m = "^3.0.2"
 icalendar = "^4.0.7"
 pytz = "^2021.1"
-requests = "^2.25.1"
+requests = "^2.31.0"
 ndh = "^3.10.4"
 Pillow = "^9.3.0"
 
